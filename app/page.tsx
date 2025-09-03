@@ -1,6 +1,6 @@
 import { getAllPosts } from "@/lib/utils/posts"
 import { PostCard } from "@/lib/components/PostCard"
-import { Brain } from "lucide-react"
+import IconMark from "@/lib/components/IconMark"
 
 export default function HomePage() {
   const posts = getAllPosts()
@@ -11,7 +11,7 @@ export default function HomePage() {
         <div className="mb-12 text-center animate-slideUp">
           <div className="flex justify-center mb-6">
             <div className="p-4 rounded-full border border-border">
-              <Brain className="h-12 w-12 text-foreground/80" />
+              <IconMark className="h-12 w-12 text-foreground/80" />
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-4">
