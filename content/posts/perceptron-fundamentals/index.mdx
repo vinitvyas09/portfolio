@@ -1,0 +1,165 @@
+---
+title: "The Perceptron: Where Deep Learning Begins"
+date: "2024-01-15"
+summary: "Understanding the fundamental building block of neural networks through intuition, mathematics, and implementation."
+tags: ["neural-networks", "fundamentals", "perceptron", "gradient-descent"]
+level: "foundation"
+status: "published"
+hero: "/images/perceptron-hero.svg"
+notebook: "notebooks/perceptron.ipynb"
+selectedCells: [3, 7, 12]
+references:
+  - title: "The Perceptron: A Probabilistic Model for Information Storage"
+    url: "https://psycnet.apa.org/record/1959-09865-001"
+    author: "Frank Rosenblatt"
+    year: 1958
+    type: "paper"
+  - title: "Pattern Recognition and Machine Learning"
+    url: "https://www.springer.com/gp/book/9780387310732"
+    author: "Christopher Bishop"
+    year: 2006
+    type: "book"
+---
+
+# The Perceptron: Where Deep Learning Begins
+
+The perceptron is the atomic unit of deep learning — a simple yet profound idea that sparked a revolution in artificial intelligence. Today, we'll build an intuitive understanding of how it works, explore its mathematical foundations, and implement it from scratch.
+
+## Why the Perceptron Matters
+
+<Intuition title="The Decision Maker">
+  Imagine you're a bouncer at an exclusive club. You make decisions based on simple criteria: age, dress code, and whether someone's on the guest list. Each criterion has a certain importance (weight) in your decision. The perceptron works similarly — it takes inputs, weighs their importance, and makes a binary decision.
+
+  The magic happens when we teach the perceptron to adjust these weights automatically, learning from examples rather than being explicitly programmed. This is the foundation upon which all of deep learning is built.
+</Intuition>
+
+## What Is a Perceptron?
+
+A perceptron is a linear binary classifier that maps input features to a binary output. It's inspired by biological neurons but simplified to its mathematical essence.
+
+<Math title="The Perceptron Equation" boxed>
+  The perceptron computes its output using:
+
+  $$y = \begin{cases} 
+    1 & \text{if } \sum_{i=1}^{n} w_i x_i + b > 0 \\
+    0 & \text{otherwise}
+  \end{cases}$$
+
+  Where:
+  - $x_i$ are input features
+  - $w_i$ are learnable weights
+  - $b$ is the bias term
+  - $y$ is the binary output
+</Math>
+
+The perceptron learns by adjusting weights based on errors:
+
+<Math title="Weight Update Rule" collapsible>
+  For each misclassified example:
+  
+  $$w_i \leftarrow w_i + \eta (y_{true} - y_{pred}) x_i$$
+  
+  $$b \leftarrow b + \eta (y_{true} - y_{pred})$$
+  
+  Where $\eta$ is the learning rate.
+</Math>
+
+## How to Implement It
+
+Let's build a perceptron from scratch in Python:
+
+<Code language="python" title="perceptron.py" highlight="15-20">
+import numpy as np
+
+class Perceptron:
+    def __init__(self, learning_rate=0.01, n_iterations=1000):
+        self.lr = learning_rate
+        self.n_iterations = n_iterations
+        self.weights = None
+        self.bias = None
+        
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.weights = np.zeros(n_features)
+        self.bias = 0
+        
+        for _ in range(self.n_iterations):
+            for idx, x_i in enumerate(X):
+                linear_output = np.dot(x_i, self.weights) + self.bias
+                y_predicted = self.activation(linear_output)
+                
+                # Perceptron update rule
+                update = self.lr * (y[idx] - y_predicted)
+                self.weights += update * x_i
+                self.bias += update
+                
+    def activation(self, x):
+        return np.where(x >= 0, 1, 0)
+    
+    def predict(self, X):
+        linear_output = np.dot(X, self.weights) + self.bias
+        return self.activation(linear_output)
+</Code>
+
+### Key Implementation Notes
+
+1. **Initialization**: Weights start at zero (though small random values work too)
+2. **Learning Rate**: Too high causes oscillation, too low slows convergence
+3. **Convergence**: The perceptron converges only if data is linearly separable
+
+## Notebook Results
+
+<Notebook selectedCells={[3, 7, 12]} />
+
+The notebook demonstrates:
+- Training on the classic XOR problem (which fails!)
+- Successful classification of linearly separable data
+- Visualization of the decision boundary evolution
+
+## Beyond the Basics
+
+The perceptron's limitations led to crucial innovations:
+
+1. **Multi-layer Perceptrons**: Stack them to solve non-linear problems
+2. **Activation Functions**: Replace step function with smooth alternatives
+3. **Backpropagation**: Enable training of deep networks
+
+These extensions transformed the humble perceptron into the deep neural networks powering today's AI revolution.
+
+<References 
+  items={[
+    {
+      title: "The Perceptron: A Probabilistic Model for Information Storage",
+      url: "https://psycnet.apa.org/record/1959-09865-001",
+      author: "Frank Rosenblatt",
+      year: 1958,
+      type: "paper"
+    },
+    {
+      title: "Pattern Recognition and Machine Learning",
+      url: "https://www.springer.com/gp/book/9780387310732",
+      author: "Christopher Bishop",
+      year: 2006,
+      type: "book"
+    },
+    {
+      title: "Deep Learning Book - Chapter 6",
+      url: "https://www.deeplearningbook.org/contents/mlp.html",
+      author: "Goodfellow, Bengio, Courville",
+      year: 2016,
+      type: "book"
+    },
+    {
+      title: "Neural Networks Playlist",
+      url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi",
+      author: "3Blue1Brown",
+      type: "video"
+    },
+    {
+      title: "Perceptron Implementation from Scratch",
+      url: "https://github.com/sebtheiler/tutorials/blob/main/perceptron/perceptron.py",
+      author: "Sebastian Theiler",
+      type: "code"
+    }
+  ]}
+/>
