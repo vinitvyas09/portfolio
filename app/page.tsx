@@ -6,7 +6,7 @@ export default function HomePage() {
   const posts = getAllPosts()
 
   return (
-    <div className="container py-10">
+    <div className="container mx-auto py-10">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center animate-slideUp">
           <div className="flex justify-center mb-6">
