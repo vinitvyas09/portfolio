@@ -14,16 +14,18 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { tag: string }
+  params: Promise<{ tag: string }>
 }): Promise<Metadata> {
+  const { tag } = await params
   return {
-    title: `${params.tag} | Deep Learning Journey`,
-    description: `Posts tagged with ${params.tag}`,
+    title: `${tag} | Deep Learning Journey`,
+    description: `Posts tagged with ${tag}`,
   }
 }
 
-export default function TagPage({ params }: { params: { tag: string } }) {
-  const posts = getPostsByTag(params.tag)
+export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag } = await params
+  const posts = getPostsByTag(tag)
 
   if (posts.length === 0) {
     notFound()
