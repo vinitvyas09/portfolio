@@ -62,7 +62,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null
 
   return (
-    <div className="container relative py-10">
+    <div className="container mx-auto relative py-10">
       <div className="mx-auto grid grid-cols-1 gap-8 lg:grid-cols-[1fr_250px] lg:gap-12 max-w-6xl">
         <article className="mx-auto w-full max-w-4xl">
           <header className="mb-10 animate-slideUp">
