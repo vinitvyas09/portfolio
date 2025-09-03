@@ -252,9 +252,11 @@ li {
   color: hsl(var(--foreground) / 0.65);
   position: relative;
   transition: color 150ms ease;
+  text-decoration: none;
 }
 .nav-link:hover {
   color: hsl(var(--foreground));
+  text-decoration: none; /* prevent default anchor underline so only the custom line shows */
 }
 .nav-link::after {
   content: "";
@@ -267,6 +269,9 @@ li {
   transition: width 200ms ease;
 }
 .nav-link:hover::after { width: 100%; }
+/* Keyboard focus: show the same elegant underline */
+.nav-link:focus-visible { outline: none; }
+.nav-link:focus-visible::after { width: 100%; }
 
 /* TOC links */
 .toc-link {
