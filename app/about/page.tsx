@@ -1,4 +1,5 @@
-import { Brain, Github, Twitter, Linkedin } from "lucide-react"
+import { Brain } from "lucide-react"
+import { SiGithub, SiX, SiLinkedin } from "react-icons/si"
 
 export default function AboutPage() {
   return (
@@ -30,7 +31,7 @@ export default function AboutPage() {
                 className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
                 aria-label="GitHub"
               >
-                <Github className="h-5 w-5" />
+                <SiGithub className="h-5 w-5" size={20} />
               </a>
               <a 
                 href="https://twitter.com" 
@@ -39,7 +40,7 @@ export default function AboutPage() {
                 className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
                 aria-label="Twitter"
               >
-                <Twitter className="h-5 w-5" />
+                <SiX className="h-5 w-5" size={20} />
               </a>
               <a 
                 href="https://linkedin.com" 
@@ -48,7 +49,7 @@ export default function AboutPage() {
                 className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
                 aria-label="LinkedIn"
               >
-                <Linkedin className="h-5 w-5" />
+                <SiLinkedin className="h-5 w-5" size={20} />
               </a>
             </div>
           </div>
