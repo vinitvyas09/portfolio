@@ -5,6 +5,7 @@ import "./globals.css"
 import "katex/dist/katex.min.css"
 import "highlight.js/styles/github.css"
 import { Inter, Fraunces } from "next/font/google"
+import Link from "next/link"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" })
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-display", display: "swap" })
@@ -46,15 +47,15 @@ export default function RootLayout({
             <header className="sticky top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/70">
               <div className="container flex h-16 items-center">
                 <div className="mr-4 flex">
-                  <a className="mr-6 flex items-center" href="/">
+                  <Link className="mr-6 flex items-center" href="/">
                     <span className="text-sm tracking-[0.18em] uppercase text-foreground/80">Deep Learning Journey</span>
-                  </a>
+                  </Link>
                 </div>
                 <div className="flex flex-1 items-center justify-between md:justify-end">
                   <nav className="flex items-center gap-6 text-sm">
-                    <a href="/" className="nav-link">Posts</a>
-                    <a href="/tags" className="nav-link">Tags</a>
-                    <a href="/about" className="nav-link">About</a>
+                    <Link href="/" className="nav-link">Posts</Link>
+                    <Link href="/tags" className="nav-link">Tags</Link>
+                    <Link href="/about" className="nav-link">About</Link>
                   </nav>
                 </div>
               </div>
