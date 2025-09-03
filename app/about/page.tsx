@@ -22,9 +22,6 @@ export default function AboutPage() {
             </p>
 
             <h2 className="text-2xl font-light mt-12 mb-6">Connect</h2>
-            <p>
-              Follow the journey and connect with me on social platforms:
-            </p>
             <div className="flex gap-4 mt-6">
               <a 
                 href="https://github.com/vinitvyas09" 
