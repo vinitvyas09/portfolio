@@ -13,7 +13,7 @@ export default function AboutPage() {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-8 text-center">
-            About This Journey
+            About
           </h1>
           
           <div className="prose prose-lg dark:prose-invert mx-auto">
