@@ -42,26 +42,26 @@ export function Code({
   }) || []
 
   return (
-    <div className="my-8 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+    <div className="my-8 rounded-xl overflow-hidden bg-card border border-border">
       {title && (
-        <div className="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border">
           <div className="flex items-center gap-2">
-            <Terminal className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{title}</span>
+            <Terminal className="h-4 w-4 text-foreground/80" />
+            <span className="text-sm font-medium">{title}</span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-500">{language}</span>
+          <span className="text-xs text-muted-foreground">{language}</span>
         </div>
       )}
       <div className="relative">
         <button
           onClick={copyToClipboard}
-          className="absolute top-3 right-3 p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          className="absolute top-3 right-3 p-2 rounded-md border border-border bg-background hover:bg-muted transition-colors"
           aria-label="Copy code"
         >
           {copied ? (
-            <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <Check className="h-4 w-4 text-foreground/80" />
           ) : (
-            <Copy className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            <Copy className="h-4 w-4 text-foreground/80" />
           )}
         </button>
         <pre className={`p-4 pr-14 overflow-x-auto ${showLineNumbers ? 'line-numbers' : ''}`}>
