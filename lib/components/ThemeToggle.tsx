@@ -15,13 +15,13 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="fixed bottom-6 right-6 p-3 rounded-full bg-background border border-border shadow-lg hover:shadow-xl transition-shadow"
+      className="fixed bottom-6 right-6 h-11 w-11 inline-flex items-center justify-center rounded-full bg-background border border-border shadow-sm hover:shadow-md transition-shadow"
       aria-label="Toggle theme"
     >
       {resolvedTheme === "dark" ? (
-        <Sun className="h-5 w-5 text-yellow-500" />
+        <Sun className="h-5 w-5 text-foreground/80" />
       ) : (
-        <Moon className="h-5 w-5 text-gray-700" />
+        <Moon className="h-5 w-5 text-foreground/80" />
       )}
     </button>
   )
