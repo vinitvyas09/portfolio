@@ -18,7 +18,7 @@ export default function HomePage() {
             Vinit Vyas Portfolio
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Exploring the mathematical foundations, intuitive understanding, and practical implementations of deep learning and the AI solutions space.
+            Exploring the mathematical foundations and practical implementations of deep learning and the AI solutions space.
           </p>
         </div>
 
