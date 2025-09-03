@@ -45,7 +45,7 @@ export default function RootLayout({
         >
           <div className="relative flex min-h-screen flex-col">
             <header className="sticky top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/70">
-              <div className="container flex h-16 items-center">
+              <div className="container flex h-16 items-center px-4 md:px-6">
                 <div className="mr-4 flex">
                   <Link className="mr-6 flex items-center" href="/">
                     <span className="text-sm tracking-[0.18em] uppercase text-foreground/80">Deep Learning Journey</span>
