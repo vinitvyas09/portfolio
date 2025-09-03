@@ -103,3 +103,4 @@ export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
 
   return null
 }
+/* eslint-disable @typescript-eslint/no-explicit-any */
