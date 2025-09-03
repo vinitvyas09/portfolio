@@ -29,11 +29,11 @@ export default function TagsPage() {
                 <Link
                   key={tag}
                   href={`/tags/${tag}`}
-                  className="group flex items-center justify-between rounded-lg border border-border bg-card p-6 transition-all hover:shadow-lg animate-slideUp"
+                  className="group flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm animate-slideUp"
                 >
                   <div className="flex items-center gap-3">
                     <Tag className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-medium">{tag}</span>
+                    <span className="font-medium group-hover:opacity-90">{tag}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
                     {posts.length} {posts.length === 1 ? 'post' : 'posts'}
