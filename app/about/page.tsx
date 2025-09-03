@@ -42,7 +42,7 @@ export default function AboutPage() {
                 <SiX className="h-5 w-5" size={20} />
               </a>
               <a 
-                href="https://linkedin.com" 
+                href="https://www.linkedin.com/in/vinitvyas" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
