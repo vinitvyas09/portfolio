@@ -42,7 +42,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
             </div>
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">
-            Posts tagged "{tag}"
+            Posts tagged “{tag}”
           </h1>
           <p className="text-muted-foreground">
             {posts.length} {posts.length === 1 ? 'post' : 'posts'} found
