@@ -3,7 +3,7 @@ import { SiGithub, SiX, SiLinkedin } from "react-icons/si"
 
 export default function AboutPage() {
   return (
-    <div className="container py-10">
+    <div className="container mx-auto py-10">
       <div className="mx-auto max-w-3xl">
         <div className="animate-slideUp">
           <div className="flex justify-center mb-8">
@@ -22,13 +22,12 @@ export default function AboutPage() {
               of deep learning, from basic perceptrons to advanced reinforcement learning.
             </p>
 
-            <h2 className="text-2xl font-light mt-12 mb-6">Connect</h2>
-            <div className="flex gap-4 mt-6">
+            <div className="flex justify-center gap-4 mt-10">
               <a 
                 href="https://github.com/vinitvyas09" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
+                className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="GitHub"
               >
                 <SiGithub className="h-5 w-5" size={20} />
@@ -37,7 +36,7 @@ export default function AboutPage() {
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
+                className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="Twitter"
               >
                 <SiX className="h-5 w-5" size={20} />
@@ -46,7 +45,7 @@ export default function AboutPage() {
                 href="https://linkedin.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
+                className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="LinkedIn"
               >
                 <SiLinkedin className="h-5 w-5" size={20} />
