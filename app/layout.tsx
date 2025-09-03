@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ThemeProvider } from "@/lib/components/ThemeProvider"
+import { ThemeToggle } from "@/lib/components/ThemeToggle"
 import "./globals.css"
 import "katex/dist/katex.min.css"
 import "highlight.js/styles/github.css"
