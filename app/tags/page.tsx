@@ -6,7 +6,7 @@ export default function TagsPage() {
   const tags = getAllTags()
   
   return (
-    <div className="container py-10">
+    <div className="container mx-auto py-10">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center animate-slideUp">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-4">
