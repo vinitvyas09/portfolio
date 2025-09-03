@@ -22,6 +22,8 @@
   --input: 0 0% 89%;
   --ring: 0 0% 7%;
   --radius: 0.75rem;
+  /* Sticky header height for anchor offset */
+  --header-height: 2rem; /* matches h-16 */
 }
 
 .dark {
@@ -60,6 +62,8 @@ body {
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  /* Also guides anchor jumps in some browsers */
+  scroll-padding-top: var(--header-height);
 }
 
 body {
@@ -74,6 +78,16 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 350;
   letter-spacing: -0.02em;
   line-height: 1.25;
+}
+
+/* Ensure anchored headings aren't hidden behind sticky header */
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6 {
+  scroll-margin-top: var(--header-height);
 }
 
 h1 {
