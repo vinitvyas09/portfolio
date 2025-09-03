@@ -10,7 +10,7 @@ export default function HomePage() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center animate-slideUp">
           <div className="flex justify-center mb-6">
-            <div className="p-4 rounded-full bg-gradient-to-br from-muted to-muted/50">
+            <div className="p-4 rounded-full border border-border">
               <Brain className="h-12 w-12 text-foreground/80" />
             </div>
           </div>
@@ -32,7 +32,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="space-y-8">
-            <h2 className="text-2xl font-light tracking-tight mb-6">Latest Posts</h2>
+            <h2 className="text-2xl font-light tracking-tight mb-2">Latest Posts</h2>
             {posts.map((post, index) => (
               <div
                 key={post.slug}
