@@ -33,10 +33,10 @@ export function References({ items }: ReferencesProps) {
   }
 
   return (
-    <div className="my-12 rounded-lg bg-gradient-to-br from-purple-50/30 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/20 p-8 border border-purple-200/50 dark:border-purple-800/30">
+    <div className="my-12 rounded-xl p-8 border border-border bg-card">
       <div className="flex items-center gap-3 mb-6">
-        <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-        <h3 className="text-xl font-medium text-purple-900 dark:text-purple-100">
+        <BookOpen className="h-6 w-6 text-foreground/80" />
+        <h3 className="text-xl font-medium">
           Further Reading & References
         </h3>
       </div>
@@ -49,12 +49,12 @@ export function References({ items }: ReferencesProps) {
                 href={ref.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-2 text-purple-900 dark:text-purple-100 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                className="group flex items-start gap-2 hover:opacity-90 transition-opacity"
               >
                 <span className="flex-1">
                   <span className="font-medium">{ref.title}</span>
                   {ref.author && (
-                    <span className="text-sm text-purple-700 dark:text-purple-300">
+                    <span className="text-sm text-muted-foreground">
                       {" "}— {ref.author}
                       {ref.year && ` (${ref.year})`}
                     </span>
