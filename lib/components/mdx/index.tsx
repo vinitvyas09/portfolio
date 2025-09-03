@@ -42,3 +42,5 @@ export const mdxComponents = {
   th: (props: any) => <th {...props} className="text-left p-3 font-medium" />,
   td: (props: any) => <td {...props} className="p-3" />,
 }
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
