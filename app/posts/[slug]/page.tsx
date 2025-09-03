@@ -3,7 +3,8 @@ import { MDXRemote } from "next-mdx-remote/rsc"
 import { getPostBySlug, getAllPosts } from "@/lib/utils/posts"
 import { TableOfContents } from "@/lib/components/TableOfContents"
 import { PostNavigation } from "@/lib/components/PostNavigation"
-import { Calendar, Clock, Tag, ExternalLink, Github } from "lucide-react"
+import { Calendar, Clock, Tag, ExternalLink } from "lucide-react"
+import { SiGithub } from "react-icons/si"
 import { mdxComponents } from "@/lib/components/mdx"
 import type { Metadata } from "next"
 
@@ -111,7 +112,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Github className="h-4 w-4" />
+                <SiGithub className="h-4 w-4" size={16} />
                 View source
               </a>
               {post.notebook && (
