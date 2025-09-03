@@ -21,14 +21,6 @@ export default function AboutPage() {
               of deep learning, from basic perceptrons to advanced reinforcement learning.
             </p>
 
-            <h2 className="text-2xl font-light mt-12 mb-6">The Approach</h2>
-            <p>
-              Learning deep learning shouldn&apos;t feel like entering a basement tech dungeon. 
-              This site is designed to be a luxurious spa for your mind — clean, minimal, 
-              and focused on the content that matters. No gimmicks, no clutter, just 
-              pure learning.
-            </p>
-
             <h2 className="text-2xl font-light mt-12 mb-6">Topics Covered</h2>
             <div className="grid gap-4 md:grid-cols-2 mt-6">
               <div className="p-4 rounded-xl border border-border bg-card">
