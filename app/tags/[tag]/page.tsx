@@ -38,11 +38,11 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
           <div className="flex justify-center mb-4">
             <div className="flex items-center gap-2 rounded-full bg-muted px-4 py-2">
               <Tag className="h-5 w-5" />
-              <span className="font-medium">{params.tag}</span>
+              <span className="font-medium">{tag}</span>
             </div>
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">
-            Posts tagged "{params.tag}"
+            Posts tagged "{tag}"
           </h1>
           <p className="text-muted-foreground">
             {posts.length} {posts.length === 1 ? 'post' : 'posts'} found
