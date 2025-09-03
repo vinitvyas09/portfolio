@@ -64,7 +64,7 @@ export default function RootLayout({
             <footer className="border-t">
               <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:px-6 md:h-24 md:flex-row">
                 <p className="text-center text-sm leading-loose text-muted-foreground md:text-left py-6">
-                  © 2024 — Vinit Vyas Portfolio
+                  © {new Date().getFullYear()} — Vinit Vyas Portfolio
                 </p>
               </div>
             </footer>
