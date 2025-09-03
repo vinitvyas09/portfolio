@@ -119,6 +119,12 @@ article > * {
   padding-right: 1rem;
 }
 
+/* Align MDX content wrapper with header by removing inherited article padding */
+article > .prose-content {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 article > .wide {
   max-width: 90ch;
 }
