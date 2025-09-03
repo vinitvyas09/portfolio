@@ -65,7 +65,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <div className="container mx-auto relative py-10">
       <div className="mx-auto grid grid-cols-1 gap-8 lg:grid-cols-[1fr_250px] lg:gap-12 max-w-6xl">
         <article className="mx-auto w-full max-w-4xl">
-          <header className="mb-10 animate-slideUp">
+          <header className="mb-10 animate-slideUp mx-auto max-w-[72ch]">
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
