@@ -48,7 +48,7 @@ export default function RootLayout({
               <div className="container mx-auto flex h-16 items-center px-4 md:px-6">
                 <div className="mr-4 flex">
                   <Link className="mr-6 flex items-center" href="/">
-                    <span className="text-sm tracking-[0.18em] uppercase text-foreground/80">Deep Learning Journey</span>
+                    <span className="text-sm tracking-[0.18em] uppercase text-foreground/80">Vinit Vyas Portfolio</span>
                   </Link>
                 </div>
                 <div className="flex flex-1 items-center justify-between md:justify-end">
