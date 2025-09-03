@@ -21,13 +21,6 @@ export default function AboutPage() {
               of deep learning, from basic perceptrons to advanced reinforcement learning.
             </p>
 
-            <ul className="space-y-2">
-              <li>Intuitive explanations that make complex concepts accessible</li>
-              <li>Mathematical rigor for those who want to go deeper</li>
-              <li>Working code that you can run and experiment with</li>
-              <li>Interactive notebooks for hands-on learning</li>
-            </ul>
-
             <h2 className="text-2xl font-light mt-12 mb-6">The Approach</h2>
             <p>
               Learning deep learning shouldn&apos;t feel like entering a basement tech dungeon. 
