@@ -24,7 +24,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-light mt-12 mb-6">The Mission</h2>
             <p>
               This portfolio documents my journey through deep learning, capturing not just 
-              the "what" but the "why" and "how" of neural networks. Each post blends:
+              the &quot;what&quot; but the &quot;why&quot; and &quot;how&quot; of neural networks. Each post blends:
             </p>
             <ul className="space-y-2">
               <li>Intuitive explanations that make complex concepts accessible</li>
@@ -35,7 +35,7 @@ export default function AboutPage() {
 
             <h2 className="text-2xl font-light mt-12 mb-6">The Approach</h2>
             <p>
-              Learning deep learning shouldn't feel like entering a basement tech dungeon. 
+              Learning deep learning shouldn&apos;t feel like entering a basement tech dungeon. 
               This site is designed to be a luxurious spa for your mind — clean, minimal, 
               and focused on the content that matters. No gimmicks, no clutter, just 
               pure learning.
