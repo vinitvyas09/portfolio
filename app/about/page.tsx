@@ -21,11 +21,6 @@ export default function AboutPage() {
               of deep learning, from basic perceptrons to advanced reinforcement learning.
             </p>
 
-            <h2 className="text-2xl font-light mt-12 mb-6">The Mission</h2>
-            <p>
-              This portfolio documents my journey through deep learning, capturing not just 
-              the &quot;what&quot; but the &quot;why&quot; and &quot;how&quot; of neural networks. Each post blends:
-            </p>
             <ul className="space-y-2">
               <li>Intuitive explanations that make complex concepts accessible</li>
               <li>Mathematical rigor for those who want to go deeper</li>
