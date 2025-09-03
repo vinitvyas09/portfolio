@@ -44,7 +44,7 @@ export function TableOfContents() {
 
   return (
     <nav className="sticky top-20 space-y-1">
-      <h4 className="mb-4 text-sm font-medium">On this page</h4>
+      <h4 className="mb-4 text-xs tracking-[0.2em] uppercase text-foreground/70">On this page</h4>
       <ul className="space-y-1 text-sm">
         {headings.map((heading) => (
           <li
