@@ -6,7 +6,7 @@ export default function AboutPage() {
       <div className="mx-auto max-w-3xl">
         <div className="animate-slideUp">
           <div className="flex justify-center mb-8">
-            <div className="p-4 rounded-full bg-gradient-to-br from-muted to-muted/50">
+            <div className="p-4 rounded-full border border-border">
               <Brain className="h-12 w-12 text-foreground/80" />
             </div>
           </div>
@@ -43,27 +43,27 @@ export default function AboutPage() {
 
             <h2 className="text-2xl font-light mt-12 mb-6">Topics Covered</h2>
             <div className="grid gap-4 md:grid-cols-2 mt-6">
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
-                <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">Foundation</h3>
-                <p className="text-sm text-green-700 dark:text-green-300">
+              <div className="p-4 rounded-xl border border-border bg-card">
+                <h3 className="font-medium mb-2">Foundation</h3>
+                <p className="text-sm text-muted-foreground">
                   Perceptrons, activation functions, gradient descent, backpropagation
                 </p>
               </div>
-              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
-                <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Intermediate</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
+              <div className="p-4 rounded-xl border border-border bg-card">
+                <h3 className="font-medium mb-2">Intermediate</h3>
+                <p className="text-sm text-muted-foreground">
                   CNNs, RNNs, LSTMs, autoencoders, regularization techniques
                 </p>
               </div>
-              <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800">
-                <h3 className="font-medium text-purple-900 dark:text-purple-100 mb-2">Advanced</h3>
-                <p className="text-sm text-purple-700 dark:text-purple-300">
+              <div className="p-4 rounded-xl border border-border bg-card">
+                <h3 className="font-medium mb-2">Advanced</h3>
+                <p className="text-sm text-muted-foreground">
                   Transformers, GANs, VAEs, reinforcement learning, neural architecture search
                 </p>
               </div>
-              <div className="p-4 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
-                <h3 className="font-medium text-orange-900 dark:text-orange-100 mb-2">Practical</h3>
-                <p className="text-sm text-orange-700 dark:text-orange-300">
+              <div className="p-4 rounded-xl border border-border bg-card">
+                <h3 className="font-medium mb-2">Practical</h3>
+                <p className="text-sm text-muted-foreground">
                   PyTorch implementations, optimization tricks, deployment strategies
                 </p>
               </div>
@@ -78,7 +78,7 @@ export default function AboutPage() {
                 href="https://github.com/vinitvyas09" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
                 aria-label="GitHub"
               >
                 <Github className="h-5 w-5" />
@@ -87,7 +87,7 @@ export default function AboutPage() {
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
                 aria-label="Twitter"
               >
                 <Twitter className="h-5 w-5" />
@@ -96,7 +96,7 @@ export default function AboutPage() {
                 href="https://linkedin.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                className="p-3 rounded-full border border-border hover:bg-muted transition-colors"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
