@@ -5,7 +5,8 @@ import { TableOfContents } from "@/lib/components/TableOfContents"
 import { PostNavigation } from "@/lib/components/PostNavigation"
 import { Calendar, Clock, Tag, ExternalLink } from "lucide-react"
 import { SiGithub } from "react-icons/si"
-import { mdxComponents } from "@/lib/components/mdx"
+// Use the MDX components that include heading overrides (ids, spacing)
+import { mdxComponents } from "@/lib/components/mdx/index"
 import type { Metadata } from "next"
 
 export async function generateStaticParams() {
@@ -66,7 +67,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <div className="mx-auto grid grid-cols-1 gap-8 lg:grid-cols-[1fr_250px] lg:gap-12 max-w-6xl">
         <article className="mx-auto w-full max-w-4xl">
           <div className="prose-content">
-            <header className="mb-10 animate-slideUp mx-auto max-w-[72ch]">
+            <header className="mb-10 animate-slideUp">
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
@@ -129,13 +130,13 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               )}
             </div>
             </header>
-          </div>
 
-          <div className="prose-content animate-fadeIn">
-            <MDXRemote 
-              source={post.content} 
-              components={mdxComponents}
-            />
+            <div className="animate-fadeIn">
+              <MDXRemote 
+                source={post.content} 
+                components={mdxComponents}
+              />
+            </div>
           </div>
 
           <PostNavigation prevPost={prevPost} nextPost={nextPost} />
