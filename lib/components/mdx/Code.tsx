@@ -73,3 +73,4 @@ export function Code({
     </div>
   )
 }
+/* eslint-disable @typescript-eslint/no-explicit-any */
