@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "Vinit Vyas Portfolio",
   description: "A portfolio of deep learning concepts, from perceptron to reinforcement learning",
   authors: [{ name: "Vinit Vyas" }],
+  icons: {
+    icon: "/icon.svg",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
