@@ -8,20 +8,7 @@ status: "published"
 hero: "/images/perceptron-hero.svg"
 notebook: "notebooks/perceptron.ipynb"
 selectedCells: [3, 7, 12]
-references:
-  - title: "The Perceptron: A Probabilistic Model for Information Storage"
-    url: "https://psycnet.apa.org/record/1959-09865-001"
-    author: "Frank Rosenblatt"
-    year: 1958
-    type: "paper"
-  - title: "Pattern Recognition and Machine Learning"
-    url: "https://www.springer.com/gp/book/9780387310732"
-    author: "Christopher Bishop"
-    year: 2006
-    type: "book"
 ---
-
-# The Perceptron: Where Deep Learning Begins
 
 The perceptron is the atomic unit of deep learning — a simple yet profound idea that sparked a revolution in artificial intelligence. Today, we'll build an intuitive understanding of how it works, explore its mathematical foundations, and implement it from scratch.
 
@@ -37,7 +24,7 @@ The perceptron is the atomic unit of deep learning — a simple yet profound ide
 
 A perceptron is a linear binary classifier that maps input features to a binary output. It's inspired by biological neurons but simplified to its mathematical essence.
 
-<Math title="The Perceptron Equation" boxed>
+<Math title="The Perceptron Equation" boxed={true}>
   The perceptron computes its output using:
 
   $$y = \begin{cases} 
@@ -54,7 +41,7 @@ A perceptron is a linear binary classifier that maps input features to a binary 
 
 The perceptron learns by adjusting weights based on errors:
 
-<Math title="Weight Update Rule" collapsible>
+<Math title="Weight Update Rule" collapsible={true}>
   For each misclassified example:
   
   $$w_i \leftarrow w_i + \eta (y_{true} - y_{pred}) x_i$$
@@ -69,7 +56,7 @@ The perceptron learns by adjusting weights based on errors:
 Let's build a perceptron from scratch in Python:
 
 <Code language="python" title="perceptron.py" highlight="15-20">
-import numpy as np
+{`import numpy as np
 
 class Perceptron:
     def __init__(self, learning_rate=0.01, n_iterations=1000):
@@ -98,7 +85,7 @@ class Perceptron:
     
     def predict(self, X):
         linear_output = np.dot(X, self.weights) + self.bias
-        return self.activation(linear_output)
+        return self.activation(linear_output)`}
 </Code>
 
 ### Key Implementation Notes
@@ -126,10 +113,12 @@ The perceptron's limitations led to crucial innovations:
 
 These extensions transformed the humble perceptron into the deep neural networks powering today's AI revolution.
 
+## Further Reading
+
 <References 
   items={[
     {
-      title: "The Perceptron: A Probabilistic Model for Information Storage",
+      title: "The Perceptron: A Probabilistic Model",
       url: "https://psycnet.apa.org/record/1959-09865-001",
       author: "Frank Rosenblatt",
       year: 1958,
@@ -148,18 +137,6 @@ These extensions transformed the humble perceptron into the deep neural networks
       author: "Goodfellow, Bengio, Courville",
       year: 2016,
       type: "book"
-    },
-    {
-      title: "Neural Networks Playlist",
-      url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi",
-      author: "3Blue1Brown",
-      type: "video"
-    },
-    {
-      title: "Perceptron Implementation from Scratch",
-      url: "https://github.com/sebtheiler/tutorials/blob/main/perceptron/perceptron.py",
-      author: "Sebastian Theiler",
-      type: "code"
     }
   ]}
 />
