@@ -1,4 +1,4 @@
-import { Brain } from "lucide-react"
+import IconMark from "@/lib/components/IconMark"
 import { SiGithub, SiX, SiLinkedin } from "react-icons/si"
 
 export default function AboutPage() {
@@ -8,7 +8,7 @@ export default function AboutPage() {
         <div className="animate-slideUp">
           <div className="flex justify-center mb-8">
             <div className="p-4 rounded-full border border-border">
-              <Brain className="h-12 w-12 text-foreground/80" />
+              <IconMark className="h-12 w-12 text-foreground/80" />
             </div>
           </div>
           
