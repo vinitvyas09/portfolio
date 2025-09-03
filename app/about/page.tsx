@@ -21,34 +21,6 @@ export default function AboutPage() {
               of deep learning, from basic perceptrons to advanced reinforcement learning.
             </p>
 
-            <h2 className="text-2xl font-light mt-12 mb-6">Topics Covered</h2>
-            <div className="grid gap-4 md:grid-cols-2 mt-6">
-              <div className="p-4 rounded-xl border border-border bg-card">
-                <h3 className="font-medium mb-2">Foundation</h3>
-                <p className="text-sm text-muted-foreground">
-                  Perceptrons, activation functions, gradient descent, backpropagation
-                </p>
-              </div>
-              <div className="p-4 rounded-xl border border-border bg-card">
-                <h3 className="font-medium mb-2">Intermediate</h3>
-                <p className="text-sm text-muted-foreground">
-                  CNNs, RNNs, LSTMs, autoencoders, regularization techniques
-                </p>
-              </div>
-              <div className="p-4 rounded-xl border border-border bg-card">
-                <h3 className="font-medium mb-2">Advanced</h3>
-                <p className="text-sm text-muted-foreground">
-                  Transformers, GANs, VAEs, reinforcement learning, neural architecture search
-                </p>
-              </div>
-              <div className="p-4 rounded-xl border border-border bg-card">
-                <h3 className="font-medium mb-2">Practical</h3>
-                <p className="text-sm text-muted-foreground">
-                  PyTorch implementations, optimization tricks, deployment strategies
-                </p>
-              </div>
-            </div>
-
             <h2 className="text-2xl font-light mt-12 mb-6">Connect</h2>
             <p>
               Follow the journey and connect with me on social platforms:
