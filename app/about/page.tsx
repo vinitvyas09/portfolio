@@ -33,7 +33,7 @@ export default function AboutPage() {
                 <SiGithub className="h-5 w-5" size={20} />
               </a>
               <a 
-                href="https://twitter.com" 
+                href="https://x.com/vinitvyas09" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
