@@ -70,6 +70,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
+          <ThemeToggle />
         </ThemeProvider>
       </body>
     </html>
