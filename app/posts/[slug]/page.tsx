@@ -78,11 +78,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <Clock className="h-4 w-4" />
                 {post.readingTime}
               </span>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                post.level === 'foundation' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                post.level === 'intermediate' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-              }`}>
+              <span className={`px-2.5 py-0.5 rounded-full text-[11px] tracking-wide uppercase border border-border text-foreground/70`}>
                 {post.level}
               </span>
             </div>
@@ -100,7 +96,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <a
                   key={tag}
                   href={`/tags/${tag}`}
-                  className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm font-medium transition-colors hover:bg-muted/80"
+                  className="flex items-center gap-1 rounded-full border border-border px-3 py-1 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
                 >
                   <Tag className="h-3 w-3" />
                   {tag}
@@ -123,11 +119,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   href={post.notebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Open notebook
-                </a>
+                className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open notebook
+              </a>
               )}
             </div>
           </header>
