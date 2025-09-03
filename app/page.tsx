@@ -15,11 +15,10 @@ export default function HomePage() {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-4">
-            Deep Learning Journey
+            Vinit Vyas Portfolio
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From perceptron to reinforcement learning — exploring the mathematical foundations, 
-            intuitive understanding, and practical implementations of deep learning.
+            Exploring the mathematical foundations, intuitive understanding, and practical implementations of deep learning and the AI solutions space.
           </p>
         </div>
 
