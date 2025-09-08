@@ -70,15 +70,17 @@ New flow:
 
 <MCPWeatherFlow />
 
-This update was so significant it spawned an entire generation of AI applications Search, calendars, CRMs, drives, code hosts, DBs, internal APIs, etc. Cursor/Claude/ChatGPT with web search or Slack/Drive/GitHub bots.
+This update was so significant it spawned an entire generation of AI applications. Search, calendars, CRMs, drives, code hosts, DBs, internal APIs, etc. Cursor/Claude/ChatGPT with web search or Slack/Drive/GitHub bots.
 
-Suddenly “LLM + tools” looked solved. In fact, you might think we're done! Sure, models had context limitations and their reasoning wasn't perfect, but from a software capability perspective, what else was needed? Maybe support more than 6 tool calls at once. Maybe improve the model's interpretive abilities through scaling or new architectures (hello, reasoning models). But fundamentally, the plumbing seemed complete. 
+Suddenly “LLM + tools” looked solved. In fact, you may be forgiven to think that we're done! Sure, models had context limitations and their reasoning wasn't perfect, but from a software capability perspective, what else was needed? Maybe support more than 6 tool calls at once. Maybe improve the model's interpretive abilities through scaling or new architectures (hello, reasoning models). But fundamentally, the plumbing seemed complete. 
 
 Except it wasn't. As teams started building real applications with multiple tools, they discovered a painful scenario.
 
 ### The Integration Tax
 
-As teams scaled beyond a toy app, they hit a wall I’ll call the integration tax. Say you run 3 LLM agents (eg, a chat app, an IDE agent, and a helpdesk agent) and need 8 tools (search, DB, GitHub, email, calendar, payments, analytics and internal services). In the basic tool‑calling world, you’re staring at up to 3 × 8 = 24 separate integrations. But it gets worse. Each tool has different authentication methods: OAuth here, API keys there, certificates somewhere else. Different data formats: JSON, XML, proprietary schemas. Different error handling patterns. Different rate limits. Different retry logic. Different logging requirements.
+As teams scaled beyond a toy app, they hit a wall I’ll call the integration tax. Say you run 3 LLM agents (eg, a chat app, an IDE agent, and a helpdesk agent) and need 8 tools (search, DB, GitHub, email, calendar, payments, analytics and internal services). In the basic tool‑calling world, you’re staring at up to 3 × 8 = 24 separate integrations that you need to build, customize and maintain. 
+
+But it gets worse. Each tool has different authentication methods: OAuth here, API keys there, certificates somewhere else. Different data formats: JSON, XML, proprietary schemas. Different error handling patterns. Different rate limits. Different retry logic. Different logging requirements.
 
 This is more than just tedious. From an organizational perspective, this creates:  
 1. Maintenance hell: Every tool update potentially breaks multiple integrations  
