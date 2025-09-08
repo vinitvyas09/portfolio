@@ -96,7 +96,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
 
         {/* Title */}
         <text x={W/2} y={40} fill="#888" fontSize="18" fontWeight="500" textAnchor="middle">
-          3 LLM Agents × 8 Tools via MCP (Selective Connections)
+          3 LLM Agents × 8 Tools via MCP
         </text>
 
         {/* MCP Host Container */}
