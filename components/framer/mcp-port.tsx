@@ -19,7 +19,6 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     id: string;
     agent: string;
     tool: string;
-    phase: 'forward' | 'backward';
     startTime: number;
   }>>([]);
   
@@ -160,45 +159,34 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     'helpdesk': ['email', 'db', 'payments', 'analytics']
   };
   
+  // Helper function to calculate position on quadratic bezier curve
+  const getQuadraticPoint = (t: number, p0: {x: number, y: number}, p1: {x: number, y: number}, p2: {x: number, y: number}) => {
+    const x = Math.pow(1 - t, 2) * p0.x + 2 * (1 - t) * t * p1.x + Math.pow(t, 2) * p2.x;
+    const y = Math.pow(1 - t, 2) * p0.y + 2 * (1 - t) * t * p1.y + Math.pow(t, 2) * p2.y;
+    return { x, y };
+  };
+  
   // Start random animations
   useEffect(() => {
     if (!mounted) return;
     
     const startRandomAnimation = () => {
-      // Clean up old connections (remove those older than 4 seconds)
-      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 4000));
+      // Clean up old connections (remove those older than 6 seconds)
+      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 6000));
       
       // Pick a random agent
       const randomAgent = agents[Math.floor(Math.random() * agents.length)];
       const availableTools = connections[randomAgent.id];
       const randomTool = availableTools[Math.floor(Math.random() * availableTools.length)];
       
-      // Check if this agent already has an active connection
+      // Add new connection (allow multiple connections per agent)
       setActiveConnections(prev => {
-        const hasActiveConnection = prev.some(conn => 
-          conn.agent === randomAgent.id && Date.now() - conn.startTime < 4000
-        );
-        
-        if (hasActiveConnection) return prev;
-        
         const newConnection = {
           id: `${randomAgent.id}-${randomTool}-${Date.now()}`,
           agent: randomAgent.id,
           tool: randomTool,
-          phase: 'forward' as const,
           startTime: Date.now()
         };
-        
-        // Switch to backward phase after 2 seconds
-        setTimeout(() => {
-          setActiveConnections(prev => 
-            prev.map(conn => 
-              conn.id === newConnection.id 
-                ? { ...conn, phase: 'backward' as const }
-                : conn
-            )
-          );
-        }, 2000);
         
         return [...prev, newConnection];
       });
@@ -207,7 +195,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     // Start animations after initial render
     const initialDelay = setTimeout(() => {
       startRandomAnimation();
-      animationIntervalRef.current = setInterval(startRandomAnimation, 800);
+      animationIntervalRef.current = setInterval(startRandomAnimation, 1200);
     }, 2000);
     
     return () => {
@@ -218,36 +206,31 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     };
   }, [mounted]);
   
-  // Helper function to check if a box is active
+  // Helper function to check if a box is active based on animation timing
   const isAgentActive = (agentId: string) => {
-    return activeConnections.some(conn => 
-      conn.agent === agentId && Date.now() - conn.startTime < 4000
-    );
+    return activeConnections.some(conn => {
+      if (conn.agent !== agentId) return false;
+      const elapsed = Date.now() - conn.startTime;
+      // Active during forward (0-500ms) and return (4500-5000ms)
+      return (elapsed >= 0 && elapsed <= 500) || (elapsed >= 4500 && elapsed <= 5000);
+    });
   };
   
   const isServerActive = (toolId: string) => {
     return activeConnections.some(conn => {
-      const isActive = conn.tool === toolId && Date.now() - conn.startTime < 4000;
-      const timeElapsed = Date.now() - conn.startTime;
-      
-      if (conn.phase === 'forward') {
-        return isActive && timeElapsed > 1000 && timeElapsed < 2000;
-      } else {
-        return isActive && timeElapsed > 2000 && timeElapsed < 3000;
-      }
+      if (conn.tool !== toolId) return false;
+      const elapsed = Date.now() - conn.startTime;
+      // Active during forward (1000-2000ms) and return (3500-4500ms)
+      return (elapsed >= 1000 && elapsed <= 2000) || (elapsed >= 3500 && elapsed <= 4500);
     });
   };
   
   const isToolActive = (toolId: string) => {
     return activeConnections.some(conn => {
-      const isActive = conn.tool === toolId && Date.now() - conn.startTime < 4000;
-      const timeElapsed = Date.now() - conn.startTime;
-      
-      if (conn.phase === 'forward') {
-        return isActive && timeElapsed > 1500;
-      } else {
-        return isActive && timeElapsed > 3500;
-      }
+      if (conn.tool !== toolId) return false;
+      const elapsed = Date.now() - conn.startTime;
+      // Active during forward arrival (2000-3500ms)
+      return elapsed >= 2000 && elapsed <= 3500;
     });
   };
 
@@ -342,19 +325,16 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
             <g key={agent.id} transform={`translate(90, ${150 + i * 200})`}>
               <motion.rect
                 variants={scaleIn}
-                transition={{ delay: 0.3 + i * 0.1 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.3 }}
                 x={0}
                 y={0}
                 width={240}
                 height={140}
                 rx={8}
                 fill={C.cardFill}
-                stroke={isAgentActive(agent.id) ? C.highlightStroke : C.cardStroke}
-                strokeWidth={isAgentActive(agent.id) ? "2" : "1"}
                 animate={{
                   stroke: isAgentActive(agent.id) ? C.highlightStroke : C.cardStroke,
                   strokeWidth: isAgentActive(agent.id) ? 2 : 1,
-                  transition: { duration: 0.3 }
                 }}
               />
               <text x={15} y={35} fontSize="24">
@@ -541,64 +521,87 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
             const toolX = 900;
             const midX = (agentX + serverX) / 2;
             
-            // Path from agent to server
-            const pathToServer = `M ${agentX} ${agentY} Q ${midX} ${agentY} ${serverX} ${serverY}`;
-            // Path from server to tool
-            const pathToTool = `M ${780} ${serverY} L ${toolX} ${serverY}`;
+            // Define path waypoints
+            const p0 = { x: agentX, y: agentY };
+            const p1 = { x: midX, y: agentY };
+            const p2 = { x: serverX, y: serverY };
             
-            if (conn.phase === 'forward') {
-              return (
-                <g key={`pulse-${conn.id}`}>
-                  {/* Pulse from agent to server */}
-                  <motion.circle
-                    r="6"
-                    fill={C.pulseColor}
-                    filter="url(#pulseGlow)"
-                    initial={{ offsetDistance: "0%" }}
-                    animate={{ offsetDistance: "100%" }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
-                    style={{
-                      offsetPath: `path('${pathToServer}')`,
-                    }}
-                  />
-                  {/* Pulse from server to tool */}
-                  <motion.circle
-                    r="6"
-                    fill={C.pulseColor}
-                    filter="url(#pulseGlow)"
-                    initial={{ x: 780, y: serverY }}
-                    animate={{ x: toolX, y: serverY }}
-                    transition={{ duration: 0.5, delay: 1, ease: "easeInOut" }}
-                  />
-                </g>
-              );
-            } else {
-              return (
-                <g key={`pulse-back-${conn.id}`}>
-                  {/* Pulse from tool to server */}
-                  <motion.circle
-                    r="6"
-                    fill={C.pulseColor}
-                    filter="url(#pulseGlow)"
-                    initial={{ x: toolX, y: serverY }}
-                    animate={{ x: 780, y: serverY }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                  />
-                  {/* Pulse from server to agent */}
-                  <motion.circle
-                    r="6"
-                    fill={C.pulseColor}
-                    filter="url(#pulseGlow)"
-                    initial={{ offsetDistance: "100%" }}
-                    animate={{ offsetDistance: "0%" }}
-                    transition={{ duration: 1, delay: 0.5, ease: "easeInOut" }}
-                    style={{
-                      offsetPath: `path('${pathToServer}')`,
-                    }}
-                  />
-                </g>
-              );
-            }
+            return (
+              <g key={`pulse-${conn.id}`}>
+                {/* Forward pulse: Agent → Server */}
+                <motion.circle
+                  r="6"
+                  fill={C.pulseColor}
+                  filter="url(#pulseGlow)"
+                  animate={{
+                    x: [p0.x, getQuadraticPoint(0.25, p0, p1, p2).x, getQuadraticPoint(0.5, p0, p1, p2).x, getQuadraticPoint(0.75, p0, p1, p2).x, p2.x],
+                    y: [p0.y, getQuadraticPoint(0.25, p0, p1, p2).y, getQuadraticPoint(0.5, p0, p1, p2).y, getQuadraticPoint(0.75, p0, p1, p2).y, p2.y],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    times: [0, 0.25, 0.5, 0.75, 1],
+                    ease: "easeInOut"
+                  }}
+                />
+                
+                {/* Forward pulse: Server → Tool */}
+                <motion.circle
+                  r="6"
+                  fill={C.pulseColor}
+                  filter="url(#pulseGlow)"
+                  initial={{ x: 780, y: serverY, opacity: 0 }}
+                  animate={{ 
+                    x: [780, toolX],
+                    y: serverY,
+                    opacity: [0, 1, 1, 0]
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 1.5,
+                    times: [0, 0.1, 0.9, 1],
+                    ease: "easeInOut"
+                  }}
+                />
+                
+                {/* Return pulse: Tool → Server */}
+                <motion.circle
+                  r="6"
+                  fill={C.pulseColor}
+                  filter="url(#pulseGlow)"
+                  initial={{ x: toolX, y: serverY, opacity: 0 }}
+                  animate={{ 
+                    x: [toolX, 780],
+                    y: serverY,
+                    opacity: [0, 1, 1, 0]
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 3,
+                    times: [0, 0.1, 0.9, 1],
+                    ease: "easeInOut"
+                  }}
+                />
+                
+                {/* Return pulse: Server → Agent */}
+                <motion.circle
+                  r="6"
+                  fill={C.pulseColor}
+                  filter="url(#pulseGlow)"
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    x: [p2.x, getQuadraticPoint(0.75, p0, p1, p2).x, getQuadraticPoint(0.5, p0, p1, p2).x, getQuadraticPoint(0.25, p0, p1, p2).x, p0.x],
+                    y: [p2.y, getQuadraticPoint(0.75, p0, p1, p2).y, getQuadraticPoint(0.5, p0, p1, p2).y, getQuadraticPoint(0.25, p0, p1, p2).y, p0.y],
+                    opacity: [0, 1, 1, 1, 0]
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    delay: 3.5,
+                    times: [0, 0.1, 0.5, 0.9, 1],
+                    ease: "easeInOut"
+                  }}
+                />
+              </g>
+            );
           })}
         </AnimatePresence>
 
