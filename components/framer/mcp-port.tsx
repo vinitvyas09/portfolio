@@ -195,7 +195,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     // Start animations after initial render
     const initialDelay = setTimeout(() => {
       startRandomAnimation();
-      animationIntervalRef.current = setInterval(startRandomAnimation, 3500);
+      animationIntervalRef.current = setInterval(startRandomAnimation, 5500);
     }, 2000);
     
     return () => {
@@ -606,12 +606,12 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   animate={{
                     x: [...xPoints].reverse(),
                     y: [...yPoints].reverse(),
-                    opacity: 1
+                    opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
                   }}
                   transition={{
-                    x: { duration: 1.5, delay: 7, ease: "linear" },
-                    y: { duration: 1.5, delay: 7, ease: "linear" },
-                    opacity: { duration: 0.2, delay: 7 }
+                    duration: 1.5,
+                    delay: 7,
+                    ease: "linear"
                   }}
                 />
               </g>
