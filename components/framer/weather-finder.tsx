@@ -621,7 +621,7 @@ export default function MCPWeatherFlow({
   );
 }
 
-/* ========================== Presentational Bits ========================== */
+/* ========================== Sophisticated Components ========================== */
 
 function Node({
   x,
@@ -629,35 +629,106 @@ function Node({
   w,
   h,
   label,
-  hue,
+  id,
+  gradient,
+  isActive,
+  C,
 }: {
   x: number;
   y: number;
   w: number;
   h: number;
   label: string;
-  hue: "zinc" | "blue" | "violet" | "emerald";
+  id: string;
+  gradient: string;
+  isActive: boolean;
+  C: any;
 }) {
-  const bg =
-    hue === "blue"
-      ? "bg-blue-600"
-      : hue === "violet"
-      ? "bg-violet-600"
-      : hue === "emerald"
-      ? "bg-emerald-600"
-      : "bg-zinc-700";
+  const iconMap: Record<string, string> = {
+    user: "👤",
+    llm: "🤖",
+    sw: "⚙️",
+    api: "🌐",
+  };
+  
   return (
-    <motion.div
-      className={`absolute ${bg} text-white rounded-xl shadow-lg`}
-      style={{ left: x, top: y, width: w, height: h }}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 24 }}
+    <motion.g
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ 
+        opacity: 1, 
+        scale: isActive ? 1.02 : 1,
+      }}
+      transition={{ 
+        opacity: { duration: 0.5, delay: 0.2 },
+        scale: { duration: 0.3 }
+      }}
     >
-      <div className="h-full w-full flex items-center justify-center font-medium tracking-wide">
-        <span className="font-mono text-[15px]">{label}</span>
-      </div>
-    </motion.div>
+      {/* Card background with gradient */}
+      <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h}
+        rx={16}
+        fill={`url(#${gradient})`}
+        fillOpacity={isActive ? 1 : 0.9}
+        stroke={isActive ? C.pulseGlow : C.cardBorder}
+        strokeWidth={isActive ? 2 : 1}
+        filter={isActive ? "url(#glow)" : "url(#shadow)"}
+      />
+      
+      {/* Glass overlay effect */}
+      <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h / 2}
+        rx={16}
+        fill="white"
+        fillOpacity={0.1}
+      />
+      
+      {/* Icon */}
+      <text
+        x={x + 24}
+        y={y + h/2 + 2}
+        fontSize="24"
+        dominantBaseline="middle"
+      >
+        {iconMap[id]}
+      </text>
+      
+      {/* Label */}
+      <text
+        x={x + 60}
+        y={y + h/2 + 2}
+        fill="white"
+        fontSize="16"
+        fontWeight="600"
+        dominantBaseline="middle"
+        fontFamily="system-ui, -apple-system, sans-serif"
+      >
+        {label}
+      </text>
+      
+      {/* Status indicator */}
+      <circle
+        cx={x + w - 20}
+        cy={y + h/2}
+        r="4"
+        fill={isActive ? "#10ff00" : "#666"}
+        filter={isActive ? "url(#pulseGlow)" : "none"}
+      >
+        {isActive && (
+          <animate
+            attributeName="r"
+            values="4;6;4"
+            dur="1.5s"
+            repeatCount="indefinite"
+          />
+        )}
+      </circle>
+    </motion.g>
   );
 }
 
@@ -668,7 +739,7 @@ function SpeechBubble({
   text,
   visible,
   cursor,
-  align,
+  C,
 }: {
   x: number;
   y: number;
@@ -676,194 +747,87 @@ function SpeechBubble({
   text: string;
   visible: boolean;
   cursor?: boolean;
-  align: "left" | "right";
+  C: any;
 }) {
   return (
     <motion.div
-      className="absolute rounded-xl wf-bubble shadow"
-      style={{ left: x, top: y, width: w, padding: 10 }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: visible ? 1 : 0 }}
-      transition={{ duration: 0.2 }}
+      className="absolute"
+      style={{ 
+        left: x, 
+        top: y, 
+        width: w,
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+      }}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ 
+        opacity: visible ? 1 : 0,
+        y: visible ? 0 : -10
+      }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
       <div
-        className="font-mono text-[14px] leading-6"
-        style={{ whiteSpace: "pre-wrap" }}
+        style={{
+          background: C.messageBg,
+          border: `1px solid ${C.messageBorder}`,
+          borderRadius: 16,
+          padding: "12px 16px",
+          boxShadow: `0 4px 12px ${C.cardShadow}`,
+          position: "relative",
+        }}
       >
-        {text}
-        {cursor && (
-          <motion.span
-            className="mono-caret inline-block w-[8px] ml-[2px] h-[1.2em] align-middle"
-            animate={{ opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 1, repeat: Infinity }}
-          />
-        )}
+        <div
+          style={{
+            fontFamily: "ui-monospace, SFMono-Regular, monospace",
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: C.messageText,
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {text}
+          {cursor && (
+            <motion.span
+              style={{
+                display: "inline-block",
+                width: 2,
+                height: 16,
+                backgroundColor: C.pulseColor,
+                marginLeft: 2,
+                verticalAlign: "text-bottom",
+              }}
+              animate={{ opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            />
+          )}
+        </div>
+        
+        {/* Subtle tail */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -6,
+            left: 24,
+            width: 0,
+            height: 0,
+            borderLeft: "6px solid transparent",
+            borderRight: "6px solid transparent",
+            borderTop: `6px solid ${C.messageBg}`,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -7,
+            left: 24,
+            width: 0,
+            height: 0,
+            borderLeft: "6px solid transparent",
+            borderRight: "6px solid transparent",
+            borderTop: `6px solid ${C.messageBorder}`,
+          }}
+        />
       </div>
-      {/* tail */}
-      <div
-        className={`absolute -bottom-2 ${
-          align === "left" ? "left-4" : "right-4"
-        } w-0 h-0 border-t-[8px] wf-bubble-tail border-x-[8px] border-x-transparent`}
-      />
     </motion.div>
-  );
-}
-
-function ArrowH({
-  x,
-  y,
-  len,
-  direction,
-  showLine,
-  packetActive,
-  packetKey,
-  durationMs,
-  label,
-  labelX = "center",
-}: {
-  x: number;
-  y: number;
-  len: number;
-  direction: 1 | -1;
-  showLine: boolean;
-  packetActive: boolean;
-  packetKey: string;
-  durationMs: number;
-  label?: string;
-  labelX?: "left" | "center" | "right";
-}) {
-  const headSide = direction === 1 ? "right" : "left";
-  const dotStart = direction === 1 ? 0 : len - 8;
-  const dotEnd = direction === 1 ? len - 8 : 0;
-  const labelLeft =
-    labelX === "left" ? 0 : labelX === "right" ? len - 140 : len / 2 - 140 / 2;
-
-  return (
-    <div className="absolute" style={{ left: x, top: y }}>
-      {showLine && (
-        <div
-          className="relative wf-line"
-          style={{ width: len, height: 2 }}
-        >
-          {/* arrowhead */}
-          <div
-            className={`absolute top-1/2 -translate-y-1/2 ${
-              headSide === "right" ? "right-0" : "left-0 rotate-180"
-            }`}
-          >
-            <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[9px] border-l-zinc-400 dark:border-l-zinc-500" />
-          </div>
-
-          {/* label pill */}
-          {label && (
-            <motion.div
-              className="absolute -top-8 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
-              style={{ left: labelLeft, width: 140, textAlign: "center" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: packetActive ? 1 : 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              {label}
-            </motion.div>
-          )}
-
-          {/* packet */}
-          <motion.div
-            key={packetKey}
-            className="absolute -top-1 h-3 w-3 rounded-full bg-blue-600 shadow z-10"
-            initial={{ opacity: 0, x: dotStart }}
-            animate={
-              packetActive
-                ? { opacity: [0, 1, 1, 0], x: dotEnd }
-                : { opacity: 0, x: dotStart }
-            }
-            transition={{
-              duration: durationMs / 1000,
-              ease: "linear",
-            }}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ArrowV({
-  x,
-  y,
-  len,
-  direction,
-  showLine,
-  packetActive,
-  packetKey,
-  durationMs,
-  label,
-  labelX = "right",
-}: {
-  x: number;
-  y: number;
-  len: number;
-  direction: 1 | -1;
-  showLine: boolean;
-  packetActive: boolean;
-  packetKey: string;
-  durationMs: number;
-  label?: string;
-  labelX?: "left" | "center" | "right";
-}) {
-  const headSide = direction === 1 ? "bottom" : "top";
-  const dotStart = direction === 1 ? 0 : len - 8;
-  const dotEnd = direction === 1 ? len - 8 : 0;
-
-  const labelLeft =
-    labelX === "left" ? -140 : labelX === "right" ? 8 : -70;
-
-  return (
-    <div className="absolute" style={{ left: x, top: y }}>
-      {showLine && (
-        <div
-          className="relative wf-line"
-          style={{ width: 2, height: len }}
-        >
-          {/* arrowhead */}
-          <div
-            className={`absolute ${
-              headSide === "bottom" ? "bottom-0" : "top-0 rotate-180"
-            } left-1/2 -translate-x-1/2`}
-          >
-            <div className="w-0 h-0 border-x-[6px] border-x-transparent border-t-[9px] border-t-zinc-400 dark:border-t-zinc-500" />
-          </div>
-
-          {/* label pill */}
-          {label && (
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
-              style={{ left: labelLeft, width: 140, textAlign: "center" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: packetActive ? 1 : 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              {label}
-            </motion.div>
-          )}
-
-          {/* packet */}
-          <motion.div
-            key={packetKey}
-            className="absolute left-1/2 -translate-x-1/2 -top-1 h-3 w-3 rounded-full bg-blue-600 shadow z-10"
-            initial={{ opacity: 0, y: dotStart }}
-            animate={
-              packetActive
-                ? { opacity: [0, 1, 1, 0], y: dotEnd }
-                : { opacity: 0, y: dotStart }
-            }
-            transition={{
-              duration: durationMs / 1000,
-              ease: "linear",
-            }}
-          />
-        </div>
-      )}
-    </div>
   );
 }
