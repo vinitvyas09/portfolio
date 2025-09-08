@@ -72,8 +72,8 @@ export default function MCPPort({ className }: { className?: string }) {
             <g key={a.id}>
               {/* pill */}
               <g transform={`translate(${x}, ${y})`}>
-                <rect width={pillW} height={pillH} rx={pillH / 2} fill="#F3F4F6" stroke="#E5E7EB" />
-                <text x={pillW / 2} y={pillH / 2 + 5} textAnchor="middle" fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI" fontSize="12" fill="#111827">{a.label}</text>
+                <rect className="pill" width={pillW} height={pillH} rx={pillH / 2} fill="#F3F4F6" stroke="#E5E7EB" />
+                <text className="pill-label" x={pillW / 2} y={pillH / 2 + 5} textAnchor="middle" fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI" fontSize="12" fill="#111827">{a.label}</text>
               </g>
               {/* connector line */}
               <line x1={x + pillW / 2} y1={y + pillH + 8} x2={xDock} y2={yDock} stroke={a.color} strokeWidth={3} strokeLinecap="round" />
@@ -84,10 +84,10 @@ export default function MCPPort({ className }: { className?: string }) {
 
         {/* Center: MCP Server box */}
         <g>
-          <rect x={box.x} y={box.y} width={box.w} height={box.h} rx={16} fill="#FFFFFF" stroke="#E5E7EB" strokeWidth="1.5" />
+          <rect className="mcp-box" x={box.x} y={box.y} width={box.w} height={box.h} rx={16} fill="#FFFFFF" stroke="#E5E7EB" strokeWidth="1.5" />
           {/* MCP chip in center */}
-          <rect x={box.x + box.w / 2 - 42} y={box.y + box.h / 2 - 13} width={84} height={26} rx={13} fill="#F3F4F6" />
-          <text x={box.x + box.w / 2} y={box.y + box.h / 2 + 4} textAnchor="middle" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontSize="14" fontWeight="600" fill="#111827">MCP</text>
+          <rect className="mcp-chip" x={box.x + box.w / 2 - 42} y={box.y + box.h / 2 - 13} width={84} height={26} rx={13} fill="#F3F4F6" />
+          <text className="mcp-chip-text" x={box.x + box.w / 2} y={box.y + box.h / 2 + 4} textAnchor="middle" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontSize="14" fontWeight="600" fill="#111827">MCP</text>
           
           {/* Top slot */}
           <rect x={slotTop.x} y={slotTop.y} width={slotTop.w} height={slotTop.h} rx={10} fill="#111827" opacity={0.9} />
@@ -114,8 +114,8 @@ export default function MCPPort({ className }: { className?: string }) {
               <>
                 {/* Google Drive pill */}
                 <g transform={`translate(${driveX}, ${driveY})`}>
-                  <rect width={pillW} height={pillH} rx={pillH / 2} fill="#F3F4F6" stroke="#E5E7EB" />
-                  <text x={pillW / 2} y={pillH / 2 + 5} textAnchor="middle" fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI" fontSize="12" fill="#111827">Google Drive</text>
+                  <rect className="pill" width={pillW} height={pillH} rx={pillH / 2} fill="#F3F4F6" stroke="#E5E7EB" />
+                  <text className="pill-label" x={pillW / 2} y={pillH / 2 + 5} textAnchor="middle" fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI" fontSize="12" fill="#111827">Google Drive</text>
                 </g>
                 {/* Connection line from MCP box to Google Drive */}
                 <line x1={connX} y1={connY} x2={driveX + pillW / 2} y2={driveY - 8} stroke="#4285F4" strokeWidth={3} strokeLinecap="round" />

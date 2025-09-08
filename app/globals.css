@@ -232,6 +232,29 @@ li {
   box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.35);
 }
 
+/* SVG theming inside MCP card */
+.mcp-card svg .mcp-box {
+  fill: hsl(var(--card));
+  stroke: hsl(var(--border));
+}
+
+.mcp-card svg .mcp-chip {
+  fill: hsl(var(--muted));
+}
+
+.mcp-card svg .mcp-chip-text {
+  fill: hsl(var(--foreground));
+}
+
+.mcp-card svg .pill {
+  fill: hsl(var(--secondary));
+  stroke: hsl(var(--border));
+}
+
+.mcp-card svg .pill-label {
+  fill: hsl(var(--foreground));
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
