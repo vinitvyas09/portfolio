@@ -1,11 +1,91 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 export default function MCPArchitectureDiagram({ className }: { className?: string }) {
   const W = 1400;
   const H = 900;
+  
+  // Theme handling (match pattern used in other components)
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
+  
+  // Theme-aware palette
+  const C = useMemo(() => {
+    // Default to light before mount to avoid hydration mismatch
+    if (!mounted) {
+      return {
+        bg1: "#fafafa",
+        bg2: "#f3f4f6",
+        textMuted: "#475569",
+        cardFill: "#ffffff",
+        cardStroke: "#e5e7eb",
+        hostGrad1: "#f3f4f6",
+        hostGrad2: "#e5e7eb",
+        hostStroke: "#e5e7eb",
+        serverFill: "#e6f3f9",
+        serverStroke: "#b6d3e4",
+        serverText: "#346c80",
+        serverDash: "#b6d3e4",
+        serverLed: "#00c16a",
+        dashedConn: "#a3a3a3",
+        footer: "#475569",
+        protocol: "#00a67e",
+        clientPill: "#00a67e",
+        clientPillText: "#ffffff",
+        title: "#64748b",
+      };
+    }
+    return isDark
+      ? {
+          // Dark theme
+          bg1: "#0f0f10",
+          bg2: "#18181b",
+          textMuted: "#a1a1aa",
+          cardFill: "#2a2a2a",
+          cardStroke: "#444",
+          hostGrad1: "#2a2a2a",
+          hostGrad2: "#1a1a1a",
+          hostStroke: "#3a3a3a",
+          serverFill: "#1e3a4a",
+          serverStroke: "#2a5a7a",
+          serverText: "#8ab4c4",
+          serverDash: "#2a5a7a",
+          serverLed: "#00ff88",
+          dashedConn: "#666",
+          footer: "#666",
+          protocol: "#00a67e",
+          clientPill: "#00a67e",
+          clientPillText: "#ffffff",
+          title: "#888",
+        }
+      : {
+          // Light theme
+          bg1: "#fafafa",
+          bg2: "#f3f4f6",
+          textMuted: "#475569",
+          cardFill: "#ffffff",
+          cardStroke: "#e5e7eb",
+          hostGrad1: "#f3f4f6",
+          hostGrad2: "#e5e7eb",
+          hostStroke: "#e5e7eb",
+          serverFill: "#e6f3f9",
+          serverStroke: "#b6d3e4",
+          serverText: "#346c80",
+          serverDash: "#b6d3e4",
+          serverLed: "#00c16a",
+          dashedConn: "#a3a3a3",
+          footer: "#475569",
+          protocol: "#10b981",
+          clientPill: "#10b981",
+          clientPillText: "#ffffff",
+          title: "#64748b",
+        };
+  }, [isDark, mounted]);
   
   // Animation variants
   const fadeIn = {
@@ -63,6 +143,24 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     'helpdesk': ['email', 'db', 'payments', 'analytics']
   };
 
+  // Placeholder to avoid SSR/CSR theme mismatch flash
+  if (!mounted) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: "100%",
+          maxWidth: 1400,
+          margin: "0 auto",
+          aspectRatio: `${W} / ${H}`,
+          borderRadius: 16,
+          background: "transparent",
+          padding: "20px",
+        }}
+      />
+    );
+  }
+
   return (
     <div
       className={className}
@@ -72,7 +170,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         margin: "0 auto",
         aspectRatio: `${W} / ${H}`,
         borderRadius: 16,
-        background: "#1a1a1a",
+        background: `linear-gradient(135deg, ${C.bg1} 0%, ${C.bg2} 100%)`,
         padding: "20px",
       }}
     >
@@ -80,8 +178,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         <defs>
           {/* Gradient for MCP Host box */}
           <linearGradient id="hostGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#2a2a2a" />
-            <stop offset="100%" stopColor="#1a1a1a" />
+            <stop offset="0%" stopColor={C.hostGrad1} />
+            <stop offset="100%" stopColor={C.hostGrad2} />
           </linearGradient>
           
           {/* Glow effect for servers */}
@@ -95,7 +193,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         </defs>
 
         {/* Title */}
-        <text x={W/2} y={40} fill="#888" fontSize="18" fontWeight="500" textAnchor="middle">
+        <text x={W/2} y={40} fill={C.title} fontSize="18" fontWeight="500" textAnchor="middle">
           3 LLM Agents × 8 Tools via MCP
         </text>
 
@@ -113,12 +211,12 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
             height={700}
             rx={12}
             fill="url(#hostGradient)"
-            stroke="#3a3a3a"
+            stroke={C.hostStroke}
             strokeWidth="2"
             strokeDasharray="8 4"
           />
           
-          <text x={70} y={110} fill="#888" fontSize="16" fontWeight="500">
+          <text x={70} y={110} fill={C.textMuted} fontSize="16" fontWeight="500">
             MCP Host
           </text>
           
@@ -133,8 +231,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                 width={240}
                 height={140}
                 rx={8}
-                fill="#2a2a2a"
-                stroke="#444"
+                fill={C.cardFill}
+                stroke={C.cardStroke}
               />
               <text x={15} y={35} fontSize="24">
                 {agent.icon}
@@ -142,11 +240,11 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
               <text x={50} y={35} fill={agent.color} fontSize="16" fontWeight="600">
                 {agent.name}
               </text>
-              <rect x={15} y={60} width={210} height={35} rx={4} fill="#00a67e" />
-              <text x={120} y={82} fill="white" fontSize="14" fontWeight="500" textAnchor="middle">
+              <rect x={15} y={60} width={210} height={35} rx={4} fill={C.clientPill} />
+              <text x={120} y={82} fill={C.clientPillText} fontSize="14" fontWeight="500" textAnchor="middle">
                 MCP Client
               </text>
-              <text x={15} y={120} fill="#666" fontSize="11">
+              <text x={15} y={120} fill={C.textMuted} fontSize="11">
                 Connects to {connections[agent.id].length} MCP servers →
               </text>
             </g>
@@ -170,18 +268,18 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   width={180}
                   height={70}
                   rx={8}
-                  fill="#1e3a4a"
-                  stroke="#2a5a7a"
+                  fill={C.serverFill}
+                  stroke={C.serverStroke}
                   strokeWidth="1.5"
                   filter="url(#glow)"
                 />
-                <rect x={10} y={12} width={6} height={6} rx={1} fill="#00ff88" />
-                <rect x={10} y={22} width={6} height={6} rx={1} fill="#00ff88" />
-                <rect x={10} y={32} width={6} height={6} rx={1} fill="#00ff88" />
-                <rect x={22} y={12} width={30} height={3} rx={1} fill="#2a5a7a" />
-                <rect x={22} y={22} width={40} height={3} rx={1} fill="#2a5a7a" />
-                <rect x={22} y={32} width={25} height={3} rx={1} fill="#2a5a7a" />
-                <text x={90} y={52} fill="#8ab4c4" fontSize="13" fontWeight="500" textAnchor="middle">
+                <rect x={10} y={12} width={6} height={6} rx={1} fill={C.serverLed} />
+                <rect x={10} y={22} width={6} height={6} rx={1} fill={C.serverLed} />
+                <rect x={10} y={32} width={6} height={6} rx={1} fill={C.serverLed} />
+                <rect x={22} y={12} width={30} height={3} rx={1} fill={C.serverDash} />
+                <rect x={22} y={22} width={40} height={3} rx={1} fill={C.serverDash} />
+                <rect x={22} y={32} width={25} height={3} rx={1} fill={C.serverDash} />
+                <text x={90} y={52} fill={C.serverText} fontSize="13" fontWeight="500" textAnchor="middle">
                   MCP Server
                 </text>
               </g>
@@ -258,7 +356,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
               key={`protocol-${agent.id}`}
               x={465}
               y={220 + idx * 200}
-              fill="#00a67e"
+              fill={C.protocol}
               fontSize="11"
               fontWeight="500"
               initial={{ opacity: 0 }}
@@ -282,7 +380,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                 y1={y}
                 x2={900}
                 y2={y}
-                stroke="#666"
+                stroke={C.dashedConn}
                 strokeWidth="2"
                 strokeDasharray="5 5"
                 initial={{ opacity: 0 }}
@@ -294,7 +392,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         </g>
 
         {/* Bottom text */}
-        <text x={W/2} y={H - 20} fill="#666" fontSize="14" textAnchor="middle">
+        <text x={W/2} y={H - 20} fill={C.footer} fontSize="14" textAnchor="middle">
           MCP enables flexible tool access: agents connect only to the tools they need
         </text>
       </svg>
