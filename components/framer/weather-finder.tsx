@@ -95,17 +95,45 @@ export default function MCPWeatherFlow({
   };
 
   // ====== Geometry (fixed canvas for GIF capture) ======
-  const W = 1200;
-  const H = height; // 675 default
-  const PAD = 72;
+  // Compact canvas sizing
+  const PAD = 24;
 
   const nodeW = 220;
   const nodeH = 68;
 
-  const user = { x: PAD, y: 240, w: nodeW, h: nodeH, label: "User" };
-  const llm = { x: PAD + 320, y: 240, w: nodeW, h: nodeH, label: "LLM" };
-  const sw = { x: PAD + 640, y: 240, w: nodeW, h: nodeH, label: "Software" };
-  const api = { x: sw.x, y: 420, w: nodeW, h: nodeH, label: "Weather API" };
+  // Reserve space at the top for the two message bubbles
+  const MSG_W = nodeW; // keep bubbles similar width to nodes
+  const MSG_Q_Y = PAD; // question bubble Y
+  const MSG_A_Y = MSG_Q_Y + 40; // answer bubble just below
+
+  // Stack nodes vertically below the message area
+  const V_GAP = 24; // vertical gap between nodes (tighter)
+  // Leave enough room for up to two lines in the answer bubble
+  const NODES_TOP_Y = MSG_A_Y + 88; // begin nodes after messages
+  const nodeX = PAD;
+
+  const user = { x: nodeX, y: NODES_TOP_Y, w: nodeW, h: nodeH, label: "User" };
+  const llm = {
+    x: nodeX,
+    y: NODES_TOP_Y + nodeH + V_GAP,
+    w: nodeW,
+    h: nodeH,
+    label: "LLM",
+  };
+  const sw = {
+    x: nodeX,
+    y: NODES_TOP_Y + (nodeH + V_GAP) * 2,
+    w: nodeW,
+    h: nodeH,
+    label: "Software",
+  };
+  const api = {
+    x: nodeX,
+    y: NODES_TOP_Y + (nodeH + V_GAP) * 3,
+    w: nodeW,
+    h: nodeH,
+    label: "Weather API",
+  };
 
   // Helper to build straight edges
   type NodeRect = { x: number; y: number; w: number; h: number };
@@ -122,12 +150,18 @@ export default function MCPWeatherFlow({
     return { x, y: y1, len: y2 - y1 };
   };
 
-  const A = edgeH(user, llm); // user → llm (question)
-  const B = edgeH(llm, sw);   // llm → software (function call)
+  // Vertical edges (top → bottom)
+  const A = edgeV(user, llm); // user → llm (question)
+  const B = edgeV(llm, sw);   // llm → software (function call)
   const C = edgeV(sw, api);   // software → api (HTTP GET)
   const Dv = edgeV(sw, api);  // api → software (reuse coords, reverse)
-  const E = edgeH(llm, sw);   // software → llm (reverse)
-  const F = edgeH(user, llm); // llm → user (reverse)
+  const E = edgeV(llm, sw);   // software → llm (reverse)
+  const F = edgeV(user, llm); // llm → user (reverse)
+
+  // Compute compact width/height based on content
+  const W = Math.max(nodeX + nodeW + PAD, nodeX + MSG_W + PAD);
+  const contentBottom = api.y + nodeH; // bottom of last node
+  const H = Math.max(contentBottom + PAD, NODES_TOP_Y + 4 * nodeH + 3 * V_GAP + PAD);
 
   const active = (name: StepName) => stepName === name;
 
@@ -142,11 +176,12 @@ export default function MCPWeatherFlow({
       <Node {...sw} hue="violet" />
       <Node {...api} hue="emerald" />
 
-      {/* User typed question */}
+      {/* Top message area */}
+      {/* User typed question at top */}
       <SpeechBubble
-        x={user.x + user.w + 16}
-        y={user.y - 42}
-        w={300}
+        x={nodeX}
+        y={MSG_Q_Y}
+        w={MSG_W}
         visible={stepIndex >= 0}
         text={
           stepName === "userType"
@@ -157,11 +192,11 @@ export default function MCPWeatherFlow({
         align="left"
       />
 
-      {/* Final LLM answer (with citation) */}
+      {/* Final LLM answer directly below the question */}
       <SpeechBubble
-        x={llm.x - 340}
-        y={llm.y - 42}
-        w={320}
+        x={nodeX}
+        y={MSG_A_Y}
+        w={MSG_W}
         visible={stepIndex >= 6 /* show only from step 6 onward */}
         text={
           stepName === "llmType"
@@ -169,12 +204,12 @@ export default function MCPWeatherFlow({
             : finalMsg
         }
         cursor={active("llmType")}
-        align="right"
+        align="left"
       />
 
       {/* Edges + packets */}
       {/* A: User → LLM (question) */}
-      <ArrowH
+      <ArrowV
         {...A}
         direction={1}
         showLine={true}
@@ -186,7 +221,7 @@ export default function MCPWeatherFlow({
       />
 
       {/* B: LLM → Software (function call) */}
-      <ArrowH
+      <ArrowV
         {...B}
         direction={1}
         showLine={true}
@@ -206,7 +241,7 @@ export default function MCPWeatherFlow({
         packetKey={`C-${stepKey}`}
         durationMs={D.swToApi}
         label={`GET /v1/weather?city=San%20Francisco`}
-        labelX="right"
+        labelX="center"
       />
 
       {/* D: Weather API → Software (200 OK JSON) */}
@@ -218,11 +253,11 @@ export default function MCPWeatherFlow({
         packetKey={`D-${stepKey}`}
         durationMs={D.apiToSw}
         label={`200 OK  { temp: 65, cond: "Clear" }`}
-        labelX="right"
+        labelX="center"
       />
 
       {/* E: Software → LLM (feed results) */}
-      <ArrowH
+      <ArrowV
         {...E}
         direction={-1}
         showLine={true}
@@ -234,7 +269,7 @@ export default function MCPWeatherFlow({
       />
 
       {/* F: LLM → User (final answer) */}
-      <ArrowH
+      <ArrowV
         {...F}
         direction={-1}
         showLine={true}
