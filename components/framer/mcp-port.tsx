@@ -30,8 +30,15 @@ export default function MCPPort({ className }: { className?: string }) {
 
   return (
     <div
-      className={className}
-      style={{ width: "100%", maxWidth: 800, margin: "0 auto" }}
+      className={["mcp-card", className].filter(Boolean).join(" ")}
+      style={{
+        width: "100%",
+        maxWidth: 800,
+        margin: "0 auto",
+        aspectRatio: `${W} / ${H}`,
+        borderRadius: 16,
+        overflow: "hidden",
+      }}
     >
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" style={{ display: "block" }}>
         {/* Title */}
