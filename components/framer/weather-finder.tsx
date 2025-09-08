@@ -253,17 +253,114 @@ export default function MCPWeatherFlow({
   const H = Math.max(contentBottom + PAD, NODES_TOP_Y + 4 * nodeH + 3 * V_GAP + PAD);
 
   const active = (name: StepName) => stepName === name;
+  
+  // Animation state tracking for active elements
+  const [activeElements, setActiveElements] = useState<Set<string>>(new Set());
+  
+  useEffect(() => {
+    if (!mounted) return;
+    const newActive = new Set<string>();
+    
+    if (stepName === "userType" || stepName === "llmToUser") {
+      newActive.add("user");
+    }
+    if (stepName === "llmToSw" || stepName === "swToLlm" || stepName === "llmType") {
+      newActive.add("llm");
+    }
+    if (stepName === "swToApi" || stepName === "apiToSw") {
+      newActive.add("sw");
+    }
+    if (stepName === "apiToSw") {
+      newActive.add("api");
+    }
+    
+    setActiveElements(newActive);
+  }, [stepName, mounted]);
+  
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: W,
+          height: H,
+          borderRadius: 24,
+          background: "transparent",
+        }}
+      />
+    );
+  }
 
   return (
     <div
-      className={`weatherflow wf-panel relative mx-auto ${className ?? ""}`}
-      style={{ width: W, height: H }}
+      className={className}
+      style={{
+        width: W,
+        height: H,
+        borderRadius: 24,
+        background: `linear-gradient(135deg, ${C.bg1} 0%, ${C.bg2} 100%)`,
+        position: "relative",
+        overflow: "hidden",
+      }}
     >
-      {/* Nodes */}
-      <Node {...user} hue="zinc" />
-      <Node {...llm} hue="blue" />
-      <Node {...sw} hue="violet" />
-      <Node {...api} hue="emerald" />
+      <svg 
+        viewBox={`0 0 ${W} ${H}`} 
+        width={W} 
+        height={H}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        <defs>
+          {/* Gradients for each node */}
+          <linearGradient id="userGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={C.userGrad1} />
+            <stop offset="100%" stopColor={C.userGrad2} />
+          </linearGradient>
+          
+          <linearGradient id="llmGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={C.llmGrad1} />
+            <stop offset="100%" stopColor={C.llmGrad2} />
+          </linearGradient>
+          
+          <linearGradient id="swGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={C.swGrad1} />
+            <stop offset="100%" stopColor={C.swGrad2} />
+          </linearGradient>
+          
+          <linearGradient id="apiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={C.apiGrad1} />
+            <stop offset="100%" stopColor={C.apiGrad2} />
+          </linearGradient>
+          
+          {/* Sophisticated glow filter */}
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          
+          {/* Pulse glow effect */}
+          <filter id="pulseGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          
+          {/* Shadow filter */}
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+          </filter>
+        </defs>
+
+        {/* Nodes */}
+        <Node {...user} id="user" gradient="userGradient" isActive={activeElements.has("user")} C={C} />
+        <Node {...llm} id="llm" gradient="llmGradient" isActive={activeElements.has("llm")} C={C} />
+        <Node {...sw} id="sw" gradient="swGradient" isActive={activeElements.has("sw")} C={C} />
+        <Node {...api} id="api" gradient="apiGradient" isActive={activeElements.has("api")} C={C} />
 
       {/* Top message area */}
       {/* User typed question at top */}
