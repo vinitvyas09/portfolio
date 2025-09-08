@@ -171,8 +171,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     if (!mounted) return;
     
     const startRandomAnimation = () => {
-      // Clean up old connections (remove those older than 8.5 seconds to ensure full animation completes)
-      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 8500));
+      // Clean up old connections (remove those older than 9.5 seconds to ensure full animation completes)
+      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 9500));
       
       // Pick a random agent
       const randomAgent = agents[Math.floor(Math.random() * agents.length)];
