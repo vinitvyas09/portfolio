@@ -319,6 +319,7 @@ export default function MCPWeatherFlow({
       style={{
         width: W,
         height: H,
+        margin: "0 auto",
         borderRadius: 24,
         background: `linear-gradient(135deg, ${C.bg1} 0%, ${C.bg2} 100%)`,
         position: "relative",
