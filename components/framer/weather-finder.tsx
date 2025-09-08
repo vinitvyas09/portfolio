@@ -652,14 +652,14 @@ export default function MCPWeatherFlow({
         <AnimatePresence>
           {active("llmToSw") && (
             <motion.g
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               <rect 
-                x={llm.x + llm.w/2 - 110}
-                y={llm.y + llm.h + 20}
+                x={edgeB.x - 110}
+                y={edgeB.y + edgeB.len / 2 - 12}
                 width={220}
                 height={24}
                 rx={12}
@@ -667,12 +667,13 @@ export default function MCPWeatherFlow({
                 fillOpacity={0.9}
               />
               <text
-                x={llm.x + llm.w/2}
-                y={llm.y + llm.h + 36}
+                x={edgeB.x}
+                y={edgeB.y + edgeB.len / 2}
                 fill={C.labelText}
                 fontSize="11"
                 fontFamily="monospace"
                 textAnchor="middle"
+                dominantBaseline="middle"
               >
                 getWeather("San Francisco")
               </text>
@@ -681,14 +682,14 @@ export default function MCPWeatherFlow({
           
           {active("swToApi") && (
             <motion.g
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               <rect 
-                x={sw.x + sw.w/2 - 100}
-                y={sw.y + sw.h + 20}
+                x={edgeC.x - 100}
+                y={edgeC.y + edgeC.len / 2 - 12}
                 width={200}
                 height={24}
                 rx={12}
@@ -696,12 +697,13 @@ export default function MCPWeatherFlow({
                 fillOpacity={0.9}
               />
               <text
-                x={sw.x + sw.w/2}
-                y={sw.y + sw.h + 36}
+                x={edgeC.x}
+                y={edgeC.y + edgeC.len / 2}
                 fill={C.labelText}
                 fontSize="11"
                 fontFamily="monospace"
                 textAnchor="middle"
+                dominantBaseline="middle"
               >
                 GET /weather?city=SF
               </text>
@@ -710,14 +712,14 @@ export default function MCPWeatherFlow({
           
           {active("apiToSw") && (
             <motion.g
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               <rect 
-                x={api.x + api.w/2 - 90}
-                y={api.y - 35}
+                x={edgeD.x - 90}
+                y={edgeD.y + edgeD.len / 2 - 12}
                 width={180}
                 height={24}
                 rx={12}
@@ -725,12 +727,13 @@ export default function MCPWeatherFlow({
                 fillOpacity={0.9}
               />
               <text
-                x={api.x + api.w/2}
-                y={api.y - 19}
+                x={edgeD.x}
+                y={edgeD.y + edgeD.len / 2}
                 fill={C.labelText}
                 fontSize="11"
                 fontFamily="monospace"
                 textAnchor="middle"
+                dominantBaseline="middle"
               >
                 {"{ temp: 65, clear }"}
               </text>
