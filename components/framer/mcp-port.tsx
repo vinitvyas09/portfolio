@@ -103,11 +103,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         };
   }, [isDark, mounted]);
   
-  // Animation variants
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 }
-  };
+  // Animation variants - fadeIn removed as it was unused
   
   const slideFromLeft = {
     hidden: { x: -50, opacity: 0 },
@@ -134,11 +130,11 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
   } as const;
 
   // Define the 3 LLM agents
-  const agents = [
+  const agents = useMemo(() => [
     { id: 'chat', name: 'Chat App', icon: '💬', color: '#4a9eff' },
     { id: 'ide', name: 'IDE Agent', icon: '🔧', color: '#ff6b6b' },
     { id: 'helpdesk', name: 'Helpdesk Agent', icon: '🎧', color: '#ffa93d' }
-  ];
+  ], []);
 
   // Define the 8 tools/servers
   const tools = [
@@ -153,11 +149,11 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
   ];
 
   // Define which tools each agent connects to (3-4 each)
-  const connections: Record<string, string[]> = {
+  const connections: Record<string, string[]> = useMemo(() => ({
     'chat': ['search', 'db', 'calendar', 'analytics'],
     'ide': ['github', 'db', 'internal'],
     'helpdesk': ['email', 'db', 'payments', 'analytics']
-  };
+  }), []);
   
   // Helper function to calculate position on quadratic bezier curve
   const getQuadraticPoint = (t: number, p0: {x: number, y: number}, p1: {x: number, y: number}, p2: {x: number, y: number}) => {
@@ -204,7 +200,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         clearInterval(animationIntervalRef.current);
       }
     };
-  }, [mounted]);
+  }, [mounted, agents, connections]);
   
   // Force re-render to update highlights
   const [, forceUpdate] = useState(0);
