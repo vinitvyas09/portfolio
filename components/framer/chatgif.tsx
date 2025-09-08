@@ -125,8 +125,8 @@ export default function ChatGif({
   }, [count, messages, step, within, p, cfg.dotsMs, cfg.stepMs]);
 
   return (
-    <div className={`relative w-full ${className ?? ""}`} style={{ height: cfg.height }}>
-      <div className="absolute inset-0 bg-white flex items-center justify-center overflow-hidden">
+    <div className={`chatgif relative w-full ${className ?? ""}`} style={{ height: cfg.height }}>
+      <div className="chatgif-panel absolute inset-0 flex items-center justify-center overflow-hidden">
         <div className="w-full h-full flex flex-col p-3 md:p-4 gap-3 md:gap-4 overflow-hidden">
 
           {/* Messages */}
@@ -153,7 +153,7 @@ function UserRow({ text, showCursor }: { text: string; showCursor?: boolean }) {
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 24 }}
-        className="max-w-[85%] rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 bg-gray-100 text-gray-900 shadow-sm"
+        className="chatgif-user max-w-[85%] rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-sm"
       >
         <Monospace text={text} showCursor={showCursor} />
       </motion.div>
@@ -186,7 +186,10 @@ function AiRow({
 }
 
 function Avatar({ hue }: { hue: "gray" | "blue" }) {
-  const cls = hue === "gray" ? "bg-gray-300" : "bg-blue-300";
+  const cls =
+    hue === "gray"
+      ? "bg-gray-300 dark:bg-gray-500"
+      : "bg-blue-300 dark:bg-blue-400";
   return <div className={`h-6 w-6 sm:h-7 sm:w-7 rounded-full ${cls} shrink-0`} />;
 }
 
@@ -212,7 +215,7 @@ function Monospace({ text, showCursor }: { text: string; showCursor?: boolean })
       {text}
       {showCursor && (
         <motion.span
-          className="inline-block w-[8px] ml-[2px] h-[1.2em] align-middle bg-black/70"
+          className="mono-caret inline-block w-[8px] ml-[2px] h-[1.2em] align-middle"
           animate={{ opacity: [0, 1, 1, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
         />
