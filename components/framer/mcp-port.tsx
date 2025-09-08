@@ -610,7 +610,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   }}
                   transition={{
                     duration: 1.5,
-                    delay: 6,
+                    delay: 7,
                     ease: "linear"
                   }}
                 />
