@@ -373,7 +373,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         >
           {tools.map((tool, i) => {
             const y = 100 + i * 95;
-            const isActive = isServerActive();
+            const isActive = isServerActive(tool.id);
             return (
               <g key={tool.id} transform={`translate(600, ${y})`}>
                 <motion.rect
