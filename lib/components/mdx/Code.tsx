@@ -16,9 +16,8 @@ export function Code({
   children, 
   language = "python", 
   title,
-  highlight,
   showLineNumbers = true 
-}: CodeProps) {
+}: Omit<CodeProps, 'highlight'>) {
   const [copied, setCopied] = useState(false)
 
   const copyToClipboard = () => {
