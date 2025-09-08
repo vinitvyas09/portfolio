@@ -197,7 +197,7 @@ export default function HeadlineCascade({
 
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-xl border border-white/10 bg-black ${
+      className={`relative w-full overflow-hidden rounded-xl border border-border bg-card/50 backdrop-blur-sm ${
         className ?? ""
       }`}
       style={{ height: cfg.height ?? autoHeight }}
@@ -260,7 +260,7 @@ export default function HeadlineCascade({
                   style={{ zIndex: 100 + (depth - k), width: "100%", maxWidth: 860 }}
                 >
                   <div
-                    className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 shadow"
+                    className="rounded-xl border border-border bg-card/80 dark:bg-card/60 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 shadow"
                     style={{
                       boxShadow: shadow,
                       filter: blur ? `blur(${blur.toFixed(2)}px)` : undefined,
@@ -273,12 +273,12 @@ export default function HeadlineCascade({
                         href={h.url}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="block text-white text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words"
+                        className="block text-foreground text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words hover:text-primary transition-colors"
                       >
                         {h.title}
                       </a>
                     ) : (
-                      <div className="block text-white text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words">
+                      <div className="block text-foreground text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words">
                         {h.title}
                       </div>
                     )}
