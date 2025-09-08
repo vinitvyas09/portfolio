@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 // Shared timeline constants and types
 const STEPS = [
   "userType",
+  "userToLlm",  // New step for the packet animation after typing
   "llmToSw",
   "swToApi",
   "apiToSw",
@@ -18,6 +19,7 @@ const STEPS = [
 type StepName = typeof STEPS[number];
 const D: Record<StepName, number> = {
   userType: 1400,
+  userToLlm: 700,  // Time for packet to travel
   llmToSw: 800,
   swToApi: 800,
   apiToSw: 700,
@@ -261,17 +263,36 @@ export default function MCPWeatherFlow({
     if (!mounted) return;
     const newActive = new Set<string>();
     
-    if (stepName === "userType" || stepName === "llmToUser") {
+    if (stepName === "userType") {
       newActive.add("user");
     }
-    if (stepName === "llmToSw" || stepName === "swToLlm" || stepName === "llmType") {
+    if (stepName === "userToLlm") {
+      newActive.add("user");
       newActive.add("llm");
     }
-    if (stepName === "swToApi" || stepName === "apiToSw") {
+    if (stepName === "llmToSw") {
+      newActive.add("llm");
       newActive.add("sw");
+    }
+    if (stepName === "swToApi") {
+      newActive.add("sw");
+      newActive.add("api");
     }
     if (stepName === "apiToSw") {
       newActive.add("api");
+      newActive.add("sw");
+    }
+    if (stepName === "swToLlm") {
+      newActive.add("sw");
+      newActive.add("llm");
+    }
+    if (stepName === "llmToUser") {
+      newActive.add("llm");
+      newActive.add("user");
+    }
+    // llmType should NOT highlight the LLM node, just the user seeing the response
+    if (stepName === "llmType") {
+      newActive.add("user");
     }
     
     setActiveElements(newActive);
@@ -385,6 +406,7 @@ export default function MCPWeatherFlow({
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           {stepName === "userType" && "User asking question..."}
+          {stepName === "userToLlm" && "Sending to LLM..."}
           {stepName === "llmToSw" && "LLM calling function..."}
           {stepName === "swToApi" && "Software calling API..."}
           {stepName === "apiToSw" && "API returning data..."}
@@ -439,20 +461,49 @@ export default function MCPWeatherFlow({
         
         {/* Animated packets with glow */}
         <AnimatePresence>
-          {active("userType") && (
-            <motion.circle
-              r="5"
-              fill={C.pulseColor}
-              filter="url(#pulseGlow)"
-              initial={{ cx: user.x + user.w/2, cy: user.y + user.h, opacity: 0 }}
-              animate={{ 
-                cx: llm.x + llm.w/2, 
-                cy: llm.y,
-                opacity: [0, 1, 1, 0]
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: D.userType / 1000, ease: "easeInOut" }}
-            />
+          {active("userToLlm") && (
+            <>
+              <motion.circle
+                r="5"
+                fill={C.pulseColor}
+                filter="url(#pulseGlow)"
+                initial={{ cx: user.x + user.w/2, cy: user.y + user.h, opacity: 0 }}
+                animate={{ 
+                  cx: llm.x + llm.w/2, 
+                  cy: llm.y,
+                  opacity: [0, 1, 1, 0]
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: D.userToLlm / 1000, ease: "easeInOut" }}
+              />
+              {/* Label for user to LLM */}
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <rect 
+                  x={user.x + user.w/2 - 25}
+                  y={user.y + user.h + 30}
+                  width={50}
+                  height={20}
+                  rx={10}
+                  fill={C.labelBg}
+                  fillOpacity={0.9}
+                />
+                <text
+                  x={user.x + user.w/2}
+                  y={user.y + user.h + 44}
+                  fill={C.labelText}
+                  fontSize="11"
+                  fontFamily="monospace"
+                  textAnchor="middle"
+                >
+                  ask
+                </text>
+              </motion.g>
+            </>
           )}
           
           {active("llmToSw") && (
@@ -504,35 +555,93 @@ export default function MCPWeatherFlow({
           )}
           
           {active("swToLlm") && (
-            <motion.circle
-              r="5"
-              fill={C.swGrad1}
-              filter="url(#pulseGlow)"
-              initial={{ cx: sw.x + sw.w/2, cy: sw.y, opacity: 0 }}
-              animate={{ 
-                cx: llm.x + llm.w/2, 
-                cy: llm.y + llm.h,
-                opacity: [0, 1, 1, 0]
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: D.swToLlm / 1000, ease: "easeInOut" }}
-            />
+            <>
+              <motion.circle
+                r="5"
+                fill={C.swGrad1}
+                filter="url(#pulseGlow)"
+                initial={{ cx: sw.x + sw.w/2, cy: sw.y, opacity: 0 }}
+                animate={{ 
+                  cx: llm.x + llm.w/2, 
+                  cy: llm.y + llm.h,
+                  opacity: [0, 1, 1, 0]
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: D.swToLlm / 1000, ease: "easeInOut" }}
+              />
+              {/* Label for Software to LLM */}
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <rect 
+                  x={sw.x + sw.w/2 - 60}
+                  y={sw.y - 35}
+                  width={120}
+                  height={20}
+                  rx={10}
+                  fill={C.labelBg}
+                  fillOpacity={0.9}
+                />
+                <text
+                  x={sw.x + sw.w/2}
+                  y={sw.y - 21}
+                  fill={C.labelText}
+                  fontSize="11"
+                  fontFamily="monospace"
+                  textAnchor="middle"
+                >
+                  results → LLM
+                </text>
+              </motion.g>
+            </>
           )}
           
           {active("llmToUser") && (
-            <motion.circle
-              r="5"
-              fill={C.llmGrad1}
-              filter="url(#pulseGlow)"
-              initial={{ cx: llm.x + llm.w/2, cy: llm.y, opacity: 0 }}
-              animate={{ 
-                cx: user.x + user.w/2, 
-                cy: user.y + user.h,
-                opacity: [0, 1, 1, 0]
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: D.llmToUser / 1000, ease: "easeInOut" }}
-            />
+            <>
+              <motion.circle
+                r="5"
+                fill={C.llmGrad1}
+                filter="url(#pulseGlow)"
+                initial={{ cx: llm.x + llm.w/2, cy: llm.y, opacity: 0 }}
+                animate={{ 
+                  cx: user.x + user.w/2, 
+                  cy: user.y + user.h,
+                  opacity: [0, 1, 1, 0]
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: D.llmToUser / 1000, ease: "easeInOut" }}
+              />
+              {/* Label for LLM to User */}
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <rect 
+                  x={llm.x + llm.w/2 - 30}
+                  y={llm.y - 35}
+                  width={60}
+                  height={20}
+                  rx={10}
+                  fill={C.labelBg}
+                  fillOpacity={0.9}
+                />
+                <text
+                  x={llm.x + llm.w/2}
+                  y={llm.y - 21}
+                  fill={C.labelText}
+                  fontSize="11"
+                  fontFamily="monospace"
+                  textAnchor="middle"
+                >
+                  reply
+                </text>
+              </motion.g>
+            </>
           )}
         </AnimatePresence>
         
@@ -646,7 +755,7 @@ export default function MCPWeatherFlow({
         x={nodeX}
         y={MSG_A_Y}
         w={MSG_W}
-        visible={stepIndex >= 6}
+        visible={stepIndex >= 7}  // Show after llmToUser completes
         text={
           stepName === "llmType"
             ? typeSlice(finalMsg, tInStep, D.llmType)
