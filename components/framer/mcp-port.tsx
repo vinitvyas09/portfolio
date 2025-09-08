@@ -211,17 +211,16 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.agent !== agentId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active during forward (0-500ms) and return (4500-5000ms)
-      return (elapsed >= 0 && elapsed <= 500) || (elapsed >= 4500 && elapsed <= 5000);
+      // Active at start (0-500ms) and when return pulse arrives (5000-5500ms)
+      return (elapsed >= 0 && elapsed <= 500) || (elapsed >= 5000 && elapsed <= 5500);
     });
   };
   
-  const isServerActive = (toolId: string) => {
+  const isServerActive = () => {
     return activeConnections.some(conn => {
-      if (conn.tool !== toolId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active during forward (1000-2000ms) and return (3500-4500ms)
-      return (elapsed >= 1000 && elapsed <= 2000) || (elapsed >= 3500 && elapsed <= 4500);
+      // Active when forward pulse arrives (1000-1500ms) and when return pulse arrives (3500-4000ms)
+      return (elapsed >= 1000 && elapsed <= 1500) || (elapsed >= 3500 && elapsed <= 4000);
     });
   };
   
@@ -229,8 +228,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.tool !== toolId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active during forward arrival (2000-3500ms)
-      return elapsed >= 2000 && elapsed <= 3500;
+      // Active when forward pulse arrives (2000-3000ms)
+      return elapsed >= 2000 && elapsed <= 3000;
     });
   };
 
@@ -363,7 +362,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         >
           {tools.map((tool, i) => {
             const y = 100 + i * 95;
-            const isActive = isServerActive(tool.id);
+            const isActive = isServerActive();
             return (
               <g key={tool.id} transform={`translate(600, ${y})`}>
                 <motion.rect
