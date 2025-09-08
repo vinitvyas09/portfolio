@@ -240,12 +240,12 @@ export default function MCPWeatherFlow({
   };
 
   // Vertical edges (top → bottom)
-  const A = edgeV(user, llm); // user → llm (question)
-  const B = edgeV(llm, sw);   // llm → software (function call)
-  const C = edgeV(sw, api);   // software → api (HTTP GET)
-  const Dv = edgeV(sw, api);  // api → software (reuse coords, reverse)
-  const E = edgeV(llm, sw);   // software → llm (reverse)
-  const F = edgeV(user, llm); // llm → user (reverse)
+  const edgeA = edgeV(user, llm); // user → llm (question)
+  const edgeB = edgeV(llm, sw);   // llm → software (function call)
+  const edgeC = edgeV(sw, api);   // software → api (HTTP GET)
+  const edgeD = edgeV(sw, api);  // api → software (reuse coords, reverse)
+  const edgeE = edgeV(llm, sw);   // software → llm (reverse)
+  const edgeF = edgeV(user, llm); // llm → user (reverse)
 
   // Compute compact width/height based on content
   const W = Math.max(nodeX + nodeW + PAD, nodeX + MSG_W + PAD);
