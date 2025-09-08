@@ -98,7 +98,7 @@ Here's where we stood: Every LLM needed to connect to multiple tools, and every 
 
 ## Enter MCP: The Standard Interface
 
-In November 2024, Anthropic released their solution. The official definition: "MCP (Model Context Protocol) is an open-source standard for connecting AI applications to external systems". Here is how it works: it defines a few things:  
+In November 2024, Anthropic released their solution. The official definition: "MCP (Model Context Protocol) is an open-source standard for connecting AI applications to external systems". To implement this idea, it defines a few things:  
 1. An MCP server created by our integration tool like Google Drive or Slack or Supabase DB.  
 2. An MCP client that is the LLM application that needs to use the tools.  
 3. A protocol that defines how they communicate with each other.  
