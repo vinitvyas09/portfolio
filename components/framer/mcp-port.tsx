@@ -23,7 +23,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     startTime: number;
   }>>([]);
   
-  const animationIntervalRef = useRef<NodeJS.Timeout>();
+  const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Theme-aware palette
   const C = useMemo(() => {
@@ -354,8 +354,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                 animate={{
                   stroke: isAgentActive(agent.id) ? C.highlightStroke : C.cardStroke,
                   strokeWidth: isAgentActive(agent.id) ? 2 : 1,
+                  transition: { duration: 0.3 }
                 }}
-                transition={{ duration: 0.3 }}
               />
               <text x={15} y={35} fontSize="24">
                 {agent.icon}
