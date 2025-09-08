@@ -195,7 +195,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     // Start animations after initial render
     const initialDelay = setTimeout(() => {
       startRandomAnimation();
-      animationIntervalRef.current = setInterval(startRandomAnimation, 1800);
+      animationIntervalRef.current = setInterval(startRandomAnimation, 3500);
     }, 2000);
     
     return () => {
