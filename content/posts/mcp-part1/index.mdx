@@ -151,11 +151,11 @@ The timing was perfect, but MCP won because it turned tool access into a portabl
 
 ## The Benefits, Crystallized
 
-The math is simple:
+The simple math demonstrates the benefits:
 - **Before MCP**: M models × N tools = M×N integrations
 - **With MCP**: M models + N tools = M+N integrations
 
-But beyond the math, an Ecosystem flywheel occurred where: more MCP‑aware clients led to more incentive to ship MCP servers; more servers led to more pressure for clients to support MCP and as more standardization happened, it led to lower costs for everyone (see GitHub, Azure, and VS Code momentum). This created a race to implement MCP servers. Not supporting it meant being locked out of a rapidly growing ecosystem where developers were converging (or as most call it, 'fomo').
+But beyond the math, an ecosystem flywheel occurred where: more MCP‑aware clients led to more incentive to ship MCP servers; more servers led to more pressure for clients to support MCP and as more standardization happened, it led to lower costs for everyone (see GitHub, Azure, and VS Code momentum). This created a race to implement MCP servers. Not supporting it meant being locked out of a rapidly growing ecosystem where developers were converging (or as most call it, 'fomo').
 
 ## What MCP Doesn't Do
 
@@ -163,7 +163,7 @@ MCP, as this blog has demonstrated, is a great protocol that solves a real probl
 
 - It doesn’t fix reasoning or hallucinations. MCP standardizes connectivity; model quality is separate  
 - It doesn’t automatically make tool use safe. You still need RBAC, sandboxing, input validation, isolation, approval steps, monitoring, and strong data boundaries.  
-- It creates new attack surfaces**: MCP enables what Simon Willison calls the "lethal trifecta"—LLMs that can read external content, access private data, AND communicate externally. This makes prompt injection attacks particularly dangerous (we'll dive deep into security in part 4)
+- It creates new attack surfaces: MCP enables what Simon Willison calls the "lethal trifecta"—LLMs that can read external content, access private data, AND communicate externally. This makes prompt injection attacks particularly dangerous (we'll dive deep into security in part 4)
 
 ---
 
