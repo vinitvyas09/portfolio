@@ -476,7 +476,7 @@ export default function MCPWeatherFlow({
                 exit={{ opacity: 0 }}
                 transition={{ duration: D.userToLlm / 1000, ease: "easeInOut" }}
               />
-              {/* Label for user to LLM */}
+              {/* Label for user to LLM (centered between nodes) */}
               <motion.g
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -484,8 +484,8 @@ export default function MCPWeatherFlow({
                 transition={{ duration: 0.3 }}
               >
                 <rect 
-                  x={user.x + user.w/2 - 25}
-                  y={user.y + user.h + 30}
+                  x={edgeA.x - 25}
+                  y={edgeA.y + edgeA.len / 2 - 10}
                   width={50}
                   height={20}
                   rx={10}
@@ -493,12 +493,13 @@ export default function MCPWeatherFlow({
                   fillOpacity={0.9}
                 />
                 <text
-                  x={user.x + user.w/2}
-                  y={user.y + user.h + 44}
+                  x={edgeA.x}
+                  y={edgeA.y + edgeA.len / 2}
                   fill={C.labelText}
                   fontSize="11"
                   fontFamily="monospace"
                   textAnchor="middle"
+                  dominantBaseline="middle"
                 >
                   ask
                 </text>
@@ -569,7 +570,7 @@ export default function MCPWeatherFlow({
                 exit={{ opacity: 0 }}
                 transition={{ duration: D.swToLlm / 1000, ease: "easeInOut" }}
               />
-              {/* Label for Software to LLM */}
+              {/* Label for Software to LLM (centered between nodes) */}
               <motion.g
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -577,8 +578,8 @@ export default function MCPWeatherFlow({
                 transition={{ duration: 0.3 }}
               >
                 <rect 
-                  x={sw.x + sw.w/2 - 60}
-                  y={sw.y - 35}
+                  x={edgeE.x - 60}
+                  y={edgeE.y + edgeE.len / 2 - 10}
                   width={120}
                   height={20}
                   rx={10}
@@ -586,12 +587,13 @@ export default function MCPWeatherFlow({
                   fillOpacity={0.9}
                 />
                 <text
-                  x={sw.x + sw.w/2}
-                  y={sw.y - 21}
+                  x={edgeE.x}
+                  y={edgeE.y + edgeE.len / 2}
                   fill={C.labelText}
                   fontSize="11"
                   fontFamily="monospace"
                   textAnchor="middle"
+                  dominantBaseline="middle"
                 >
                   results → LLM
                 </text>
