@@ -218,8 +218,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.agent !== agentId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active at start (0-600ms) and when return pulse arrives (7000-7600ms)
-      return (elapsed >= 0 && elapsed <= 600) || (elapsed >= 7000 && elapsed <= 7600);
+      // Active at start (0-600ms) and when return pulse arrives (7500-8100ms)
+      return (elapsed >= 0 && elapsed <= 600) || (elapsed >= 7500 && elapsed <= 8100);
     });
   };
   
@@ -227,8 +227,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.tool !== toolId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active when forward pulse arrives (1500-2500ms) and when return pulse arrives (5000-6000ms)
-      return (elapsed >= 1500 && elapsed <= 2500) || (elapsed >= 5000 && elapsed <= 6000);
+      // Active when forward pulse arrives (1500-2500ms) and when return pulse arrives (6000-7000ms)
+      return (elapsed >= 1500 && elapsed <= 2500) || (elapsed >= 6000 && elapsed <= 7000);
     });
   };
   
@@ -236,8 +236,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.tool !== toolId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active when forward pulse arrives (3000-4500ms)
-      return elapsed >= 3000 && elapsed <= 4500;
+      // Active when forward pulse arrives (4000-4500ms)
+      return elapsed >= 4000 && elapsed <= 4500;
     });
   };
 
@@ -556,7 +556,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                     opacity: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
                   }}
                   transition={{
-                    duration: 1,
+                    duration: 1.5,
                     ease: "linear"
                   }}
                 />
@@ -566,16 +566,16 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   r="6"
                   fill={C.pulseColor}
                   filter="url(#pulseGlow)"
-                  initial={{ x: 780, y: serverY, opacity: 0 }}
+                  initial={{ x: serverX, y: serverY, opacity: 0 }}
                   animate={{ 
-                    x: [780, 840, toolX],
+                    x: [serverX, 780, 840, toolX],
                     y: serverY,
-                    opacity: [0, 1, 0]
+                    opacity: [0, 1, 1, 0]
                   }}
                   transition={{
-                    duration: 1,
-                    delay: 1,
-                    times: [0, 0.5, 1],
+                    duration: 1.5,
+                    delay: 2.5,
+                    times: [0, 0.1, 0.9, 1],
                     ease: "linear"
                   }}
                 />
@@ -587,14 +587,14 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   filter="url(#pulseGlow)"
                   initial={{ x: toolX, y: serverY, opacity: 0 }}
                   animate={{ 
-                    x: [toolX, 840, 780],
+                    x: [toolX, 840, 780, serverX],
                     y: serverY,
-                    opacity: [0, 1, 0]
+                    opacity: [0, 1, 1, 0]
                   }}
                   transition={{
-                    duration: 0.5,
-                    delay: 3,
-                    times: [0, 0.5, 1],
+                    duration: 1.5,
+                    delay: 4.5,
+                    times: [0, 0.1, 0.9, 1],
                     ease: "linear"
                   }}
                 />
@@ -612,7 +612,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   }}
                   transition={{
                     duration: 1.5,
-                    delay: 4,
+                    delay: 6,
                     ease: "linear"
                   }}
                 />
