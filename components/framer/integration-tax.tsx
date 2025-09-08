@@ -72,8 +72,17 @@ export default function IntegrationTaxGif({
     t < T3 ? 1 :
     1 - (t - T3) / xfadeMs;
 
-  const beforeDraw = ease(s(t < T1 ? t / beforeMs : t < T2 ? 1 - (t - T1) / xfadeMs : 0));
-  const afterDraw  = ease(s(t < T2 ? (t - T1) / xfadeMs : t < T3 ? (t - T2) / afterMs : 1 - (t - T3) / xfadeMs));
+  // Draw behavior: grow left→right, then disappear (no reverse "undraw").
+  // - BEFORE edges: 0→1 during T0..T1, hold at 1 during T1..T2, hidden afterwards until next loop
+  // - AFTER edges:  0→1 during T1..T2, continue to 1 during T2..T3, hold at 1 during T3..T4 (fade out via alpha)
+  const beforeDraw =
+    t < T1 ? ease(s(t / beforeMs)) :
+    t < T2 ? 1 :
+    0;
+  const afterDraw =
+    t < T2 ? ease(s((t - T1) / xfadeMs)) :
+    t < T3 ? ease(s((t - T2) / afterMs)) :
+    1;
 
   // Layout
   const marginX = 140;
