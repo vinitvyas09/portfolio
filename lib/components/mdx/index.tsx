@@ -9,6 +9,7 @@ import ChatGif from "../../../components/framer/chatgif"
 import HeadlineCascade from "../../../components/framer/headline-cascade"
 import MCPWeatherFlow from "../../../components/framer/weather-finder"
 import MCPPort from "../../../components/framer/mcp-port"
+import IntegrationTaxGif from "../../../components/framer/integration-tax"
 
 export const mdxComponents = {
   Intuition,
@@ -20,6 +21,7 @@ export const mdxComponents = {
   HeadlineCascade,
   MCPWeatherFlow,
   MCPPort,
+  IntegrationTaxGif,
   h1: (props: any) => <h1 {...props} className="text-4xl font-light tracking-tight mt-12 mb-6" />,
   h2: (props: any) => <h2 {...props} className="text-3xl font-light tracking-tight mt-10 mb-4" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h3: (props: any) => <h3 {...props} className="text-2xl font-light tracking-tight mt-8 mb-3" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,

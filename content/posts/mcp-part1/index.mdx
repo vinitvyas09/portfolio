@@ -83,7 +83,8 @@ This is more than just tedious. From an organizational perspective, this creates
 
 It is not that there were zero solutions to this: Teams tried bespoke adapters, vendor-specific plugins (OpenAI had one too, which it later cancelled), and brittle middle layers. It worked in demos and failed at scale whereas the M×N explosion made integration costs grow nonlinearly.
 
-*GIF suggestion: before/after diagram. Before: dense bipartite graph (many LLM clients ↔ many tools) showing ~m×n lines. After: a hub labeled “MCP server(s)” sits between them; clients connect once, tools implement once → m + n lines.*
+<IntegrationTaxGif />
+<br />
 
 Note that I'm conveniently glossing over other hard problems like context window limitations that led to RAG, or the need for deterministic control that spawned LangGraph. We're laser-focused on the specific pain that birthed MCP.
 
