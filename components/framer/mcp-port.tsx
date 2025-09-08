@@ -206,21 +206,28 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     };
   }, [mounted]);
   
+  // Force re-render to update highlights
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => forceUpdate(n => n + 1), 50);
+    return () => clearInterval(interval);
+  }, []);
+  
   // Helper function to check if a box is active based on animation timing
   const isAgentActive = (agentId: string) => {
     return activeConnections.some(conn => {
       if (conn.agent !== agentId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active at start (0-500ms) and when return pulse arrives (5000-5500ms)
-      return (elapsed >= 0 && elapsed <= 500) || (elapsed >= 5000 && elapsed <= 5500);
+      // Active at start (0-500ms) and when return pulse arrives (5500-6000ms)
+      return (elapsed >= 0 && elapsed <= 500) || (elapsed >= 5500 && elapsed <= 6000);
     });
   };
   
   const isServerActive = () => {
     return activeConnections.some(conn => {
       const elapsed = Date.now() - conn.startTime;
-      // Active when forward pulse arrives (1000-1500ms) and when return pulse arrives (3500-4000ms)
-      return (elapsed >= 1000 && elapsed <= 1500) || (elapsed >= 3500 && elapsed <= 4000);
+      // Active when forward pulse arrives (1000-1500ms) and when return pulse arrives (4000-4500ms)
+      return (elapsed >= 1000 && elapsed <= 1500) || (elapsed >= 4000 && elapsed <= 4500);
     });
   };
   
