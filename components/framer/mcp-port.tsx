@@ -602,16 +602,16 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   r="6"
                   fill={C.pulseColor}
                   filter="url(#pulseGlow)"
-                  initial={{ x: p2.x, y: p2.y, opacity: 0 }}
+                  initial={{ x: serverX, y: serverY, opacity: 0 }}
                   animate={{
                     x: [...xPoints].reverse(),
                     y: [...yPoints].reverse(),
-                    opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+                    opacity: 1
                   }}
                   transition={{
-                    duration: 1.5,
-                    delay: 7,
-                    ease: "linear"
+                    x: { duration: 1.5, delay: 7, ease: "linear" },
+                    y: { duration: 1.5, delay: 7, ease: "linear" },
+                    opacity: { duration: 0.2, delay: 7 }
                   }}
                 />
               </g>
