@@ -356,14 +356,240 @@ export default function MCPWeatherFlow({
           </filter>
         </defs>
 
-        {/* Nodes */}
+      {/* Nodes */}
         <Node {...user} id="user" gradient="userGradient" isActive={activeElements.has("user")} C={C} />
         <Node {...llm} id="llm" gradient="llmGradient" isActive={activeElements.has("llm")} C={C} />
         <Node {...sw} id="sw" gradient="swGradient" isActive={activeElements.has("sw")} C={C} />
         <Node {...api} id="api" gradient="apiGradient" isActive={activeElements.has("api")} C={C} />
 
-      {/* Top message area */}
-      {/* User typed question at top */}
+        {/* Edges with more sophisticated paths */}
+        {/* Draw edges before messages so they appear behind */}
+        <g opacity={0.8}>
+          {/* User → LLM */}
+          <motion.path
+            d={`M ${user.x + user.w/2} ${user.y + user.h} L ${llm.x + llm.w/2} ${llm.y}`}
+            stroke={activeElements.has("user") && activeElements.has("llm") ? C.edgeActive : C.edgeColor}
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          />
+          
+          {/* LLM → Software */}
+          <motion.path
+            d={`M ${llm.x + llm.w/2} ${llm.y + llm.h} L ${sw.x + sw.w/2} ${sw.y}`}
+            stroke={activeElements.has("llm") && activeElements.has("sw") ? C.edgeActive : C.edgeColor}
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          />
+          
+          {/* Software → API */}
+          <motion.path
+            d={`M ${sw.x + sw.w/2} ${sw.y + sw.h} L ${api.x + api.w/2} ${api.y}`}
+            stroke={activeElements.has("sw") && activeElements.has("api") ? C.edgeActive : C.edgeColor}
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          />
+        </g>
+        
+        {/* Animated packets with glow */}
+        <AnimatePresence>
+          {active("userType") && (
+            <motion.circle
+              r="5"
+              fill={C.pulseColor}
+              filter="url(#pulseGlow)"
+              initial={{ cx: user.x + user.w/2, cy: user.y + user.h, opacity: 0 }}
+              animate={{ 
+                cx: llm.x + llm.w/2, 
+                cy: llm.y,
+                opacity: [0, 1, 1, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: D.userType / 1000, ease: "easeInOut" }}
+            />
+          )}
+          
+          {active("llmToSw") && (
+            <motion.circle
+              r="5"
+              fill={C.pulseColor}
+              filter="url(#pulseGlow)"
+              initial={{ cx: llm.x + llm.w/2, cy: llm.y + llm.h, opacity: 0 }}
+              animate={{ 
+                cx: sw.x + sw.w/2, 
+                cy: sw.y,
+                opacity: [0, 1, 1, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: D.llmToSw / 1000, ease: "easeInOut" }}
+            />
+          )}
+          
+          {active("swToApi") && (
+            <motion.circle
+              r="5"
+              fill={C.pulseColor}
+              filter="url(#pulseGlow)"
+              initial={{ cx: sw.x + sw.w/2, cy: sw.y + sw.h, opacity: 0 }}
+              animate={{ 
+                cx: api.x + api.w/2, 
+                cy: api.y,
+                opacity: [0, 1, 1, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: D.swToApi / 1000, ease: "easeInOut" }}
+            />
+          )}
+          
+          {active("apiToSw") && (
+            <motion.circle
+              r="5"
+              fill={C.apiGrad1}
+              filter="url(#pulseGlow)"
+              initial={{ cx: api.x + api.w/2, cy: api.y, opacity: 0 }}
+              animate={{ 
+                cx: sw.x + sw.w/2, 
+                cy: sw.y + sw.h,
+                opacity: [0, 1, 1, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: D.apiToSw / 1000, ease: "easeInOut" }}
+            />
+          )}
+          
+          {active("swToLlm") && (
+            <motion.circle
+              r="5"
+              fill={C.swGrad1}
+              filter="url(#pulseGlow)"
+              initial={{ cx: sw.x + sw.w/2, cy: sw.y, opacity: 0 }}
+              animate={{ 
+                cx: llm.x + llm.w/2, 
+                cy: llm.y + llm.h,
+                opacity: [0, 1, 1, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: D.swToLlm / 1000, ease: "easeInOut" }}
+            />
+          )}
+          
+          {active("llmToUser") && (
+            <motion.circle
+              r="5"
+              fill={C.llmGrad1}
+              filter="url(#pulseGlow)"
+              initial={{ cx: llm.x + llm.w/2, cy: llm.y, opacity: 0 }}
+              animate={{ 
+                cx: user.x + user.w/2, 
+                cy: user.y + user.h,
+                opacity: [0, 1, 1, 0]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: D.llmToUser / 1000, ease: "easeInOut" }}
+            />
+          )}
+        </AnimatePresence>
+        
+        {/* Message labels */}
+        <AnimatePresence>
+          {active("llmToSw") && (
+            <motion.g
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.3 }}
+            >
+              <rect 
+                x={llm.x + llm.w/2 - 110}
+                y={llm.y + llm.h + 20}
+                width={220}
+                height={24}
+                rx={12}
+                fill={C.labelBg}
+                fillOpacity={0.9}
+              />
+              <text
+                x={llm.x + llm.w/2}
+                y={llm.y + llm.h + 36}
+                fill={C.labelText}
+                fontSize="11"
+                fontFamily="monospace"
+                textAnchor="middle"
+              >
+                getWeather("San Francisco")
+              </text>
+            </motion.g>
+          )}
+          
+          {active("swToApi") && (
+            <motion.g
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.3 }}
+            >
+              <rect 
+                x={sw.x + sw.w/2 - 100}
+                y={sw.y + sw.h + 20}
+                width={200}
+                height={24}
+                rx={12}
+                fill={C.labelBg}
+                fillOpacity={0.9}
+              />
+              <text
+                x={sw.x + sw.w/2}
+                y={sw.y + sw.h + 36}
+                fill={C.labelText}
+                fontSize="11"
+                fontFamily="monospace"
+                textAnchor="middle"
+              >
+                GET /weather?city=SF
+              </text>
+            </motion.g>
+          )}
+          
+          {active("apiToSw") && (
+            <motion.g
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.3 }}
+            >
+              <rect 
+                x={api.x + api.w/2 - 90}
+                y={api.y - 35}
+                width={180}
+                height={24}
+                rx={12}
+                fill={C.labelBg}
+                fillOpacity={0.9}
+              />
+              <text
+                x={api.x + api.w/2}
+                y={api.y - 19}
+                fill={C.labelText}
+                fontSize="11"
+                fontFamily="monospace"
+                textAnchor="middle"
+              >
+                {"{ temp: 65, clear }"}
+              </text>
+            </motion.g>
+          )}
+        </AnimatePresence>
+      </svg>
+      
+      {/* Message bubbles rendered as HTML overlays for better text handling */}
       <SpeechBubble
         x={nodeX}
         y={MSG_Q_Y}
@@ -375,95 +601,21 @@ export default function MCPWeatherFlow({
             : userMsg
         }
         cursor={active("userType")}
-        align="left"
+        C={C}
       />
 
-      {/* Final LLM answer directly below the question */}
       <SpeechBubble
         x={nodeX}
         y={MSG_A_Y}
         w={MSG_W}
-        visible={stepIndex >= 6 /* show only from step 6 onward */}
+        visible={stepIndex >= 6}
         text={
           stepName === "llmType"
             ? typeSlice(finalMsg, tInStep, D.llmType)
             : finalMsg
         }
         cursor={active("llmType")}
-        align="left"
-      />
-
-      {/* Edges + packets */}
-      {/* A: User → LLM (question) */}
-      <ArrowV
-        {...A}
-        direction={1}
-        showLine={true}
-        packetActive={active("userType")}
-        packetKey={`A-${stepKey}`}
-        durationMs={D.userType}
-        label="ask"
-        labelX="center"
-      />
-
-      {/* B: LLM → Software (function call) */}
-      <ArrowV
-        {...B}
-        direction={1}
-        showLine={true}
-        packetActive={active("llmToSw")}
-        packetKey={`B-${stepKey}`}
-        durationMs={D.llmToSw}
-        label={`function: getWeather({ city: "San Francisco" })`}
-        labelX="center"
-      />
-
-      {/* C: Software → Weather API (HTTP GET) */}
-      <ArrowV
-        {...C}
-        direction={1}
-        showLine={true}
-        packetActive={active("swToApi")}
-        packetKey={`C-${stepKey}`}
-        durationMs={D.swToApi}
-        label={`GET /v1/weather?city=San%20Francisco`}
-        labelX="center"
-      />
-
-      {/* D: Weather API → Software (200 OK JSON) */}
-      <ArrowV
-        {...Dv}
-        direction={-1}
-        showLine={true}
-        packetActive={active("apiToSw")}
-        packetKey={`D-${stepKey}`}
-        durationMs={D.apiToSw}
-        label={`200 OK  { temp: 65, cond: "Clear" }`}
-        labelX="center"
-      />
-
-      {/* E: Software → LLM (feed results) */}
-      <ArrowV
-        {...E}
-        direction={-1}
-        showLine={true}
-        packetActive={active("swToLlm")}
-        packetKey={`E-${stepKey}`}
-        durationMs={D.swToLlm}
-        label={`results → LLM`}
-        labelX="center"
-      />
-
-      {/* F: LLM → User (final answer) */}
-      <ArrowV
-        {...F}
-        direction={-1}
-        showLine={true}
-        packetActive={active("llmToUser")}
-        packetKey={`F-${stepKey}`}
-        durationMs={D.llmToUser}
-        label={`reply`}
-        labelX="center"
+        C={C}
       />
     </div>
   );
