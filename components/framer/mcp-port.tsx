@@ -606,11 +606,28 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   animate={{
                     x: [...xPoints].reverse(),
                     y: [...yPoints].reverse(),
-                    opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+                    opacity: 1
                   }}
                   transition={{
                     duration: 1.5,
                     delay: 7,
+                    ease: "linear"
+                  }}
+                />
+                
+                {/* Fade out return pulse at destination */}
+                <motion.circle
+                  r="6"
+                  fill={C.pulseColor}
+                  filter="url(#pulseGlow)"
+                  initial={{ x: p0.x, y: p0.y, opacity: 0 }}
+                  animate={{
+                    opacity: [0, 0, 1, 0]
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    delay: 8.4,
+                    times: [0, 0.5, 0.6, 1],
                     ease: "linear"
                   }}
                 />
