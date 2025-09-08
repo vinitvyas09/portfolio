@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function MCPArchitectureDiagram({ className }) {
+export default function MCPArchitectureDiagram({ className }: { className?: string }) {
   const W = 1400;
   const H = 900;
   
@@ -33,7 +33,7 @@ export default function MCPArchitectureDiagram({ className }) {
       opacity: 1,
       transition: { duration: 0.8, ease: "easeInOut" }
     }
-  };
+  } as const;
 
   // Define the 3 LLM agents
   const agents = [
@@ -55,7 +55,7 @@ export default function MCPArchitectureDiagram({ className }) {
   ];
 
   // Define which tools each agent connects to (3-4 each)
-  const connections = {
+  const connections: Record<string, string[]> = {
     'chat': ['search', 'db', 'calendar', 'analytics'],
     'ide': ['github', 'db', 'internal'],
     'helpdesk': ['email', 'db', 'payments', 'analytics']
@@ -224,7 +224,7 @@ export default function MCPArchitectureDiagram({ className }) {
             const agentY = 220 + agentIdx * 200;
             const agentX = 330;
             
-            return connections[agent.id].map((toolId, connIdx) => {
+            return connections[agent.id].map((toolId: string, connIdx: number) => {
               const toolIdx = tools.findIndex(t => t.id === toolId);
               const serverY = 135 + toolIdx * 95;
               const serverX = 600;
