@@ -171,8 +171,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     if (!mounted) return;
     
     const startRandomAnimation = () => {
-      // Clean up old connections (remove those older than 6.5 seconds to ensure full animation completes)
-      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 6500));
+      // Clean up old connections (remove those older than 8 seconds to ensure full animation completes)
+      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 8000));
       
       // Pick a random agent
       const randomAgent = agents[Math.floor(Math.random() * agents.length)];
@@ -195,7 +195,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     // Start animations after initial render
     const initialDelay = setTimeout(() => {
       startRandomAnimation();
-      animationIntervalRef.current = setInterval(startRandomAnimation, 1200);
+      animationIntervalRef.current = setInterval(startRandomAnimation, 1800);
     }, 2000);
     
     return () => {
@@ -218,16 +218,17 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.agent !== agentId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active at start (0-500ms) and when return pulse arrives (5500-6000ms)
-      return (elapsed >= 0 && elapsed <= 500) || (elapsed >= 5500 && elapsed <= 6000);
+      // Active at start (0-600ms) and when return pulse arrives (7000-7600ms)
+      return (elapsed >= 0 && elapsed <= 600) || (elapsed >= 7000 && elapsed <= 7600);
     });
   };
   
-  const isServerActive = () => {
+  const isServerActive = (toolId: string) => {
     return activeConnections.some(conn => {
+      if (conn.tool !== toolId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active when forward pulse arrives (1000-1500ms) and when return pulse arrives (4000-4500ms)
-      return (elapsed >= 1000 && elapsed <= 1500) || (elapsed >= 4000 && elapsed <= 4500);
+      // Active when forward pulse arrives (1500-2500ms) and when return pulse arrives (5000-6000ms)
+      return (elapsed >= 1500 && elapsed <= 2500) || (elapsed >= 5000 && elapsed <= 6000);
     });
   };
   
@@ -235,8 +236,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.tool !== toolId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active when forward pulse arrives (2000-3000ms)
-      return elapsed >= 2000 && elapsed <= 3000;
+      // Active when forward pulse arrives (3000-4500ms)
+      return elapsed >= 3000 && elapsed <= 4500;
     });
   };
 
