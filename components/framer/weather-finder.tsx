@@ -405,7 +405,7 @@ function ArrowH({
     <div className="absolute" style={{ left: x, top: y }}>
       {showLine && (
         <div
-          className="relative z-0"
+          className="relative"
           style={{ width: len, height: 2, background: "rgba(0,0,0,0.12)" }}
         >
           {/* arrowhead */}
@@ -485,7 +485,7 @@ function ArrowV({
     <div className="absolute" style={{ left: x, top: y }}>
       {showLine && (
         <div
-          className="relative z-0"
+          className="relative"
           style={{ width: 2, height: len, background: "rgba(0,0,0,0.12)" }}
         >
           {/* arrowhead */}
