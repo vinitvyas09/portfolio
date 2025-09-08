@@ -20,7 +20,6 @@ export type ChatGifConfig = {
   stepMs?: number; // per-message duration
   dotsMs?: number; // AI thinking dots duration (subset of stepMs)
   pauseMs?: number; // pause after final message before loop
-  showHeader?: boolean; // show minimal header bar
   height?: number; // px height of the container
 };
 
@@ -39,11 +38,10 @@ const DEFAULT_MESSAGES: ChatMessage[] = [
   },
 ];
 
-const DEFAULT_CFG: Required<Pick<ChatGifConfig, "stepMs" | "dotsMs" | "pauseMs" | "showHeader" | "height">> = {
+const DEFAULT_CFG: Required<Pick<ChatGifConfig, "stepMs" | "dotsMs" | "pauseMs" | "height">> = {
   stepMs: 2_500,
   dotsMs: 500,
   pauseMs: 1_000,
-  showHeader: true,
   height: 424, // px, tuned for blog layout
 };
 
@@ -130,16 +128,6 @@ export default function ChatGif({
     <div className={`relative w-full ${className ?? ""}`} style={{ height: cfg.height }}>
       <div className="absolute inset-0 bg-white flex items-center justify-center overflow-hidden">
         <div className="w-full h-full flex flex-col p-3 md:p-4 gap-3 md:gap-4 overflow-hidden">
-          {cfg.showHeader && (
-            <div className="flex items-center justify-between border-b border-gray-200 pb-2 md:pb-3">
-              <div className="h-3 w-12 sm:w-14 rounded-full bg-gray-200" />
-              <div className="flex gap-2">
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-              </div>
-            </div>
-          )}
 
           {/* Messages */}
           <div className="flex-1 flex flex-col gap-2.5 sm:gap-3 text-[14px] sm:text-[15px] md:text-[16px] leading-6 sm:leading-7 overflow-hidden">

@@ -14,7 +14,6 @@ export type HeadlineCascadeConfig = {
   durationMs?: number; // full loop time across all headlines
   density?: number; // kept for backwards-compat (unused)
   tilt?: number; // kept for backwards-compat (unused)
-  showHeader?: boolean; // minimal header chrome
   visibleCount?: number; // how many stacked cards to keep visible
   gap?: number; // px gap between stacked cards
   // Overlap tuning
@@ -50,11 +49,10 @@ const DEFAULT_HEADLINES: Headline[] = [
   },
 ];
 
-const DEFAULTS: Required<Pick<HeadlineCascadeConfig, "height" | "durationMs" | "showHeader">> &
-  Omit<HeadlineCascadeConfig, "height" | "durationMs" | "showHeader"> = {
+const DEFAULTS: Required<Pick<HeadlineCascadeConfig, "height" | "durationMs">> &
+  Omit<HeadlineCascadeConfig, "height" | "durationMs"> = {
   height: 420,
   durationMs: 12_000,
-  showHeader: false,
   // extras
   density: 1,
   tilt: 0,
@@ -169,16 +167,7 @@ export default function HeadlineCascade({
       }`}
       style={{ height: cfg.height }}
     >
-      {cfg.showHeader && (
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 py-2 text-white/60 text-xs tracking-wide">
-          <div className="flex items-center gap-2">
-            <div className="h-2.5 w-2.5 rounded-full bg-white/30" />
-            <div className="h-2.5 w-2.5 rounded-full bg-white/30" />
-            <div className="h-2.5 w-2.5 rounded-full bg-white/30" />
-          </div>
-          <div>Headlines</div>
-        </div>
-      )}
+      {/* Header removed (no three-dot chrome) */}
 
       {/* Centered stack */}
       <div className="absolute inset-0 flex items-center justify-center">
