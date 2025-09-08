@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 /**
  * Framer Motion loop: "Integration Tax — Dense Connections (M×N)"
@@ -33,6 +34,13 @@ export default function IntegrationTaxMcpGif({
   const animDuration = 3000;  // Animation duration
   const pauseDuration = 1500;  // Pause duration
   const totalMs = animDuration + pauseDuration;
+  
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [now, setNow] = useState(0);
   useEffect(() => {
@@ -103,18 +111,61 @@ export default function IntegrationTaxMcpGif({
     return out;
   }, [clients, tools]);
 
-  // Visual constants - enhanced color palette
-  const C = {
-    bg: "#fafafa",
-    grid: "#e5e7eb",
-    line: "#94a3b8",         // slate-400 (visible connections)
-    progressBar: "#4f46e5",  // indigo-600 (progress indicator)
-    client: "#7c3aed",       // violet-600 (more vibrant)
-    clientShadow: "#ddd6fe", // violet-200
-    tool: "#0891b2",         // cyan-600 (more distinct)
-    toolShadow: "#cffafe",   // cyan-100
-    label: "#475569",        // slate-600 (better contrast)
-  };
+  // Visual constants - theme-aware color palette
+  const isDark = resolvedTheme === "dark";
+  
+  const C = useMemo(() => {
+    if (!mounted) {
+      // Default to light theme colors while loading
+      return {
+        bg: "#fafafa",
+        bgGradient: "#f3f4f6",
+        grid: "#e5e7eb",
+        line: "#94a3b8",
+        progressBar: "#4f46e5",
+        client: "#7c3aed",
+        clientLight: "#8b5cf6",
+        clientShadow: "#ddd6fe",
+        tool: "#0891b2",
+        toolLight: "#06b6d4",
+        toolShadow: "#cffafe",
+        label: "#475569",
+        border: "rgba(0,0,0,0.05)",
+      };
+    }
+    
+    return isDark ? {
+      // Dark mode colors
+      bg: "#0f0f10",
+      bgGradient: "#18181b",
+      grid: "#27272a",
+      line: "#52525b",          // zinc-600 (softer in dark)
+      progressBar: "#6366f1",   // indigo-500 (brighter in dark)
+      client: "#a78bfa",        // violet-400 (lighter for dark)
+      clientLight: "#c4b5fd",   // violet-300
+      clientShadow: "#4c1d95",  // violet-900
+      tool: "#22d3ee",          // cyan-400 (lighter for dark)
+      toolLight: "#67e8f9",     // cyan-300
+      toolShadow: "#164e63",    // cyan-900
+      label: "#a1a1aa",         // zinc-400 (readable in dark)
+      border: "rgba(255,255,255,0.05)",
+    } : {
+      // Light mode colors
+      bg: "#fafafa",
+      bgGradient: "#f3f4f6",
+      grid: "#e5e7eb",
+      line: "#94a3b8",          // slate-400 (visible connections)
+      progressBar: "#4f46e5",   // indigo-600 (progress indicator)
+      client: "#7c3aed",        // violet-600 (more vibrant)
+      clientLight: "#8b5cf6",   // violet-500
+      clientShadow: "#ddd6fe",  // violet-200
+      tool: "#0891b2",          // cyan-600 (more distinct)
+      toolLight: "#06b6d4",     // cyan-500
+      toolShadow: "#cffafe",    // cyan-100
+      label: "#475569",         // slate-600 (better contrast)
+      border: "rgba(0,0,0,0.05)",
+    };
+  }, [isDark, mounted]);
 
   // Helpers
   const edgePath = (e: Edge) => `M ${e.x1} ${e.y1} L ${e.x2} ${e.y2}`;
@@ -125,26 +176,28 @@ export default function IntegrationTaxMcpGif({
       style={{
         width: "100%",
         aspectRatio: "1200 / 675",
-        background: `linear-gradient(135deg, ${C.bg} 0%, #f3f4f6 100%)`,
+        background: `linear-gradient(135deg, ${C.bg} 0%, ${C.bgGradient} 100%)`,
         borderRadius: 16,
         overflow: "hidden",
-        boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)",
-        border: "1px solid rgba(0,0,0,0.05)",
+        boxShadow: isDark 
+          ? "0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2)"
+          : "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)",
+        border: `1px solid ${C.border}`,
       }}
     >
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" role="img" aria-hidden>
         {/* Define gradients and filters */}
         <defs>
           <linearGradient id="clientGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="100%" stopColor="#7c3aed" />
+            <stop offset="0%" stopColor={C.clientLight} />
+            <stop offset="100%" stopColor={C.client} />
           </linearGradient>
           <linearGradient id="toolGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#06b6d4" />
-            <stop offset="100%" stopColor="#0891b2" />
+            <stop offset="0%" stopColor={C.toolLight} />
+            <stop offset="100%" stopColor={C.tool} />
           </linearGradient>
           <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.15"/>
+            <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity={isDark ? "0.25" : "0.15"}/>
           </filter>
         </defs>
 
