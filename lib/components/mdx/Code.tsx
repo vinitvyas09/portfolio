@@ -16,7 +16,6 @@ export function Code({
   children, 
   language = "python", 
   title,
-  highlight,
   showLineNumbers = true 
 }: CodeProps) {
   const [copied, setCopied] = useState(false)
