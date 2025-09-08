@@ -104,12 +104,13 @@ export default function MCPWeatherFlow({
   // Reserve space at the top for the two message bubbles
   const MSG_W = nodeW; // keep bubbles similar width to nodes
   const MSG_Q_Y = PAD; // question bubble Y
-  const MSG_A_Y = MSG_Q_Y + 40; // answer bubble just below
+  const MSG_A_Y = MSG_Q_Y + 64; // add a bit more space between bubbles
 
   // Stack nodes vertically below the message area
   const V_GAP = 24; // vertical gap between nodes (tighter)
-  // Leave enough room for up to two lines in the answer bubble
-  const NODES_TOP_Y = MSG_A_Y + 88; // begin nodes after messages
+  // More padding under lower message before the first node
+  const MSG_TO_NODES_GAP = 112;
+  const NODES_TOP_Y = MSG_A_Y + MSG_TO_NODES_GAP; // begin nodes after messages
   const nodeX = PAD;
 
   const user = { x: nodeX, y: NODES_TOP_Y, w: nodeW, h: nodeH, label: "User" };
