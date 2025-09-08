@@ -327,22 +327,24 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
           </text>
           
           {/* LLM Agents */}
-          {agents.map((agent, i) => (
-            <g key={agent.id} transform={`translate(90, ${150 + i * 200})`}>
-              <motion.rect
-                variants={scaleIn}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.3 }}
-                x={0}
-                y={0}
-                width={240}
-                height={140}
-                rx={8}
-                fill={C.cardFill}
-                animate={{
-                  stroke: isAgentActive(agent.id) ? C.highlightStroke : C.cardStroke,
-                  strokeWidth: isAgentActive(agent.id) ? 2 : 1,
-                }}
-              />
+          {agents.map((agent, i) => {
+            const isActive = isAgentActive(agent.id);
+            return (
+              <g key={agent.id} transform={`translate(90, ${150 + i * 200})`}>
+                <motion.rect
+                  variants={scaleIn}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.3 + i * 0.1, duration: 0.3 }}
+                  x={0}
+                  y={0}
+                  width={240}
+                  height={140}
+                  rx={8}
+                  fill={C.cardFill}
+                  stroke={isActive ? C.highlightStroke : C.cardStroke}
+                  strokeWidth={isActive ? 2 : 1}
+                />
               <text x={15} y={35} fontSize="24">
                 {agent.icon}
               </text>
@@ -357,7 +359,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                 Connects to {connections[agent.id].length} MCP servers →
               </text>
             </g>
-          ))}
+            );
+          })}
         </motion.g>
 
         {/* MCP Servers */}
