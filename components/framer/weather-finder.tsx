@@ -168,8 +168,8 @@ export default function MCPWeatherFlow({
 
   return (
     <div
-      className={`relative mx-auto ${className ?? ""}`}
-      style={{ width: W, height: H, background: "white" }}
+      className={`weatherflow wf-panel relative mx-auto ${className ?? ""}`}
+      style={{ width: W, height: H }}
     >
       {/* Nodes */}
       <Node {...user} hue="zinc" />
@@ -343,7 +343,7 @@ function SpeechBubble({
 }) {
   return (
     <motion.div
-      className="absolute rounded-xl bg-zinc-100 text-zinc-900 shadow"
+      className="absolute rounded-xl wf-bubble shadow"
       style={{ left: x, top: y, width: w, padding: 10 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: visible ? 1 : 0 }}
@@ -356,7 +356,7 @@ function SpeechBubble({
         {text}
         {cursor && (
           <motion.span
-            className="inline-block w-[8px] ml-[2px] h-[1.2em] align-middle bg-black/70"
+            className="mono-caret inline-block w-[8px] ml-[2px] h-[1.2em] align-middle"
             animate={{ opacity: [0, 1, 1, 0] }}
             transition={{ duration: 1, repeat: Infinity }}
           />
@@ -366,7 +366,7 @@ function SpeechBubble({
       <div
         className={`absolute -bottom-2 ${
           align === "left" ? "left-4" : "right-4"
-        } w-0 h-0 border-t-[8px] border-t-zinc-100 border-x-[8px] border-x-transparent`}
+        } w-0 h-0 border-t-[8px] wf-bubble-tail border-x-[8px] border-x-transparent`}
       />
     </motion.div>
   );
@@ -405,8 +405,8 @@ function ArrowH({
     <div className="absolute" style={{ left: x, top: y }}>
       {showLine && (
         <div
-          className="relative"
-          style={{ width: len, height: 2, background: "rgba(0,0,0,0.12)" }}
+          className="relative wf-line"
+          style={{ width: len, height: 2 }}
         >
           {/* arrowhead */}
           <div
@@ -414,13 +414,13 @@ function ArrowH({
               headSide === "right" ? "right-0" : "left-0 rotate-180"
             }`}
           >
-            <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[9px] border-l-zinc-400" />
+            <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[9px] border-l-zinc-400 dark:border-l-zinc-500" />
           </div>
 
           {/* label pill */}
           {label && (
             <motion.div
-              className="absolute -top-8 rounded-md bg-zinc-900 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
+              className="absolute -top-8 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
               style={{ left: labelLeft, width: 140, textAlign: "center" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: packetActive ? 1 : 0 }}
@@ -485,8 +485,8 @@ function ArrowV({
     <div className="absolute" style={{ left: x, top: y }}>
       {showLine && (
         <div
-          className="relative"
-          style={{ width: 2, height: len, background: "rgba(0,0,0,0.12)" }}
+          className="relative wf-line"
+          style={{ width: 2, height: len }}
         >
           {/* arrowhead */}
           <div
@@ -494,13 +494,13 @@ function ArrowV({
               headSide === "bottom" ? "bottom-0" : "top-0 rotate-180"
             } left-1/2 -translate-x-1/2`}
           >
-            <div className="w-0 h-0 border-x-[6px] border-x-transparent border-t-[9px] border-t-zinc-400" />
+            <div className="w-0 h-0 border-x-[6px] border-x-transparent border-t-[9px] border-t-zinc-400 dark:border-t-zinc-500" />
           </div>
 
           {/* label pill */}
           {label && (
             <motion.div
-              className="absolute top-1/2 -translate-y-1/2 rounded-md bg-zinc-900 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
+              className="absolute top-1/2 -translate-y-1/2 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
               style={{ left: labelLeft, width: 140, textAlign: "center" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: packetActive ? 1 : 0 }}

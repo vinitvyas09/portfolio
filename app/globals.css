@@ -273,6 +273,32 @@ li {
   background: rgba(255, 255, 255, 0.7);
 }
 
+/* WeatherFlow theming (SSR-safe) */
+.weatherflow .wf-panel {
+  background: hsl(var(--card));
+}
+
+.weatherflow .wf-bubble {
+  background: hsl(var(--secondary));
+  color: hsl(var(--foreground));
+}
+
+.weatherflow .wf-bubble-tail {
+  border-top-color: hsl(var(--secondary));
+}
+
+.weatherflow .wf-line {
+  background: hsl(var(--border));
+}
+
+.weatherflow .mono-caret {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .weatherflow .mono-caret {
+  background: rgba(255, 255, 255, 0.7);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
