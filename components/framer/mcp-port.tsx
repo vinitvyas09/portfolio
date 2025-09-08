@@ -1,350 +1,300 @@
-"use client";
-import * as React from "react";
+import React from "react";
 import { motion } from "framer-motion";
 
-/**
- * MCPPort — animated, labeled with MCP Client/Server and "MCP Protocol" connectors
- */
-export default function MCPPort({ className }: { className?: string }) {
-  const W = 800;
-  const H = 600;
-  const cx = W / 2;
-  const cy = H / 2;
+export default function MCPArchitectureDiagram({ className }) {
+  const W = 1400;
+  const H = 900;
+  
+  // Animation variants
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  };
+  
+  const slideFromLeft = {
+    hidden: { x: -50, opacity: 0 },
+    visible: { x: 0, opacity: 1 }
+  };
+  
+  const slideFromRight = {
+    hidden: { x: 50, opacity: 0 },
+    visible: { x: 0, opacity: 1 }
+  };
+  
+  const scaleIn = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: { scale: 1, opacity: 1 }
+  };
+  
+  const drawLine = {
+    hidden: { pathLength: 0, opacity: 0 },
+    visible: { 
+      pathLength: 1, 
+      opacity: 1,
+      transition: { duration: 0.8, ease: "easeInOut" }
+    }
+  };
 
-  // Top row: many apps/clients that can use the tool via MCP
-  const apps = [
-    { id: "gpt", label: "GPT", color: "#111827" },
-    { id: "chatgpt", label: "ChatGPT", color: "#10A37F" },
-    { id: "claude", label: "Claude", color: "#0F766E" },
-    { id: "gemini", label: "Gemini", color: "#2563EB" },
-    { id: "copilot", label: "Copilot", color: "#7C3AED" },
-    { id: "cursor", label: "Cursor", color: "#DB2777" },
-  ] as const;
+  // Define the 3 LLM agents
+  const agents = [
+    { id: 'chat', name: 'Chat App', icon: '💬', color: '#4a9eff' },
+    { id: 'ide', name: 'IDE Agent', icon: '🔧', color: '#ff6b6b' },
+    { id: 'helpdesk', name: 'Helpdesk Agent', icon: '🎧', color: '#ffd93d' }
+  ];
 
-  // Center: MCP server box
-  const box = { x: cx - 180, y: cy - 60, w: 360, h: 120 };
-  const slotTop = { x: box.x + 90, y: box.y - 10, w: 180, h: 20 };
-  const slotBottom = { x: box.x + 90, y: box.y + box.h - 10, w: 180, h: 20 };
+  // Define the 8 tools/servers
+  const tools = [
+    { id: 'search', name: 'Search', icon: '🔍', color: '#4285f4' },
+    { id: 'db', name: 'Database', icon: '🗄️', color: '#336791' },
+    { id: 'github', name: 'GitHub', icon: '🐙', color: '#24292e' },
+    { id: 'email', name: 'Email', icon: '📧', color: '#ea4335' },
+    { id: 'calendar', name: 'Calendar', icon: '📅', color: '#0f9d58' },
+    { id: 'payments', name: 'Payments', icon: '💳', color: '#635bff' },
+    { id: 'analytics', name: 'Analytics', icon: '📊', color: '#ff6900' },
+    { id: 'internal', name: 'Internal Services', icon: '⚙️', color: '#6b7280' }
+  ];
 
-  // Utility: make a smooth cubic curve from (x1,y1) to (x2,y2)
-  const curve = (x1: number, y1: number, x2: number, y2: number) => {
-    const dx = x2 - x1;
-    const c1 = `${x1},${y1 + 40}`;          // pull down from the pill
-    const c2 = `${x2},${y2 - 40}`;          // pull up into the slot
-    return `M ${x1},${y1} C ${c1} ${c2} ${x2},${y2}`;
+  // Define which tools each agent connects to (3-4 each)
+  const connections = {
+    'chat': ['search', 'db', 'calendar', 'analytics'],
+    'ide': ['github', 'db', 'internal'],
+    'helpdesk': ['email', 'db', 'payments', 'analytics']
   };
 
   return (
     <div
-      className={["mcp-card", className].filter(Boolean).join(" ")}
+      className={className}
       style={{
         width: "100%",
-        maxWidth: 800,
+        maxWidth: 1400,
         margin: "0 auto",
         aspectRatio: `${W} / ${H}`,
         borderRadius: 16,
-        overflow: "hidden",
+        background: "#1a1a1a",
+        padding: "20px",
       }}
     >
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        width="100%"
-        height="100%"
-        style={{ display: "block", background: "transparent" }}
-      >
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%">
+        <defs>
+          {/* Gradient for MCP Host box */}
+          <linearGradient id="hostGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2a2a2a" />
+            <stop offset="100%" stopColor="#1a1a1a" />
+          </linearGradient>
+          
+          {/* Glow effect for servers */}
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
         {/* Title */}
-        <text
-          x={cx}
-          y={28}
-          textAnchor="middle"
-          fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-          fontSize="14"
-          fill="#6B7280"
-        >
-          Apps & Tools connect via MCP
+        <text x={W/2} y={40} fill="#888" fontSize="18" fontWeight="500" textAnchor="middle">
+          3 LLM Agents × 8 Tools via MCP (Selective Connections)
         </text>
 
-        {/* --- MCP CLIENTS LABEL --- */}
-        <g>
-          <rect
-            x={cx - 160}
-            y={48}
-            width={120}
-            height={24}
-            rx={6}
-            fill="#EEF2FF"
-            stroke="#C7D2FE"
-          />
-          <text
-            x={cx - 100}
-            y={65}
-            textAnchor="middle"
-            fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-            fontWeight={600}
-            fontSize="11"
-            fill="#3730A3"
-          >
-            MCP Clients
-          </text>
-        </g>
-
-        {/* Top: App pills in a horizontal row */}
-        {apps.map((a, i) => {
-          const pillW = 100;
-          const pillH = 28;
-          const totalWidth = apps.length * pillW + (apps.length - 1) * 20;
-          const startX = cx - totalWidth / 2;
-          const x = startX + i * (pillW + 20);
-          const y = 86;
-
-          // Connection points on top slot
-          const docks = apps.length;
-          const span = Math.min(140, slotTop.w - 20);
-          const xDock = slotTop.x + 10 + (span * i) / Math.max(1, docks - 1);
-          const yDock = slotTop.y + slotTop.h;
-
-          const pathId = `conn-${a.id}`;
-          const d = curve(x + pillW / 2, y + pillH + 8, xDock, yDock);
-
-          return (
-            <g key={a.id}>
-              {/* connector path (animated draw) */}
-              <motion.path
-                id={pathId}
-                d={d}
-                fill="none"
-                stroke={a.color}
-                strokeWidth={3}
-                strokeLinecap="round"
-                initial={{ pathLength: 0, opacity: 0.7 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.9, delay: 0.1 + i * 0.06, ease: "easeInOut" }}
-              />
-              {/* "MCP Protocol" label riding the path */}
-              <motion.text
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.45 + i * 0.06 }}
-                fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-                fontSize="10"
-                fontWeight={600}
-                fill="#6B7280"
-                pointerEvents="none"
-              >
-                <textPath href={`#${pathId}`} startOffset="50%">
-                  <tspan textAnchor="middle">MCP Protocol</tspan>
-                </textPath>
-              </motion.text>
-
-              {/* dock point */}
-              <circle cx={xDock} cy={yDock} r={3.5} fill={a.color} />
-
-              {/* pill */}
-              <motion.g
-                transform={`translate(${x}, ${y})`}
-                initial={{ y: -12, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.35, delay: 0.05 + i * 0.05 }}
-              >
-                <rect
-                  className="pill"
-                  width={pillW}
-                  height={pillH}
-                  rx={pillH / 2}
-                  fill="#F3F4F6"
-                  stroke="#E5E7EB"
-                />
-                <text
-                  className="pill-label"
-                  x={pillW / 2}
-                  y={pillH / 2 + 5}
-                  textAnchor="middle"
-                  fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-                  fontSize="12"
-                  fill="#111827"
-                >
-                  {a.label}
-                </text>
-              </motion.g>
-            </g>
-          );
-        })}
-
-        {/* Center: MCP Server box */}
+        {/* MCP Host Container */}
         <motion.g
-          initial={{ scale: 0.97, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.35, delay: 0.2 }}
+          initial="hidden"
+          animate="visible"
+          variants={slideFromLeft}
+          transition={{ duration: 0.5 }}
         >
           <rect
-            className="mcp-box"
-            x={box.x}
-            y={box.y}
-            width={box.w}
-            height={box.h}
-            rx={16}
-            fill="#FFFFFF"
-            stroke="#E5E7EB"
-            strokeWidth="1.5"
+            x={50}
+            y={80}
+            width={320}
+            height={700}
+            rx={12}
+            fill="url(#hostGradient)"
+            stroke="#3a3a3a"
+            strokeWidth="2"
+            strokeDasharray="8 4"
           />
-          {/* Server label */}
-          <text
-            x={box.x + 12}
-            y={box.y + 22}
-            fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-            fontWeight={600}
-            fontSize="12"
-            fill="#111827"
-          >
-            MCP Server
+          
+          <text x={70} y={110} fill="#888" fontSize="16" fontWeight="500">
+            MCP Host
           </text>
-
-          {/* MCP chip in center */}
-          <rect
-            className="mcp-chip"
-            x={box.x + box.w / 2 - 42}
-            y={box.y + box.h / 2 - 13}
-            width={84}
-            height={26}
-            rx={13}
-            fill="#F3F4F6"
-          />
-          <text
-            className="mcp-chip-text"
-            x={box.x + box.w / 2}
-            y={box.y + box.h / 2 + 4}
-            textAnchor="middle"
-            fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
-            fontSize="14"
-            fontWeight="600"
-            fill="#111827"
-          >
-            MCP
-          </text>
-
-          {/* Top slot */}
-          <rect
-            x={slotTop.x}
-            y={slotTop.y}
-            width={slotTop.w}
-            height={slotTop.h}
-            rx={10}
-            fill="#111827"
-            opacity={0.9}
-          />
-          <rect
-            x={slotTop.x + 18}
-            y={slotTop.y + 4}
-            width={slotTop.w - 36}
-            height={slotTop.h - 8}
-            rx={5}
-            fill="#374151"
-          />
-
-          {/* Bottom slot */}
-          <rect
-            x={slotBottom.x}
-            y={slotBottom.y}
-            width={slotBottom.w}
-            height={slotBottom.h}
-            rx={10}
-            fill="#111827"
-            opacity={0.9}
-          />
-          <rect
-            x={slotBottom.x + 18}
-            y={slotBottom.y + 4}
-            width={slotBottom.w - 36}
-            height={slotBottom.h - 8}
-            rx={5}
-            fill="#374151"
-          />
+          
+          {/* LLM Agents */}
+          {agents.map((agent, i) => (
+            <g key={agent.id} transform={`translate(90, ${150 + i * 200})`}>
+              <motion.rect
+                variants={scaleIn}
+                transition={{ delay: 0.3 + i * 0.1 }}
+                x={0}
+                y={0}
+                width={240}
+                height={140}
+                rx={8}
+                fill="#2a2a2a"
+                stroke="#444"
+              />
+              <text x={15} y={35} fontSize="24">
+                {agent.icon}
+              </text>
+              <text x={50} y={35} fill={agent.color} fontSize="16" fontWeight="600">
+                {agent.name}
+              </text>
+              <rect x={15} y={60} width={210} height={35} rx={4} fill="#00a67e" />
+              <text x={120} y={82} fill="white" fontSize="14" fontWeight="500" textAnchor="middle">
+                MCP Client
+              </text>
+              <text x={15} y={120} fill="#666" fontSize="11">
+                Connects to {connections[agent.id].length} MCP servers →
+              </text>
+            </g>
+          ))}
         </motion.g>
 
-        {/* Bottom: Google Drive (example tool) */}
-        <g>
-          {(() => {
-            const pillW = 120;
-            const pillH = 28;
-            const driveX = cx - pillW / 2;
-            const driveY = box.y + box.h + 80;
-
-            // Connection point on bottom slot
-            const connX = slotBottom.x + slotBottom.w / 2;
-            const connY = slotBottom.y;
-
-            // Gentle curve downward
-            const d = curve(connX, connY, driveX + pillW / 2, driveY - 8);
-            const pathId = "conn-drive";
-
+        {/* MCP Servers */}
+        <motion.g
+          initial="hidden"
+          animate="visible"
+          variants={scaleIn}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          {tools.map((tool, i) => {
+            const y = 100 + i * 95;
             return (
-              <>
-                <motion.path
-                  id={pathId}
-                  d={d}
-                  fill="none"
-                  stroke="#4285F4"
-                  strokeWidth={3}
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0.7 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.9, delay: 0.35, ease: "easeInOut" }}
+              <g key={tool.id} transform={`translate(600, ${y})`}>
+                <rect
+                  x={0}
+                  y={0}
+                  width={180}
+                  height={70}
+                  rx={8}
+                  fill="#1e3a4a"
+                  stroke="#2a5a7a"
+                  strokeWidth="1.5"
+                  filter="url(#glow)"
                 />
-                {/* (This one is not MCP; it's the tool/backend side) */}
-                <motion.g
-                  transform={`translate(${driveX}, ${driveY})`}
-                  initial={{ y: 12, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.35, delay: 0.45 }}
-                >
-                  <rect
-                    className="pill"
-                    width={pillW}
-                    height={pillH}
-                    rx={pillH / 2}
-                    fill="#F3F4F6"
-                    stroke="#E5E7EB"
-                  />
-                  <text
-                    className="pill-label"
-                    x={pillW / 2}
-                    y={pillH / 2 + 5}
-                    textAnchor="middle"
-                    fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-                    fontSize="12"
-                    fill="#111827"
-                  >
-                    Google Drive
-                  </text>
-                </motion.g>
-              </>
+                <rect x={10} y={12} width={6} height={6} rx={1} fill="#00ff88" />
+                <rect x={10} y={22} width={6} height={6} rx={1} fill="#00ff88" />
+                <rect x={10} y={32} width={6} height={6} rx={1} fill="#00ff88" />
+                <rect x={22} y={12} width={30} height={3} rx={1} fill="#2a5a7a" />
+                <rect x={22} y={22} width={40} height={3} rx={1} fill="#2a5a7a" />
+                <rect x={22} y={32} width={25} height={3} rx={1} fill="#2a5a7a" />
+                <text x={90} y={52} fill="#8ab4c4" fontSize="13" fontWeight="500" textAnchor="middle">
+                  MCP Server
+                </text>
+              </g>
             );
-          })()}
+          })}
+        </motion.g>
+
+        {/* Tools/Resources on the right - Made wider */}
+        <motion.g
+          initial="hidden"
+          animate="visible"
+          variants={slideFromRight}
+          transition={{ duration: 0.5, delay: 0.8 }}
+        >
+          {tools.map((tool, i) => {
+            const y = 100 + i * 95;
+            return (
+              <g key={tool.id} transform={`translate(900, ${y})`}>
+                <rect 
+                  x={0} 
+                  y={0} 
+                  width={260} 
+                  height={70} 
+                  rx={8} 
+                  fill={tool.color} 
+                  opacity={0.9}
+                />
+                <text x={20} y={40} fontSize="28">
+                  {tool.icon}
+                </text>
+                <text x={60} y={40} fill="white" fontSize="16" fontWeight="500">
+                  {tool.name}
+                </text>
+              </g>
+            );
+          })}
+        </motion.g>
+
+        {/* Connection Lines - Selective connections based on the connections map */}
+        <g>
+          {agents.map((agent, agentIdx) => {
+            const agentY = 220 + agentIdx * 200;
+            const agentX = 330;
+            
+            return connections[agent.id].map((toolId, connIdx) => {
+              const toolIdx = tools.findIndex(t => t.id === toolId);
+              const serverY = 135 + toolIdx * 95;
+              const serverX = 600;
+              
+              // Calculate control points for curved paths
+              const midX = (agentX + serverX) / 2;
+              
+              return (
+                <g key={`${agent.id}-${toolId}`}>
+                  <motion.path
+                    d={`M ${agentX} ${agentY} Q ${midX} ${agentY} ${serverX} ${serverY}`}
+                    stroke={agent.color}
+                    strokeWidth="1.5"
+                    fill="none"
+                    opacity={0.6}
+                    initial="hidden"
+                    animate="visible"
+                    variants={drawLine}
+                    transition={{ delay: 0.8 + agentIdx * 0.2 + connIdx * 0.1 }}
+                  />
+                </g>
+              );
+            });
+          })}
+          
+          {/* MCP Protocol labels - one for each agent's bundle of connections */}
+          {agents.map((agent, idx) => (
+            <motion.text
+              key={`protocol-${agent.id}`}
+              x={465}
+              y={220 + idx * 200}
+              fill="#00a67e"
+              fontSize="11"
+              fontWeight="500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5 }}
+              textAnchor="middle"
+            >
+              MCP Protocol
+            </motion.text>
+          ))}
         </g>
 
-        {/* Legend / concise definitions */}
+        {/* Server to Tool connections (dashed lines) */}
         <g>
-          <text
-            x={cx}
-            y={H - 42}
-            textAnchor="middle"
-            fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-            fontSize="11"
-            fill="#6B7280"
-          >
-            MCP Client: runs in the model host and speaks MCP.
-          </text>
-          <text
-            x={cx}
-            y={H - 24}
-            textAnchor="middle"
-            fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI"
-            fontSize="11"
-            fill="#6B7280"
-          >
-            MCP Server: external process exposing tools/resources over MCP.
-          </text>
+          {tools.map((tool, i) => {
+            const y = 135 + i * 95;
+            return (
+              <motion.line
+                key={`server-tool-${tool.id}`}
+                x1={780}
+                y1={y}
+                x2={900}
+                y2={y}
+                stroke="#666"
+                strokeWidth="2"
+                strokeDasharray="5 5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.3 + i * 0.05 }}
+              />
+            );
+          })}
         </g>
+
+        {/* Bottom text */}
+        <text x={W/2} y={H - 20} fill="#666" fontSize="14" textAnchor="middle">
+          MCP enables flexible tool access: agents connect only to the tools they need
+        </text>
       </svg>
     </div>
   );
