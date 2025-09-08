@@ -33,7 +33,9 @@ The model was incredible, unlike anything before it. It could hold actual conver
 <br />
 It became the fastest app to reach 1 million users (5 days) and 100 million (2 months). The hype train went full throttle: Bill Gates prophesized a future without work, Sam Altman imagined universal basic income for a jobless population, Geoffrey Hinton warned of AI soldiers, and, post GPT4 release, Microsoft released a "Sparks of AGI" paper.
 
-*GIF suggestion: Cascade of real headlines from that era, building in intensity to show the hysteria.*
+<HeadlineCascade
+  config={{ height: 420, durationMs: 12000, density: 4, tilt: 10, showHeader: true }}
+/>
 
 Individuals found immediate value. Prosecutors could summarize 30-page judgments. Teachers explained complex concepts simply ("explain water's anomalous behavior to a 5-year-old"). Engineers could debug code snippets. Individual productivity seemed to skyrocket!
 
@@ -61,7 +63,7 @@ New flow:
 → Software feeds results back to LLM  
 → LLM responds to the user with accurate, cited information
 
-*GIF suggestion: Visual flow showing user question → LLM function call → API request → response back to LLM → final answer to user.*
+<MCPWeatherFlow />
 
 This update was so significant it spawned an entire generation of AI applicationsL Search, calendars, CRMs, drives, code hosts, DBs, internal APIs, etc. Cursor/Claude/ChatGPT with web search or Slack/Drive/GitHub bots.
 
