@@ -121,7 +121,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
   const agents = [
     { id: 'chat', name: 'Chat App', icon: '💬', color: '#4a9eff' },
     { id: 'ide', name: 'IDE Agent', icon: '🔧', color: '#ff6b6b' },
-    { id: 'helpdesk', name: 'Helpdesk Agent', icon: '🎧', color: '#ffd93d' }
+    { id: 'helpdesk', name: 'Helpdesk Agent', icon: '🎧', color: '#ffa93d' }
   ];
 
   // Define the 8 tools/servers
