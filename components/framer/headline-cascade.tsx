@@ -288,8 +288,8 @@ export default function HeadlineCascade({
             })}
           {/* offscreen measurer to estimate card height for overlap math */}
           <div className="absolute -z-50 opacity-0 pointer-events-none left-0 top-0 w-full">
-            <div ref={measureRef} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 md:px-5 md:py-4">
-              <div className="block text-white text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words">
+            <div ref={measureRef} className="rounded-xl border border-border bg-card/80 dark:bg-card/60 px-4 py-3 md:px-5 md:py-4">
+              <div className="block text-foreground text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words">
                 {base[step]?.title || "Sample"}
               </div>
             </div>
