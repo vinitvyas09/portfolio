@@ -616,7 +616,7 @@ export default function MCPWeatherFlow({
                 exit={{ opacity: 0 }}
                 transition={{ duration: D.llmToUser / 1000, ease: "easeInOut" }}
               />
-              {/* Label for LLM to User */}
+              {/* Label for LLM to User (centered between nodes) */}
               <motion.g
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -624,8 +624,8 @@ export default function MCPWeatherFlow({
                 transition={{ duration: 0.3 }}
               >
                 <rect 
-                  x={llm.x + llm.w/2 - 30}
-                  y={llm.y - 35}
+                  x={edgeF.x - 30}
+                  y={edgeF.y + edgeF.len / 2 - 10}
                   width={60}
                   height={20}
                   rx={10}
@@ -633,12 +633,13 @@ export default function MCPWeatherFlow({
                   fillOpacity={0.9}
                 />
                 <text
-                  x={llm.x + llm.w/2}
-                  y={llm.y - 21}
+                  x={edgeF.x}
+                  y={edgeF.y + edgeF.len / 2}
                   fill={C.labelText}
                   fontSize="11"
                   fontFamily="monospace"
                   textAnchor="middle"
+                  dominantBaseline="middle"
                 >
                   reply
                 </text>
