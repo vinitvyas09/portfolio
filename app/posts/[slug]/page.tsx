@@ -109,7 +109,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
             <div className="flex gap-4 text-sm">
               <a
-                href={`https://github.com/vinitvyas09/portfolio/tree/main/content/posts/${post.slug}`}
+                href={`https://github.com/vinitvyas09/portfolio/tree/main/content/posts/${post.slug}/index.mdx`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
