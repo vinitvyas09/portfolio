@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
 
 // Shared timeline constants and types
 const STEPS = [
@@ -27,19 +28,11 @@ const D: Record<StepName, number> = {
 };
 
 /**
- * Framer Motion loop: MCP-style “weather tool call” flow as a simple GIFable scene.
- * - Fixed 1200×675 canvas, ~8s loop, minimal UI (no headings).
- * - Sequence:
- *   1) User asks     → “What’s the weather in SF today?”
- *   2) LLM signals   → function call
- *   3) Software      → calls Weather API
- *   4) Weather API   → returns JSON
- *   5) Software      → feeds results to LLM
- *   6) LLM           → replies (with citation)
- *
- * How to use (quick):
- * 1) Install framer-motion. Drop component into a Next.js/React page.
- * 2) Render at 1200×675; screen-record 8–9 s; convert to GIF.
+ * Sophisticated MCP Weather Flow Animation
+ * - Theme-aware with dark/light mode support
+ * - Elegant gradients and glow effects
+ * - Smooth, modern animations with subtle interactions
+ * - Fixed 1200×675 canvas for consistent rendering
  */
 
 export default function MCPWeatherFlow({
@@ -49,6 +42,101 @@ export default function MCPWeatherFlow({
   className?: string;
   height?: number;
 }) {
+  // Theme handling (match pattern from mcp-port)
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
+  
+  // Theme-aware sophisticated color palette
+  const C = useMemo(() => {
+    if (!mounted) {
+      return {
+        bg1: "#fafafa",
+        bg2: "#f3f4f6",
+        textPrimary: "#1f2937",
+        textSecondary: "#64748b",
+        textMuted: "#94a3b8",
+        cardBg: "#ffffff",
+        cardBorder: "#e2e8f0",
+        cardShadow: "rgba(0, 0, 0, 0.05)",
+        userGrad1: "#6366f1",
+        userGrad2: "#8b5cf6",
+        llmGrad1: "#3b82f6",
+        llmGrad2: "#0ea5e9",
+        swGrad1: "#8b5cf6",
+        swGrad2: "#d946ef",
+        apiGrad1: "#10b981",
+        apiGrad2: "#34d399",
+        pulseColor: "#3b82f6",
+        pulseGlow: "#60a5fa",
+        messageBg: "#ffffff",
+        messageBorder: "#e2e8f0",
+        messageText: "#1f2937",
+        edgeColor: "#cbd5e1",
+        edgeActive: "#3b82f6",
+        labelBg: "#1e293b",
+        labelText: "#f1f5f9",
+      };
+    }
+    return isDark
+      ? {
+          // Dark theme - sophisticated palette
+          bg1: "#0a0a0b",
+          bg2: "#111113",
+          textPrimary: "#f1f5f9",
+          textSecondary: "#cbd5e1",
+          textMuted: "#64748b",
+          cardBg: "rgba(30, 41, 59, 0.5)",
+          cardBorder: "rgba(71, 85, 105, 0.3)",
+          cardShadow: "rgba(0, 0, 0, 0.5)",
+          userGrad1: "#6366f1",
+          userGrad2: "#8b5cf6",
+          llmGrad1: "#3b82f6",
+          llmGrad2: "#0ea5e9",
+          swGrad1: "#8b5cf6",
+          swGrad2: "#d946ef",
+          apiGrad1: "#10b981",
+          apiGrad2: "#34d399",
+          pulseColor: "#60a5fa",
+          pulseGlow: "#93bbfc",
+          messageBg: "rgba(30, 41, 59, 0.8)",
+          messageBorder: "rgba(71, 85, 105, 0.5)",
+          messageText: "#e2e8f0",
+          edgeColor: "rgba(100, 116, 139, 0.3)",
+          edgeActive: "#60a5fa",
+          labelBg: "rgba(15, 23, 42, 0.9)",
+          labelText: "#e2e8f0",
+        }
+      : {
+          // Light theme - sophisticated palette
+          bg1: "#fafafa",
+          bg2: "#f3f4f6",
+          textPrimary: "#1f2937",
+          textSecondary: "#64748b",
+          textMuted: "#94a3b8",
+          cardBg: "#ffffff",
+          cardBorder: "#e2e8f0",
+          cardShadow: "rgba(0, 0, 0, 0.05)",
+          userGrad1: "#6366f1",
+          userGrad2: "#8b5cf6",
+          llmGrad1: "#3b82f6",
+          llmGrad2: "#0ea5e9",
+          swGrad1: "#8b5cf6",
+          swGrad2: "#d946ef",
+          apiGrad1: "#10b981",
+          apiGrad2: "#34d399",
+          pulseColor: "#3b82f6",
+          pulseGlow: "#60a5fa",
+          messageBg: "#ffffff",
+          messageBorder: "#e2e8f0",
+          messageText: "#1f2937",
+          edgeColor: "#cbd5e1",
+          edgeActive: "#3b82f6",
+          labelBg: "#1e293b",
+          labelText: "#f1f5f9",
+        };
+  }, [isDark, mounted]);
   // ====== Timeline ======
   const starts = useMemo(() => {
     const s: number[] = [];
