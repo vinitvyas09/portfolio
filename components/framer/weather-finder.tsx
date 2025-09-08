@@ -428,7 +428,7 @@ export default function MCPWeatherFlow({
           {/* User → LLM */}
           <motion.path
             d={`M ${user.x + user.w/2} ${user.y + user.h} L ${llm.x + llm.w/2} ${llm.y}`}
-            stroke={activeElements.has("user") && activeElements.has("llm") ? C.edgeActive : C.edgeColor}
+            stroke={(stepName === "userToLlm" || stepName === "llmToUser") ? C.edgeActive : C.edgeColor}
             strokeWidth="2"
             fill="none"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -439,7 +439,7 @@ export default function MCPWeatherFlow({
           {/* LLM → Software */}
           <motion.path
             d={`M ${llm.x + llm.w/2} ${llm.y + llm.h} L ${sw.x + sw.w/2} ${sw.y}`}
-            stroke={activeElements.has("llm") && activeElements.has("sw") ? C.edgeActive : C.edgeColor}
+            stroke={(stepName === "llmToSw" || stepName === "swToLlm") ? C.edgeActive : C.edgeColor}
             strokeWidth="2"
             fill="none"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -450,7 +450,7 @@ export default function MCPWeatherFlow({
           {/* Software → API */}
           <motion.path
             d={`M ${sw.x + sw.w/2} ${sw.y + sw.h} L ${api.x + api.w/2} ${api.y}`}
-            stroke={activeElements.has("sw") && activeElements.has("api") ? C.edgeActive : C.edgeColor}
+            stroke={(stepName === "swToApi" || stepName === "apiToSw") ? C.edgeActive : C.edgeColor}
             strokeWidth="2"
             fill="none"
             initial={{ pathLength: 0, opacity: 0 }}
