@@ -17,6 +17,12 @@ export type HeadlineCascadeConfig = {
   showHeader?: boolean; // minimal header chrome
   visibleCount?: number; // how many stacked cards to keep visible
   gap?: number; // px gap between stacked cards
+  // Overlap tuning
+  topArrival?: number; // 0..1 point when top reaches final Y
+  shiftStart?: number; // 0..1 point when lower cards start shifting
+  overlapRatio?: number; // 0..1 of card height to enter before shift
+  overlapPx?: number; // explicit px override for overlap depth
+  overlapFeather?: number; // px softness of the mask edge
 };
 
 const DEFAULT_HEADLINES: Headline[] = [
@@ -54,6 +60,12 @@ const DEFAULTS: Required<Pick<HeadlineCascadeConfig, "height" | "durationMs" | "
   tilt: 0,
   visibleCount: 6,
   gap: 10,
+  // overlap defaults: more visible overlap window
+  topArrival: 0.4,
+  shiftStart: 0.65,
+  overlapRatio: 0.66,
+  overlapPx: undefined,
+  overlapFeather: 8,
 };
 
 export default function HeadlineCascade({
@@ -127,15 +139,16 @@ export default function HeadlineCascade({
 
   // Tuning + helpers outside the map so we can compute top position once
   const gap = Math.max(0, cfg.gap ?? 10);
-  const topArrival = 0.3; // portion of step where top fully arrives
-  const shiftStart = 0.35; // portion after which lower cards shift down
-  const blurMax = 7; // px max blur on the previous top during overlap
-  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
   const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+  const topArrival = clamp(cfg.topArrival ?? 0.4); // portion of step where top fully arrives
+  const shiftStart = clamp(cfg.shiftStart ?? 0.65); // portion after which lower cards shift down
+  const blurMax = 7; // px max blur on the previous top during overlap
 
   // Compute top card Y once for overlap math
-  const yTopInitial = -(gap + 12);
+  const desiredOverlap = cfg.overlapPx ?? Math.floor(cardH * (cfg.overlapRatio ?? 0.66));
+  const yTopInitial = -Math.max(gap + 12, Math.min(Math.max(8, desiredOverlap), Math.max(8, cardH - 4)));
   const yTopFinal = 0;
   const yTop = lerp(yTopInitial, yTopFinal, easeOut(clamp(appearP / topArrival)));
   // Progress used by all non-top cards
@@ -208,7 +221,7 @@ export default function HeadlineCascade({
                 if (k === 1) blur = blurMax * easeInOut(ratio);
 
                 // Build mask: hide from 0 -> overlapPx (with a soft feather)
-                const feather = 14; // px feather for softer edge
+                const feather = Math.max(0, cfg.overlapFeather ?? 8); // px feather for softer edge
                 const fadeEnd = Math.min(cardH, overlapPx + feather);
                 // Use alpha-only stops: transparent (hidden) to opaque (visible)
                 maskImage = `linear-gradient(to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0) ${overlapPx.toFixed(2)}px, rgba(0,0,0,1) ${fadeEnd.toFixed(2)}px, rgba(0,0,0,1) 100%)`;

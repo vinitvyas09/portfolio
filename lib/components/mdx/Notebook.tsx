@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -12,7 +11,6 @@ interface NotebookProps {
 
 export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
   const [isLoading, setIsLoading] = useState(true)
-  const [cells, setCells] = useState<any[]>([])
 
   useEffect(() => {
     if (path && selectedCells) {
@@ -104,4 +102,4 @@ export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
 
   return null
 }
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// end

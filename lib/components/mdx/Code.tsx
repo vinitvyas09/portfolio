@@ -37,11 +37,6 @@ export function Code({
     return ''
   }
 
-  const highlightLines = highlight?.split(',').map(range => {
-    const [start, end] = range.split('-').map(Number)
-    return end ? { start, end } : { start, end: start }
-  }) || []
-
   return (
     <div className="my-8 rounded-xl overflow-hidden bg-card border border-border">
       {title && (
@@ -74,4 +69,4 @@ export function Code({
     </div>
   )
 }
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// end

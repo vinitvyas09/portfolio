@@ -3,6 +3,29 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
+// Shared timeline constants and types
+const STEPS = [
+  "userType",
+  "llmToSw",
+  "swToApi",
+  "apiToSw",
+  "swToLlm",
+  "llmToUser",
+  "llmType",
+  "pause",
+] as const;
+type StepName = typeof STEPS[number];
+const D: Record<StepName, number> = {
+  userType: 1400,
+  llmToSw: 800,
+  swToApi: 800,
+  apiToSw: 700,
+  swToLlm: 700,
+  llmToUser: 700,
+  llmType: 1800,
+  pause: 1000,
+};
+
 /**
  * Framer Motion loop: MCP-style “weather tool call” flow as a simple GIFable scene.
  * - Fixed 1200×675 canvas, ~8s loop, minimal UI (no headings).
@@ -27,33 +50,12 @@ export default function MCPWeatherFlow({
   height?: number;
 }) {
   // ====== Timeline ======
-  const D = {
-    userType: 1400,
-    llmToSw: 800,
-    swToApi: 800,
-    apiToSw: 700,
-    swToLlm: 700,
-    llmToUser: 700,
-    llmType: 1800,
-    pause: 1000,
-  };
-  const STEPS = [
-    "userType",
-    "llmToSw",
-    "swToApi",
-    "apiToSw",
-    "swToLlm",
-    "llmToUser",
-    "llmType",
-    "pause",
-  ] as const;
-
   const starts = useMemo(() => {
     const s: number[] = [];
     let acc = 0;
     for (const k of STEPS) {
       s.push(acc);
-      acc += (D as any)[k];
+      acc += D[k];
     }
     return s;
   }, []);
@@ -74,7 +76,7 @@ export default function MCPWeatherFlow({
   const stepIndex = useMemo(() => {
     let i = 0;
     for (; i < starts.length; i++) {
-      if (now < starts[i] + (D as any)[STEPS[i]]) break;
+      if (now < starts[i] + D[STEPS[i]]) break;
     }
     return Math.min(i, STEPS.length - 1);
   }, [now, starts]);
@@ -106,13 +108,14 @@ export default function MCPWeatherFlow({
   const api = { x: sw.x, y: 420, w: nodeW, h: nodeH, label: "Weather API" };
 
   // Helper to build straight edges
-  const edgeH = (from: any, to: any) => {
+  type NodeRect = { x: number; y: number; w: number; h: number };
+  const edgeH = (from: NodeRect, to: NodeRect) => {
     const y = from.y + from.h / 2;
     const x1 = from.x + from.w + 12;
     const x2 = to.x - 12;
     return { x: x1, y, len: x2 - x1 };
   };
-  const edgeV = (from: any, to: any) => {
+  const edgeV = (from: NodeRect, to: NodeRect) => {
     const x = from.x + from.w / 2;
     const y1 = from.y + from.h + 12;
     const y2 = to.y - 12;
@@ -126,7 +129,7 @@ export default function MCPWeatherFlow({
   const E = edgeH(llm, sw);   // software → llm (reverse)
   const F = edgeH(user, llm); // llm → user (reverse)
 
-  const active = (name: (typeof STEPS)[number]) => stepName === name;
+  const active = (name: StepName) => stepName === name;
 
   return (
     <div
