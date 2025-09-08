@@ -4,11 +4,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
 /**
- * Framer Motion loop: "Integration Tax — Before/After (M×N → m+n via MCP)"
- * - SVG 1200×675 (scales with container), seamless 8s loop
- * - Phase A: dense bipartite (m×n) edges between LLM clients ↔ tools
- * - Crossfade
- * - Phase B: hub "MCP server(s)" between them; only m + n edges
+ * Framer Motion loop: "Integration Tax — Dense Connections (M×N)"
+ * - SVG 1200×675 (scales with container), 4.5s loop (3s animation + 1.5s pause)
+ * - Shows dense bipartite (m×n) edges between LLM clients ↔ tools
+ * - Animates lines drawing from left to right
+ * - Pauses briefly, then restarts
  * - Minimal labels, no headings; drop into a page, screen‑record to GIF
  *
  * Quick use:
@@ -18,9 +18,6 @@ import { motion } from "framer-motion";
 type Props = {
   m?: number;               // number of LLM clients (left)
   n?: number;               // number of tools (right)
-  beforeMs?: number;        // duration of "before" phase
-  afterMs?: number;         // duration of "after" phase
-  xfadeMs?: number;         // crossfade duration
   className?: string;
   showLabels?: boolean;
 };
@@ -28,15 +25,14 @@ type Props = {
 export default function IntegrationTaxMcpGif({
   m = 3,
   n = 8,
-  beforeMs = 3000,
-  afterMs = 3000,
-  xfadeMs = 1000,
   className,
   showLabels = true,
 }: Props) {
   const W = 1200;
   const H = 675;
-  const totalMs = beforeMs + xfadeMs + afterMs + xfadeMs;
+  const animDuration = 3000;  // Animation duration
+  const pauseDuration = 1500;  // Pause duration
+  const totalMs = animDuration + pauseDuration;
 
   const [now, setNow] = useState(0);
   useEffect(() => {
@@ -51,38 +47,17 @@ export default function IntegrationTaxMcpGif({
     return () => cancelAnimationFrame(raf);
   }, [totalMs]);
 
-  // Timeline → alphas
+  // Timeline → animation state
   const t = now;
-  const T1 = beforeMs;
-  const T2 = T1 + xfadeMs;
-  const T3 = T2 + afterMs;
-  const T4 = T3 + xfadeMs;
-
   const s = (x: number) => Math.min(1, Math.max(0, x));
   const ease = (x: number) => x * x * (3 - 2 * x); // smoothstep
 
-  const beforeAlpha =
-    t < T1 ? 1 :
-    t < T2 ? 1 - (t - T1) / xfadeMs :
-    t < T3 ? 0 :
-    0 + (t - T3) / xfadeMs;
-  const afterAlpha =
-    t < T1 ? 0 :
-    t < T2 ? (t - T1) / xfadeMs :
-    t < T3 ? 1 :
-    1 - (t - T3) / xfadeMs;
-
-  // Draw behavior: grow left→right, then disappear (no reverse "undraw").
-  // - BEFORE edges: 0→1 during T0..T1, hold at 1 during T1..T2, hidden afterwards until next loop
-  // - AFTER edges:  0→1 during T1..T2, continue to 1 during T2..T3, hold at 1 during T3..T4 (fade out via alpha)
-  const beforeDraw =
-    t < T1 ? ease(s(t / beforeMs)) :
-    t < T2 ? 1 :
-    0;
-  const afterDraw =
-    t < T2 ? ease(s((t - T1) / xfadeMs)) :
-    t < T3 ? ease(s((t - T2) / afterMs)) :
-    1;
+  // Simple animation: draw lines during animation phase, then pause
+  const isAnimating = t < animDuration;
+  const animProgress = isAnimating ? t / animDuration : 1;
+  
+  // Draw lines progressively during animation, keep them during pause
+  const lineDraw = isAnimating ? ease(s(animProgress)) : 1;
 
   // Layout
   const marginX = 140;
@@ -90,7 +65,6 @@ export default function IntegrationTaxMcpGif({
   const bottom = 90;
   const leftX = marginX;
   const rightX = W - marginX;
-  const hub = { x: W * 0.5, y: H * 0.5 };
 
   const clients = useMemo(() => {
     const count = Math.max(1, m);
@@ -114,7 +88,7 @@ export default function IntegrationTaxMcpGif({
 
   // Edges
   type Edge = { x1: number; y1: number; x2: number; y2: number };
-  const beforeEdges: Edge[] = useMemo(() => {
+  const edges: Edge[] = useMemo(() => {
     const out: Edge[] = [];
     for (let i = 0; i < clients.length; i++) {
       for (let j = 0; j < tools.length; j++) {
@@ -129,34 +103,18 @@ export default function IntegrationTaxMcpGif({
     return out;
   }, [clients, tools]);
 
-  const afterEdges: Edge[] = useMemo(() => {
-    const out: Edge[] = [];
-    for (let i = 0; i < clients.length; i++) {
-      out.push({ x1: clients[i].x, y1: clients[i].y, x2: hub.x, y2: hub.y });
-    }
-    for (let j = 0; j < tools.length; j++) {
-      out.push({ x1: hub.x, y1: hub.y, x2: tools[j].x, y2: tools[j].y });
-    }
-    return out;
-  }, [clients, tools]);
-
   // Visual constants - enhanced color palette
   const C = {
     bg: "#fafafa",
     grid: "#e5e7eb",
-    beforeLine: "#94a3b8",   // slate-400 (more visible)
-    afterLine: "#4f46e5",    // indigo-600 (richer)
+    line: "#94a3b8",         // slate-400 (visible connections)
+    progressBar: "#4f46e5",  // indigo-600 (progress indicator)
     client: "#7c3aed",       // violet-600 (more vibrant)
     clientShadow: "#ddd6fe", // violet-200
     tool: "#0891b2",         // cyan-600 (more distinct)
     toolShadow: "#cffafe",   // cyan-100
-    hub: "#dc2626",          // red-600 (strong focal point)
-    hubGlow: "#fca5a5",      // red-300
     label: "#475569",        // slate-600 (better contrast)
   };
-
-  const hubPulse =
-    0.5 + 0.5 * Math.sin(((now / 1000) * 2 * Math.PI) / 2); // gentle 0..1
 
   // Helpers
   const edgePath = (e: Edge) => `M ${e.x1} ${e.y1} L ${e.x2} ${e.y2}`;
@@ -185,17 +143,6 @@ export default function IntegrationTaxMcpGif({
             <stop offset="0%" stopColor="#06b6d4" />
             <stop offset="100%" stopColor="#0891b2" />
           </linearGradient>
-          <radialGradient id="hubGrad">
-            <stop offset="0%" stopColor="#ef4444" />
-            <stop offset="100%" stopColor="#dc2626" />
-          </radialGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
           <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.15"/>
           </filter>
@@ -210,54 +157,27 @@ export default function IntegrationTaxMcpGif({
           <line x1={W * 0.75} y1={0} x2={W * 0.75} y2={H} stroke={C.grid} strokeWidth={0.5} strokeDasharray="2,8" />
         </g>
 
-        {/* BEFORE: dense bipartite edges */}
-        <motion.g style={{ opacity: beforeAlpha * 0.7 }}>
-          {beforeEdges.map((e, i) => (
-            <motion.path
-              key={`b-${i}`}
-              d={edgePath(e)}
-              fill="none"
-              stroke={C.beforeLine}
-              strokeWidth={1.5}
-              strokeLinecap="round"
-              strokeDasharray="5,3"
-              initial={false}
-              animate={{ pathLength: Math.max(0.0001, beforeDraw) }}
-              transition={{ duration: 0 }}
-            />
-          ))}
-        </motion.g>
-
-        {/* AFTER: hub-and-spoke via MCP */}
-        <motion.g style={{ opacity: afterAlpha }}>
-          {afterEdges.map((e, i) => (
-            <g key={`a-${i}`}>
-              {/* Glow effect for the lines */}
-              <motion.path
+        {/* Dense bipartite edges */}
+        <g style={{ opacity: 0.7 }}>
+          {edges.map((e, i) => {
+            const len = Math.sqrt((e.x2 - e.x1) ** 2 + (e.y2 - e.y1) ** 2);
+            const dashLength = len;
+            const dashOffset = dashLength * (1 - lineDraw);
+            
+            return (
+              <path
+                key={`edge-${i}`}
                 d={edgePath(e)}
                 fill="none"
-                stroke={C.afterLine}
-                strokeWidth={4}
+                stroke={C.line}
+                strokeWidth={1.5}
                 strokeLinecap="round"
-                opacity={0.3}
-                initial={false}
-                animate={{ pathLength: Math.max(0.0001, afterDraw) }}
-                transition={{ duration: 0 }}
-                filter="url(#glow)"
+                strokeDasharray={dashLength}
+                strokeDashoffset={dashOffset}
               />
-              <motion.path
-                d={edgePath(e)}
-                fill="none"
-                stroke={C.afterLine}
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                initial={false}
-                animate={{ pathLength: Math.max(0.0001, afterDraw) }}
-                transition={{ duration: 0 }}
-              />
-            </g>
-          ))}
-        </motion.g>
+            );
+          })}
+        </g>
 
         {/* Nodes: clients (left) */}
         {clients.map((p, i) => (
@@ -283,44 +203,6 @@ export default function IntegrationTaxMcpGif({
           </g>
         ))}
 
-        {/* Hub */}
-        <motion.g style={{ opacity: afterAlpha }}>
-          {/* Outer glow */}
-          <motion.circle
-            cx={hub.x}
-            cy={hub.y}
-            r={25 + 8 * hubPulse}
-            fill={C.hubGlow}
-            opacity={0.3 + 0.2 * hubPulse}
-            filter="url(#glow)"
-          />
-          {/* Mid ring */}
-          <motion.circle
-            cx={hub.x}
-            cy={hub.y}
-            r={20 + 4 * hubPulse}
-            fill="none"
-            stroke={C.hub}
-            strokeWidth={2}
-            opacity={0.5}
-          />
-          {/* Main hub */}
-          <motion.circle
-            cx={hub.x}
-            cy={hub.y}
-            r={18 + 2 * hubPulse}
-            fill="url(#hubGrad)"
-            filter="url(#shadow)"
-          />
-          {/* Inner highlight */}
-          <motion.circle
-            cx={hub.x - 3}
-            cy={hub.y - 3}
-            r={5}
-            fill="white"
-            opacity={0.6}
-          />
-        </motion.g>
         {showLabels && (
           <>
             <text x={leftX} y={42} textAnchor="start" fontSize={24} fontWeight="600" fill={C.label}>
@@ -329,17 +211,13 @@ export default function IntegrationTaxMcpGif({
             <text x={rightX} y={42} textAnchor="end" fontSize={24} fontWeight="600" fill={C.label}>
               Tools ({n})
             </text>
-            <motion.text
-              x={hub.x}
-              y={hub.y + 45}
-              textAnchor="middle"
-              fontSize={22}
-              fontWeight="bold"
-              fill={C.hub}
-              style={{ opacity: afterAlpha }}
-            >
-              MCP server
-            </motion.text>
+            {/* Phase indicator */}
+            <text x={W/2} y={H - 30} textAnchor="middle" fontSize={16} fill={C.label} opacity={0.7}>
+              {isAnimating ? `Integration Tax: ${m}×${n} = ${m*n} connections` : "Pausing..."}
+            </text>
+            {/* Progress bar */}
+            <rect x={W/2 - 100} y={H - 15} width={200} height={4} fill={C.grid} rx={2} />
+            <rect x={W/2 - 100} y={H - 15} width={200 * (t / totalMs)} height={4} fill={C.progressBar} rx={2} />
           </>
         )}
       </svg>
