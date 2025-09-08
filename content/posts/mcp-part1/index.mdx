@@ -1,0 +1,156 @@
+---
+title: "Model Context Protocol (MCP), Part 1 — Why was this inevitable?"
+date: "2025-09-08"
+summary: "A narrative of the conditions, failed alternatives, and timing that made MCP the standard way to connect LLMs to real tools and data."
+tags: ["mcp", "tool-calling", "standards", "ecosystem"]
+level: "foundation"
+status: "published"
+---
+
+Model Context Protocol, a little open-source framework introduced by Anthropic, was released in late 2024 to surprisingly little fanfare. However, after a viral moment in early 2025, it's now the de-facto standard for any service provider that hopes to be called by an LLM. MCP fought the protocol wars and emerged victorious, especially after OpenAI announced support, followed by Google's Gemini. The tipping point? When Microsoft integrated it into Copilot Studio and Azure, while Cursor baked it into its coding workflows. Suddenly, not supporting MCP meant being locked out of an entire ecosystem.
+
+But here's the thing: even in our protocol-heavy, "just-add-another-interface" world of software, I've found that while everyone knows the surface-level definition ("a standard way to connect LLMs to apps"), almost no one can explain what it actually does at a deeper level.
+
+So here's my attempt. In this 4-part series, we'll dissect MCP end-to-end. In this first part, let's forget the technical details. Instead, let's focus entirely on the problems and conditions that made MCP not just logical, but inevitable. By the end, you'll understand the "why" (the concceptual depth) so clearly that you'll know exactly which situations need MCP and which don't, even without knowing any other details like the protocol, architecture, or implementation.
+
+## The Conditions That Made MCP Inevitable
+
+### November 30th, 2022: The 'spark' of Intelligence
+
+This was the day the Turing test became instantly obsolete, yet we had no idea how to actually use this new intelligence. ChatGPT launched as a consumer chat app, letting anyone talk to GPT-3.5, a model fine-tuned to respond conversationally. Come to think of it, ChatGPT was the very first "wrapper" company, hah!
+
+The model was incredible, unlike anything before it. It could hold actual conversations, and the public was dazzled watching it write haikus about thanking your spouse with deep sarcasm, answering what would happen if the speed of light were 30 km/h, or if friction increased with speed. The magic was here, sparking collective wonder unlike anything we'd seen in a long, long time.
+
+*GIF suggestion: Early ChatGPT interactions showing creative/funny prompts and responses.*
+
+It became the fastest app to reach 1 million users (5 days) and 100 million (2 months). The hype train went full throttle: Bill Gates prophesized a future without work, Sam Altman imagined universal basic income for a jobless population, Geoffrey Hinton warned of AI soldiers, and, post GPT4 release, Microsoft released a "Sparks of AGI" paper.
+
+*GIF suggestion: Cascade of real headlines from that era, building in intensity to show the hysteria.*
+
+Individuals found immediate value. Prosecutors could summarize 30-page judgments. Teachers explained complex concepts simply ("explain water's anomalous behavior to a 5-year-old"). Engineers could debug code snippets. Individual productivity seemed to skyrocket!
+
+However, some cracks started appearing. Lawyers got sued for citing ChatGPT's hallucinated cases. Engineers became human copy-paste machines, shuttling code snippets in and out of the chat interface, frustrated not just by the context limitations (apps typically offered 8k tokens while models supported 128k), but by the fundamental awkwardness of the interface. The tool was incredible, but using it felt like trying to drink from a firehose through a straw.
+
+OpenAI seemed to have realized enterprise was where a ton of potential revenue lived. They released API access almost immediately (this connects directly to our MCP story, because APIs meant enterprises could now integrate this breakthrough technology directly into their systems). Problem solved as enterprises now look like they're not afraid to adopt cutting edge tech, and now were perfectly placed to reap the order of mangnitude increase in productivity, right? ;-)
+
+Enterprise quickly hit the same wall power users had discovered: the AI was simultaneously brilliant and completely clueless. It could write Shakespeare but couldn't tell you today's weather. In a world that measures reliability in "five nines" (99.999% uptime), watching it hallucinate simple facts was painful.
+
+### Mid-2023: Function calling… and a flood of integrations
+
+The core problem became clear: even for simple tasks, AI models were lost without relevant context. Wouldn't it be great if they could search the internet? Or query internal company databases?
+
+Enter function calling (now rebranded as "tool calling") which promised a significant update. Instead of just chat between user and LLM, the model could now make API calls. Here's how it worked. 
+
+Old flow:  
+→ User asks "What's the weather in SF today?"  
+→ LLM does not know, so it hallucinates  
+→ LLM responds with dated or worse, incorrect solution
+
+New flow:  
+→ User asks "What's the weather in SF today?"   
+→ LLM recognizes it needs external data and so indicates to SW that it needs to call a 'function'  
+→ Software actually calls the weather API  
+→ Software feeds results back to LLM  
+→ LLM responds to the user with accurate, cited information
+
+*GIF suggestion: Visual flow showing user question → LLM function call → API request → response back to LLM → final answer to user.*
+
+This update was so significant it spawned an entire generation of AI applicationsL Search, calendars, CRMs, drives, code hosts, DBs, internal APIs, etc. Cursor/Claude/ChatGPT with web search or Slack/Drive/GitHub bots.
+
+Suddenly “LLM + tools” looked solved. In fact, you might think we're done! Sure, models had context limitations and their reasoning wasn't perfect, but from a software capability perspective, what else was needed? Maybe support more than 6 tool calls at once. Maybe improve the model's interpretive abilities through scaling or new architectures (hello, reasoning models). But fundamentally, the plumbing seemed complete. 
+
+Except it wasn't. As teams started building real applications with multiple tools, they discovered a painful scenario.
+
+### The Integration Tax
+
+As teams scaled beyond a toy app, they hit a wall I’ll call the integration tax. Say you run 3 LLM agents (eg, a chat app, an IDE agent, and a helpdesk agent) and need 8 tools (search, DB, GitHub, email, calendar, payments, analytics and internal services). In the basic tool‑calling world, you’re staring at up to 3 × 8 = 24 separate integrations. But it gets worse. Each tool has different authentication methods: OAuth here, API keys there, certificates somewhere else. Different data formats: JSON, XML, proprietary schemas. Different error handling patterns. Different rate limits. Different retry logic. Different logging requirements.
+
+This is more than just tedious. From an organizational perspective, this creates:  
+1. Maintenance hell: Every tool update potentially breaks multiple integrations  
+2. Cost explosion: Developer time multiplied by complexity  
+3. Consistency issues: Different teams implementing the same tool differently  
+4. Security nightmare: Each integration is a potential vulnerability (we'll cover MCP's security challenges in part 4).
+
+It is not that there were zero solutions to this: Teams tried bespoke adapters, vendor-specific plugins (OpenAI had one too, which it later cancelled), and brittle middle layers. It worked in demos and failed at scale whereas the M×N explosion made integration costs grow nonlinearly.
+
+*GIF suggestion: before/after diagram. Before: dense bipartite graph (many LLM clients ↔ many tools) showing ~m×n lines. After: a hub labeled “MCP server(s)” sits between them; clients connect once, tools implement once → m + n lines.*
+
+Note that I'm conveniently glossing over other hard problems like context window limitations that led to RAG, or the need for deterministic control that spawned LangGraph. We're laser-focused on the specific pain that birthed MCP.
+
+## The Core Problem Statement
+Here's where we stood: Every LLM needed to connect to multiple tools, and every tool needed to be accessible by multiple LLMs. This created an M×N integration problem: if you have M models and N tools, you need M×N separate integrations. Each integration meant custom code for authentication, data transformation, error handling, rate limiting, and business logic. The industry was drowning in integration code. Something had to give.
+
+## Enter MCP: The Standard Interface
+
+In November 2024, Anthropic released their solution. The official definition: "MCP (Model Context Protocol) is an open-source standard for connecting AI applications to external systems." 
+
+Let's make this concrete. Today, when you write a weather tool for an LLM, you write both client code (the tool definition) and server code (the actual API call):
+
+```python
+# Client side (what you write for each LLM)
+def get_weather(city: str):
+    url = f"https://api.weather.com/v1/weather?city={city}"
+    response = http_get(url, headers={"API-Key": key})
+    data = json.parse(response)
+    return f"{city}: {data['temp']}°C, {data['condition']}"
+
+# Server side (the actual weather service)
+@app.route("/weather")
+def weather_endpoint():
+    city = request.args.get("city")
+    result = database.query_weather(city)
+    return jsonify(result)
+```
+
+Now imagine writing similar code for N different LLMs connecting to M different tools (N×M integrations!).
+With MCP, the weather service itself handles all the complexity. You just write:
+
+```python
+# Client side with MCP (same for ALL LLMs)
+result = mcp_client.call_tool("get_weather", {"city": "London"})
+```
+
+The weather service now handles authentication, rate limiting, data formatting, error handling, everything. And here's the kicker: every MCP-compatible LLM can now use this tool with zero additional integration work.
+
+*Visual idea: simple “port” metaphor—USB‑C icon next to “MCP” showing different cables (GitHub, DB, Search, Drive) snapping in. Keep it minimal.*
+
+### When to NOT Use MCP
+
+It is not that each situation or AI Agent needs MCP. For example, if you're just shipping a quick prototype with one LLM talking to one tool and don't care about portability, no need to add complexity when a direct integration works fine. Or when your tool requires some highly specialized, non-standard behavior that you know for certain won't be reused elsewhere. Another one would be, if you're in an offline or air-gapped environment where security mandates a narrow, bespoke interface, MCP's standardization won't help you. Basically, if you're building something intentionally isolated and unique, MCP is overkill.
+
+## When Did Lightning Strike?
+
+The path to dominance wasn't immediate. OpenAI had tried "plugins" in 2023—they failed because they were OpenAI-specific and required complex OAuth flows. Microsoft had "skills," Google had "extensions"—all proprietary, all incompatible. MCP succeeded because it was open source (No vendor lock-in), simple (just JSON-RPC over stdio/SSE/WebSocket) and timing (seemed to have released exactly when everyone realized they needed it).
+
+Here's the adoption timeline:
+
+- **Nov 25, 2024**: MCP open-sourced with Claude Desktop GitHub demo
+- **Early 2025**: OpenAI's Agents SDK announces first-class MCP support
+- **April 2025**: GitHub releases official MCP server; Copilot gains remote MCP support
+- **May 2025**: Microsoft Copilot Studio MCP integration goes GA
+- **June 2025**: Google Gemini adds built-in MCP support
+- **August 2025**: Major spec update with auth standards; legacy SSE deprecated
+
+The timing was perfect, but MCP won because it turned tool access into a portable, governable interface at the exact moment all major vendors converged on the same need. The factors converged such that instead of being yet another protocol, it led to this race where the cheapest, safest path forward with the best chance of adoption became "just use MCP"
+
+## The Benefits, Crystallized
+
+The math is simple:
+- **Before MCP**: M models × N tools = M×N integrations
+- **With MCP**: M models + N tools = M+N integrations
+
+But beyond the math, an Ecosystem flywheel occurred where: more MCP‑aware clients led to more incentive to ship MCP servers; more servers led to more pressure for clients to support MCP and as more standardization happened, it led to lower costs for everyone (see GitHub, Azure, and VS Code momentum). This created a race to implement MCP servers. Not supporting it meant being locked out of a rapidly growing ecosystem where developers were converging (or as most call it, 'fomo').
+
+## What MCP Doesn't Do
+
+MCP, as this blog has demonstrated, is a great protocol that solves a real problem. However, based on what I see folks write or talk about, I wanted to list out a few things about what MCP isn't or doesn't do:
+
+- It doesn’t fix reasoning or hallucinations. MCP standardizes connectivity; model quality is separate  
+- It doesn’t automatically make tool use safe. You still need RBAC, sandboxing, input validation, isolation, approval steps, monitoring, and strong data boundaries.  
+- It creates new attack surfaces**: MCP enables what Simon Willison calls the "lethal trifecta"—LLMs that can read external content, access private data, AND communicate externally. This makes prompt injection attacks particularly dangerous (we'll dive deep into security in part 4)
+
+---
+
+MCP isn't magic. It's plumbing—boring, essential plumbing that solved an M×N problem at exactly the right moment. In the next part, we'll dissect the actual architecture and see how this plumbing works under the hood. But for now, you understand why it exists, why it won, and why every major AI platform rushed to support it.
+
+The speedy adoption wasn't because of the protocol itself. It was in recognizing that without standardized plumbing, the AI adoption itself would drown in its own integration complexity.
