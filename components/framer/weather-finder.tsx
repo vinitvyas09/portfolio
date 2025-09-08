@@ -405,7 +405,7 @@ function ArrowH({
     <div className="absolute" style={{ left: x, top: y }}>
       {showLine && (
         <div
-          className="relative"
+          className="relative z-0"
           style={{ width: len, height: 2, background: "rgba(0,0,0,0.12)" }}
         >
           {/* arrowhead */}
@@ -420,7 +420,7 @@ function ArrowH({
           {/* label pill */}
           {label && (
             <motion.div
-              className="absolute -top-8 rounded-md bg-zinc-900 text-white text-[11px] font-mono px-2 py-1"
+              className="absolute -top-8 rounded-md bg-zinc-900 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
               style={{ left: labelLeft, width: 140, textAlign: "center" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: packetActive ? 1 : 0 }}
@@ -433,7 +433,7 @@ function ArrowH({
           {/* packet */}
           <motion.div
             key={packetKey}
-            className="absolute -top-1 h-3 w-3 rounded-full bg-blue-600 shadow"
+            className="absolute -top-1 h-3 w-3 rounded-full bg-blue-600 shadow z-10"
             initial={{ opacity: 0, x: dotStart }}
             animate={
               packetActive
@@ -485,7 +485,7 @@ function ArrowV({
     <div className="absolute" style={{ left: x, top: y }}>
       {showLine && (
         <div
-          className="relative"
+          className="relative z-0"
           style={{ width: 2, height: len, background: "rgba(0,0,0,0.12)" }}
         >
           {/* arrowhead */}
@@ -500,7 +500,7 @@ function ArrowV({
           {/* label pill */}
           {label && (
             <motion.div
-              className="absolute top-1/2 -translate-y-1/2 rounded-md bg-zinc-900 text-white text-[11px] font-mono px-2 py-1"
+              className="absolute top-1/2 -translate-y-1/2 rounded-md bg-zinc-900 text-white text-[11px] font-mono px-2 py-1 z-30 pointer-events-none"
               style={{ left: labelLeft, width: 140, textAlign: "center" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: packetActive ? 1 : 0 }}
@@ -513,7 +513,7 @@ function ArrowV({
           {/* packet */}
           <motion.div
             key={packetKey}
-            className="absolute left-1/2 -translate-x-1/2 -top-1 h-3 w-3 rounded-full bg-blue-600 shadow"
+            className="absolute left-1/2 -translate-x-1/2 -top-1 h-3 w-3 rounded-full bg-blue-600 shadow z-10"
             initial={{ opacity: 0, y: dotStart }}
             animate={
               packetActive
