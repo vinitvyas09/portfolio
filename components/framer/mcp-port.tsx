@@ -606,7 +606,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   animate={{
                     x: [...xPoints].reverse(),
                     y: [...yPoints].reverse(),
-                    opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+                    opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                   }}
                   transition={{
                     duration: 1.5,
