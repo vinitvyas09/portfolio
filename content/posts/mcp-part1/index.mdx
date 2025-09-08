@@ -93,7 +93,7 @@ It is not that there were zero solutions to this: Teams tried bespoke adapters, 
 <IntegrationTaxGif />
 <br />
 
-Note that I'm conveniently glossing over other hard problems like context window limitations that led to RAG, or the need for deterministic control that spawned LangGraph. We're laser-focused on the specific pain that birthed MCP.
+Note that I'm conveniently glossing over other hard problems like context window limitations that led to RAG, or the need for deterministic control that spawned LangGraph. Maybe for another time. For now, let's focus on the specific pain that birthed MCP.
 
 ## The Core Problem Statement
 Here's where we stood: Every LLM needed to connect to multiple tools, and every tool needed to be accessible by multiple LLMs. This created an M×N integration problem: if you have M models and N tools, you need M×N separate integrations. Each integration meant custom code for authentication, data transformation, error handling, rate limiting, and business logic. The industry was drowning in integration code. Something had to give.
