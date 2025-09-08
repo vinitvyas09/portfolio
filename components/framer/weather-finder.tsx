@@ -390,7 +390,6 @@ export default function MCPWeatherFlow({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          MCP Weather Tool Call Flow
         </motion.text>
         
         {/* Current Stage Indicator */}
