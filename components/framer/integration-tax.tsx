@@ -112,11 +112,12 @@ export default function IntegrationTaxMcpGif({
   }, [clients, tools]);
 
   // Visual constants - theme-aware color palette
-  const isDark = resolvedTheme === "dark";
+  // Use light theme as default until mounted to avoid hydration mismatch
+  const isDark = mounted && resolvedTheme === "dark";
   
   const C = useMemo(() => {
+    // Always use light theme values during SSR and initial render
     if (!mounted) {
-      // Default to light theme colors while loading
       return {
         bg: "#fafafa",
         bgGradient: "#f3f4f6",
@@ -170,6 +171,22 @@ export default function IntegrationTaxMcpGif({
   // Helpers
   const edgePath = (e: Edge) => `M ${e.x1} ${e.y1} L ${e.x2} ${e.y2}`;
 
+  // Don't render until mounted to prevent flash
+  if (!mounted) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: "100%",
+          aspectRatio: "1200 / 675",
+          borderRadius: 16,
+          overflow: "hidden",
+          backgroundColor: "transparent",
+        }}
+      />
+    );
+  }
+
   return (
     <div
       className={className}
@@ -202,7 +219,7 @@ export default function IntegrationTaxMcpGif({
         </defs>
 
         {/* Soft grid with pattern */}
-        <g opacity={0.15}>
+        <g opacity={isDark ? 0.1 : 0.15}>
           <line x1={W * 0.5} y1={0} x2={W * 0.5} y2={H} stroke={C.grid} strokeWidth={1} strokeDasharray="5,5" />
           <line x1={0} y1={H * 0.5} x2={W} y2={H * 0.5} stroke={C.grid} strokeWidth={1} strokeDasharray="5,5" />
           {/* Additional grid lines for depth */}
@@ -240,7 +257,7 @@ export default function IntegrationTaxMcpGif({
             {/* Main node with gradient */}
             <circle cx={p.x} cy={p.y} r={11} fill="url(#clientGrad)" filter="url(#shadow)" />
             {/* Inner highlight */}
-            <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={0.5} />
+            <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={isDark ? 0.3 : 0.5} />
           </g>
         ))}
 
@@ -252,7 +269,7 @@ export default function IntegrationTaxMcpGif({
             {/* Main node with gradient */}
             <circle cx={p.x} cy={p.y} r={11} fill="url(#toolGrad)" filter="url(#shadow)" />
             {/* Inner highlight */}
-            <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={0.5} />
+            <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={isDark ? 0.3 : 0.5} />
           </g>
         ))}
 

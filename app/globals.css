@@ -255,6 +255,24 @@ li {
   fill: hsl(var(--foreground));
 }
 
+/* ChatGif theming (SSR-safe, no JS checks) */
+.chatgif .chatgif-panel {
+  background: hsl(var(--card));
+}
+
+.chatgif .chatgif-user {
+  background: hsl(var(--secondary));
+  color: hsl(var(--foreground));
+}
+
+.chatgif .mono-caret {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .chatgif .mono-caret {
+  background: rgba(255, 255, 255, 0.7);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
