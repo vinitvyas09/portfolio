@@ -417,7 +417,7 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
             const isActive = isToolActive(tool.id);
             return (
               <g key={tool.id} transform={`translate(900, ${y})`}>
-                <motion.rect 
+                <rect 
                   x={0} 
                   y={0} 
                   width={260} 
@@ -425,13 +425,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   rx={8} 
                   fill={tool.color} 
                   opacity={0.9}
-                  stroke={isActive ? C.highlightStroke : "transparent"}
-                  strokeWidth={isActive ? "2" : "0"}
-                  animate={{
-                    stroke: isActive ? C.highlightStroke : "transparent",
-                    strokeWidth: isActive ? 2 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
+                  stroke={isActive ? C.highlightStroke : tool.color}
+                  strokeWidth={isActive ? 3 : 0}
                 />
                 <text x={20} y={40} fontSize="28">
                   {tool.icon}
