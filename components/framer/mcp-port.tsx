@@ -566,16 +566,15 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   r="6"
                   fill={C.pulseColor}
                   filter="url(#pulseGlow)"
-                  initial={{ x: serverX, y: serverY, opacity: 0 }}
+                  initial={{ x: 780, y: serverY, opacity: 0 }}
                   animate={{ 
-                    x: [serverX, 780, 840, toolX],
+                    x: toolX,
                     y: serverY,
-                    opacity: [0, 1, 1, 0]
+                    opacity: [0, 1, 1, 1, 1, 1, 0]
                   }}
                   transition={{
                     duration: 1.5,
                     delay: 2.5,
-                    times: [0, 0.1, 0.9, 1],
                     ease: "linear"
                   }}
                 />
@@ -587,14 +586,13 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   filter="url(#pulseGlow)"
                   initial={{ x: toolX, y: serverY, opacity: 0 }}
                   animate={{ 
-                    x: [toolX, 840, 780, serverX],
+                    x: 780,
                     y: serverY,
-                    opacity: [0, 1, 1, 0]
+                    opacity: [0, 1, 1, 1, 1, 1, 0]
                   }}
                   transition={{
                     duration: 1.5,
                     delay: 4.5,
-                    times: [0, 0.1, 0.9, 1],
                     ease: "linear"
                   }}
                 />
