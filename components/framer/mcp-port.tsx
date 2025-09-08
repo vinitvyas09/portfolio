@@ -16,6 +16,7 @@ export default function MCPPort({ className }: { className?: string }) {
   // Left column: many apps/clients that can use the same tool via MCP
   const apps = [
     { id: "gpt", label: "GPT", color: "#111827" },
+    { id: "chatgpt", label: "ChatGPT", color: "#10A37F" },
     { id: "claude", label: "Claude", color: "#0F766E" },
     { id: "gemini", label: "Gemini", color: "#2563EB" },
     { id: "copilot", label: "Copilot", color: "#7C3AED" },
@@ -91,6 +92,33 @@ export default function MCPPort({ className }: { className?: string }) {
             </g>
           );
         })}
+
+        {/* Right: Google Drive connecting to the MCP box */}
+        <g>
+          {(() => {
+            const driveX = box.x + box.w + 60;
+            const driveY = cy - 14;
+            const pillW = 120;
+            const pillH = 28;
+            
+            // Connection point on the right side of the slot
+            const connX = slot.x + slot.w;
+            const connY = slot.y + slot.h / 2;
+            
+            return (
+              <>
+                {/* Google Drive pill */}
+                <g transform={`translate(${driveX}, ${driveY})`}>
+                  <rect width={pillW} height={pillH} rx={pillH / 2} fill="#F3F4F6" stroke="#E5E7EB" />
+                  <text x={pillW / 2} y={pillH / 2 + 5} textAnchor="middle" fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI" fontSize="12" fill="#111827">Google Drive</text>
+                </g>
+                {/* Connection line from Google Drive to MCP box */}
+                <line x1={driveX - 12} y1={driveY + pillH / 2} x2={connX} y2={connY} stroke="#4285F4" strokeWidth={3.5} strokeLinecap="round" />
+                <circle cx={connX} cy={connY} r={4} fill="#4285F4" />
+              </>
+            );
+          })()}
+        </g>
 
         {/* Legend: M+N intuition at bottom-right (optional subtle) */}
         <text x={box.x + box.w} y={H - 16} textAnchor="end" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontSize="12" fill="#9CA3AF">M apps + 1 tool → MCP</text>
