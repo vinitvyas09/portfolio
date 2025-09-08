@@ -133,6 +133,9 @@ result = mcp_client.call_tool("get_weather", {"city": "London"})
 The weather service now handles authentication, rate limiting, data formatting, error handling, everything. And here's the kicker: every MCP-compatible LLM can now use this tool with zero additional integration work.
 
 <MCPPort />
+<br />
+
+Having said that, it is not that each situation or AI Agent needs MCP. For example, if you're just shipping a quick prototype with one LLM talking to one tool and don't care about portability, no need to add complexity when a direct integration works fine. Or when your tool requires some highly specialized, non-standard behavior that you know for certain won't be reused elsewhere. Another one would be, if you're in an offline or air-gapped environment where security mandates a narrow, bespoke interface, MCP's standardization won't help you. Basically, if you're building something intentionally isolated and unique, MCP is overkill.
 
 ### Reflecting on the Current Fragmentation Crisis
 
@@ -149,10 +152,6 @@ But underneath all this complexity lay the most painful fragmentation of all: da
 MCP chose to solve exactly one slice of this fragmentation: the tool connectivity layer. Not model selection, not orchestration, not agent definitions. Just the unglamorous problem of "how does any LLM talk to any tool?"
 
 By solving this narrow problem completely, MCP became the foundation others could build on. Model routers could switch between models without losing tool access. Orchestration frameworks could focus on control flow without worrying about integration details. The ecosystem could finally stop reinventing the plumbing and start building applications.
-
-### When to NOT Use MCP
-
-It is not that each situation or AI Agent needs MCP. For example, if you're just shipping a quick prototype with one LLM talking to one tool and don't care about portability, no need to add complexity when a direct integration works fine. Or when your tool requires some highly specialized, non-standard behavior that you know for certain won't be reused elsewhere. Another one would be, if you're in an offline or air-gapped environment where security mandates a narrow, bespoke interface, MCP's standardization won't help you. Basically, if you're building something intentionally isolated and unique, MCP is overkill.
 
 ## When Did Lightning Strike?
 
