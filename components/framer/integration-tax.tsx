@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
 /**
@@ -81,7 +82,7 @@ export default function IntegrationTaxMcpGif({
       x: leftX,
       y: top + i * step,
     }));
-  }, [m, leftX]);
+  }, [m]);
 
   const tools = useMemo(() => {
     const count = Math.max(1, n);
@@ -91,7 +92,7 @@ export default function IntegrationTaxMcpGif({
       x: rightX,
       y: top + i * step,
     }));
-  }, [n, rightX]);
+  }, [n]);
 
   // Edges
   type Edge = { x1: number; y1: number; x2: number; y2: number };

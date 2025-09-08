@@ -39,6 +39,7 @@ const D: Record<StepName, number> = {
 
 export default function MCPWeatherFlow({
   className,
+  height = 675,
 }: {
   className?: string;
   height?: number;
@@ -169,7 +170,7 @@ export default function MCPWeatherFlow({
     }
     return Math.min(i, STEPS.length - 1);
   }, [now, starts]);
-  // const stepKey = useMemo(() => `${stepIndex}-${Math.floor(now)}`, [stepIndex, now]);
+  const stepKey = useMemo(() => `${stepIndex}-${Math.floor(now)}`, [stepIndex, now]);
   const stepName = STEPS[stepIndex];
   const tInStep =
     now - starts[stepIndex] >= 0 ? now - starts[stepIndex] : 0;
@@ -227,12 +228,12 @@ export default function MCPWeatherFlow({
 
   // Helper to build straight edges
   type NodeRect = { x: number; y: number; w: number; h: number };
-  // const edgeH = (from: NodeRect, to: NodeRect) => {
-  //   const y = from.y + from.h / 2;
-  //   const x1 = from.x + from.w + 12;
-  //   const x2 = to.x - 12;
-  //   return { x: x1, y, len: x2 - x1 };
-  // };
+  const edgeH = (from: NodeRect, to: NodeRect) => {
+    const y = from.y + from.h / 2;
+    const x1 = from.x + from.w + 12;
+    const x2 = to.x - 12;
+    return { x: x1, y, len: x2 - x1 };
+  };
   const edgeV = (from: NodeRect, to: NodeRect) => {
     const x = from.x + from.w / 2;
     const y1 = from.y + from.h + 12;
@@ -674,7 +675,7 @@ export default function MCPWeatherFlow({
                 textAnchor="middle"
                 dominantBaseline="middle"
               >
-                getWeather(&quot;San Francisco&quot;)
+                getWeather("San Francisco")
               </text>
             </motion.g>
           )}
@@ -794,28 +795,7 @@ function Node({
   id: string;
   gradient: string;
   isActive: boolean;
-  C: {
-    bg1: string;
-    bg2: string;
-    userGrad1: string;
-    userGrad2: string;
-    llmGrad1: string;
-    llmGrad2: string;
-    swGrad1: string;
-    swGrad2: string;
-    apiGrad1: string;
-    apiGrad2: string;
-    textSecondary: string;
-    textMuted: string;
-    edgeActive: string;
-    edgeColor: string;
-    pulseColor: string;
-    pulseGlow: string;
-    labelBg: string;
-    labelText: string;
-    cardBorder: string;
-    cardShadow: string;
-  };
+  C: any;
 }) {
   const iconMap: Record<string, string> = {
     user: "👤",
@@ -920,13 +900,7 @@ function SpeechBubble({
   text: string;
   visible: boolean;
   cursor?: boolean;
-  C: {
-    messageBg: string;
-    messageBorder: string;
-    cardShadow: string;
-    messageText: string;
-    pulseColor: string;
-  };
+  C: any;
 }) {
   return (
     <motion.div
