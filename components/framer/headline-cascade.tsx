@@ -16,6 +16,7 @@ export type HeadlineCascadeConfig = {
   tilt?: number; // kept for backwards-compat (unused)
   visibleCount?: number; // how many stacked cards to keep visible
   gap?: number; // px gap between stacked cards
+  verticalPadding?: number; // px padding above/below the stack when auto height
   // Overlap tuning
   topArrival?: number; // 0..1 point when top reaches final Y
   shiftStart?: number; // 0..1 point when lower cards start shifting
@@ -49,15 +50,15 @@ const DEFAULT_HEADLINES: Headline[] = [
   },
 ];
 
-const DEFAULTS: Required<Pick<HeadlineCascadeConfig, "height" | "durationMs">> &
-  Omit<HeadlineCascadeConfig, "height" | "durationMs"> = {
-  height: 420,
+const DEFAULTS: Required<Pick<HeadlineCascadeConfig, "durationMs">> &
+  Omit<HeadlineCascadeConfig, "durationMs"> = {
   durationMs: 12_000,
   // extras
   density: 1,
   tilt: 0,
   visibleCount: 6,
   gap: 10,
+  verticalPadding: 8,
   // overlap defaults: more visible overlap window
   topArrival: 0.4,
   shiftStart: 0.65,
@@ -160,17 +161,26 @@ export default function HeadlineCascade({
 
   if (!n) return null;
 
+  // Compute auto height: account for full card + stack depth + animation space
+  const stackDepth = Math.max(0, depth - 1) * gap; // Space taken by stacked cards
+  const animationBuffer = 50; // Space needed for overlap animation (further reduced)
+  const stackH = cardH + stackDepth + animationBuffer;
+  // Fixed top padding (40px in the container) + minimal bottom padding
+  const topPadding = 20; // This matches the paddingTop in the container
+  const bottomPadding = 0; // Minimal bottom padding - just enough to avoid cutoff
+  const autoHeight = Math.round(stackH + topPadding + bottomPadding);
+
   return (
     <div
       className={`relative w-full overflow-hidden rounded-xl border border-white/10 bg-black ${
         className ?? ""
       }`}
-      style={{ height: cfg.height }}
+      style={{ height: cfg.height ?? autoHeight }}
     >
       {/* Header removed (no three-dot chrome) */}
 
-      {/* Centered stack */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      {/* Stack positioned with balanced spacing */}
+      <div className="absolute inset-0 flex justify-center" style={{ paddingTop: '40px' }}>
         <div className="relative w-[min(92vw,860px)] px-3">
           {/* Render bottom → top to ensure correct stacking */}
           {stack
