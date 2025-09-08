@@ -520,10 +520,21 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
             const toolX = 900;
             const midX = (agentX + serverX) / 2;
             
-            // Define path waypoints
+            // Define path waypoints for smooth animation
             const p0 = { x: agentX, y: agentY };
             const p1 = { x: midX, y: agentY };
             const p2 = { x: serverX, y: serverY };
+            
+            // Generate smooth curve points
+            const curvePoints = 20;
+            const xPoints = [];
+            const yPoints = [];
+            for (let i = 0; i <= curvePoints; i++) {
+              const t = i / curvePoints;
+              const point = getQuadraticPoint(t, p0, p1, p2);
+              xPoints.push(point.x);
+              yPoints.push(point.y);
+            }
             
             return (
               <g key={`pulse-${conn.id}`}>
@@ -532,14 +543,15 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   r="6"
                   fill={C.pulseColor}
                   filter="url(#pulseGlow)"
+                  initial={{ x: p0.x, y: p0.y, opacity: 1 }}
                   animate={{
-                    x: [p0.x, getQuadraticPoint(0.25, p0, p1, p2).x, getQuadraticPoint(0.5, p0, p1, p2).x, getQuadraticPoint(0.75, p0, p1, p2).x, p2.x],
-                    y: [p0.y, getQuadraticPoint(0.25, p0, p1, p2).y, getQuadraticPoint(0.5, p0, p1, p2).y, getQuadraticPoint(0.75, p0, p1, p2).y, p2.y],
+                    x: xPoints,
+                    y: yPoints,
+                    opacity: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
                   }}
                   transition={{
-                    duration: 1.5,
-                    times: [0, 0.25, 0.5, 0.75, 1],
-                    ease: "easeInOut"
+                    duration: 1,
+                    ease: "linear"
                   }}
                 />
                 
@@ -550,15 +562,15 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   filter="url(#pulseGlow)"
                   initial={{ x: 780, y: serverY, opacity: 0 }}
                   animate={{ 
-                    x: [780, toolX],
+                    x: [780, 840, toolX],
                     y: serverY,
-                    opacity: [0, 1, 1, 0]
+                    opacity: [0, 1, 0]
                   }}
                   transition={{
-                    duration: 0.5,
-                    delay: 1.5,
-                    times: [0, 0.1, 0.9, 1],
-                    ease: "easeInOut"
+                    duration: 1,
+                    delay: 1,
+                    times: [0, 0.5, 1],
+                    ease: "linear"
                   }}
                 />
                 
@@ -569,15 +581,15 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   filter="url(#pulseGlow)"
                   initial={{ x: toolX, y: serverY, opacity: 0 }}
                   animate={{ 
-                    x: [toolX, 780],
+                    x: [toolX, 840, 780],
                     y: serverY,
-                    opacity: [0, 1, 1, 0]
+                    opacity: [0, 1, 0]
                   }}
                   transition={{
                     duration: 0.5,
                     delay: 3,
-                    times: [0, 0.1, 0.9, 1],
-                    ease: "easeInOut"
+                    times: [0, 0.5, 1],
+                    ease: "linear"
                   }}
                 />
                 
@@ -586,17 +598,16 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   r="6"
                   fill={C.pulseColor}
                   filter="url(#pulseGlow)"
-                  initial={{ opacity: 0 }}
+                  initial={{ x: p2.x, y: p2.y, opacity: 0 }}
                   animate={{
-                    x: [p2.x, getQuadraticPoint(0.75, p0, p1, p2).x, getQuadraticPoint(0.5, p0, p1, p2).x, getQuadraticPoint(0.25, p0, p1, p2).x, p0.x],
-                    y: [p2.y, getQuadraticPoint(0.75, p0, p1, p2).y, getQuadraticPoint(0.5, p0, p1, p2).y, getQuadraticPoint(0.25, p0, p1, p2).y, p0.y],
-                    opacity: [0, 1, 1, 1, 0]
+                    x: [...xPoints].reverse(),
+                    y: [...yPoints].reverse(),
+                    opacity: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
                   }}
                   transition={{
                     duration: 1.5,
-                    delay: 3.5,
-                    times: [0, 0.1, 0.5, 0.9, 1],
-                    ease: "easeInOut"
+                    delay: 4,
+                    ease: "linear"
                   }}
                 />
               </g>
