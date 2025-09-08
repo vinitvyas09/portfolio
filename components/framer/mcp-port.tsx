@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 
 export default function MCPArchitectureDiagram({ className }: { className?: string }) {
@@ -13,6 +13,17 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
+  
+  // Animation state
+  const [activeConnections, setActiveConnections] = useState<Array<{
+    id: string;
+    agent: string;
+    tool: string;
+    phase: 'forward' | 'backward';
+    startTime: number;
+  }>>([]);
+  
+  const animationIntervalRef = useRef<NodeJS.Timeout>();
   
   // Theme-aware palette
   const C = useMemo(() => {
@@ -38,6 +49,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         clientPill: "#00a67e",
         clientPillText: "#ffffff",
         title: "#64748b",
+        highlightStroke: "#00a67e",
+        pulseColor: "#00ff88",
       };
     }
     return isDark
@@ -62,6 +75,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
           clientPill: "#00a67e",
           clientPillText: "#ffffff",
           title: "#888",
+          highlightStroke: "#00ff88",
+          pulseColor: "#00ff88",
         }
       : {
           // Light theme
@@ -84,6 +99,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
           clientPill: "#10b981",
           clientPillText: "#ffffff",
           title: "#64748b",
+          highlightStroke: "#10b981",
+          pulseColor: "#10b981",
         };
   }, [isDark, mounted]);
   
@@ -142,6 +159,97 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     'ide': ['github', 'db', 'internal'],
     'helpdesk': ['email', 'db', 'payments', 'analytics']
   };
+  
+  // Start random animations
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const startRandomAnimation = () => {
+      // Clean up old connections (remove those older than 4 seconds)
+      setActiveConnections(prev => prev.filter(conn => Date.now() - conn.startTime < 4000));
+      
+      // Pick a random agent
+      const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+      const availableTools = connections[randomAgent.id];
+      const randomTool = availableTools[Math.floor(Math.random() * availableTools.length)];
+      
+      // Check if this agent already has an active connection
+      setActiveConnections(prev => {
+        const hasActiveConnection = prev.some(conn => 
+          conn.agent === randomAgent.id && Date.now() - conn.startTime < 4000
+        );
+        
+        if (hasActiveConnection) return prev;
+        
+        const newConnection = {
+          id: `${randomAgent.id}-${randomTool}-${Date.now()}`,
+          agent: randomAgent.id,
+          tool: randomTool,
+          phase: 'forward' as const,
+          startTime: Date.now()
+        };
+        
+        // Switch to backward phase after 2 seconds
+        setTimeout(() => {
+          setActiveConnections(prev => 
+            prev.map(conn => 
+              conn.id === newConnection.id 
+                ? { ...conn, phase: 'backward' as const }
+                : conn
+            )
+          );
+        }, 2000);
+        
+        return [...prev, newConnection];
+      });
+    };
+    
+    // Start animations after initial render
+    const initialDelay = setTimeout(() => {
+      startRandomAnimation();
+      animationIntervalRef.current = setInterval(startRandomAnimation, 800);
+    }, 2000);
+    
+    return () => {
+      clearTimeout(initialDelay);
+      if (animationIntervalRef.current) {
+        clearInterval(animationIntervalRef.current);
+      }
+    };
+  }, [mounted]);
+  
+  // Helper function to check if a box is active
+  const isAgentActive = (agentId: string) => {
+    return activeConnections.some(conn => 
+      conn.agent === agentId && Date.now() - conn.startTime < 4000
+    );
+  };
+  
+  const isServerActive = (toolId: string) => {
+    return activeConnections.some(conn => {
+      const isActive = conn.tool === toolId && Date.now() - conn.startTime < 4000;
+      const timeElapsed = Date.now() - conn.startTime;
+      
+      if (conn.phase === 'forward') {
+        return isActive && timeElapsed > 1000 && timeElapsed < 2000;
+      } else {
+        return isActive && timeElapsed > 2000 && timeElapsed < 3000;
+      }
+    });
+  };
+  
+  const isToolActive = (toolId: string) => {
+    return activeConnections.some(conn => {
+      const isActive = conn.tool === toolId && Date.now() - conn.startTime < 4000;
+      const timeElapsed = Date.now() - conn.startTime;
+      
+      if (conn.phase === 'forward') {
+        return isActive && timeElapsed > 1500;
+      } else {
+        return isActive && timeElapsed > 3500;
+      }
+    });
+  };
 
   // Placeholder to avoid SSR/CSR theme mismatch flash
   if (!mounted) {
@@ -190,6 +298,15 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          
+          {/* Pulse glow effect */}
+          <filter id="pulseGlow">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
 
         {/* Title */}
@@ -232,7 +349,13 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                 height={140}
                 rx={8}
                 fill={C.cardFill}
-                stroke={C.cardStroke}
+                stroke={isAgentActive(agent.id) ? C.highlightStroke : C.cardStroke}
+                strokeWidth={isAgentActive(agent.id) ? "2" : "1"}
+                animate={{
+                  stroke: isAgentActive(agent.id) ? C.highlightStroke : C.cardStroke,
+                  strokeWidth: isAgentActive(agent.id) ? 2 : 1,
+                }}
+                transition={{ duration: 0.3 }}
               />
               <text x={15} y={35} fontSize="24">
                 {agent.icon}
@@ -260,18 +383,24 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         >
           {tools.map((tool, i) => {
             const y = 100 + i * 95;
+            const isActive = isServerActive(tool.id);
             return (
               <g key={tool.id} transform={`translate(600, ${y})`}>
-                <rect
+                <motion.rect
                   x={0}
                   y={0}
                   width={180}
                   height={70}
                   rx={8}
                   fill={C.serverFill}
-                  stroke={C.serverStroke}
-                  strokeWidth="1.5"
+                  stroke={isActive ? C.highlightStroke : C.serverStroke}
+                  strokeWidth={isActive ? "2" : "1.5"}
                   filter="url(#glow)"
+                  animate={{
+                    stroke: isActive ? C.highlightStroke : C.serverStroke,
+                    strokeWidth: isActive ? 2 : 1.5,
+                  }}
+                  transition={{ duration: 0.3 }}
                 />
                 <rect x={10} y={12} width={6} height={6} rx={1} fill={C.serverLed} />
                 <rect x={10} y={22} width={6} height={6} rx={1} fill={C.serverLed} />
@@ -296,9 +425,10 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
         >
           {tools.map((tool, i) => {
             const y = 100 + i * 95;
+            const isActive = isToolActive(tool.id);
             return (
               <g key={tool.id} transform={`translate(900, ${y})`}>
-                <rect 
+                <motion.rect 
                   x={0} 
                   y={0} 
                   width={260} 
@@ -306,6 +436,13 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
                   rx={8} 
                   fill={tool.color} 
                   opacity={0.9}
+                  stroke={isActive ? C.highlightStroke : "transparent"}
+                  strokeWidth={isActive ? "2" : "0"}
+                  animate={{
+                    stroke: isActive ? C.highlightStroke : "transparent",
+                    strokeWidth: isActive ? 2 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
                 />
                 <text x={20} y={40} fontSize="28">
                   {tool.icon}
@@ -390,6 +527,80 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
             );
           })}
         </g>
+        
+        {/* Animated Pulses */}
+        <AnimatePresence>
+          {activeConnections.map(conn => {
+            const agentIdx = agents.findIndex(a => a.id === conn.agent);
+            const toolIdx = tools.findIndex(t => t.id === conn.tool);
+            
+            const agentY = 220 + agentIdx * 200;
+            const agentX = 330;
+            const serverY = 135 + toolIdx * 95;
+            const serverX = 600;
+            const toolX = 900;
+            const midX = (agentX + serverX) / 2;
+            
+            // Path from agent to server
+            const pathToServer = `M ${agentX} ${agentY} Q ${midX} ${agentY} ${serverX} ${serverY}`;
+            // Path from server to tool
+            const pathToTool = `M ${780} ${serverY} L ${toolX} ${serverY}`;
+            
+            if (conn.phase === 'forward') {
+              return (
+                <g key={`pulse-${conn.id}`}>
+                  {/* Pulse from agent to server */}
+                  <motion.circle
+                    r="6"
+                    fill={C.pulseColor}
+                    filter="url(#pulseGlow)"
+                    initial={{ offsetDistance: "0%" }}
+                    animate={{ offsetDistance: "100%" }}
+                    transition={{ duration: 1, ease: "easeInOut" }}
+                    style={{
+                      offsetPath: `path('${pathToServer}')`,
+                    }}
+                  />
+                  {/* Pulse from server to tool */}
+                  <motion.circle
+                    r="6"
+                    fill={C.pulseColor}
+                    filter="url(#pulseGlow)"
+                    initial={{ x: 780, y: serverY }}
+                    animate={{ x: toolX, y: serverY }}
+                    transition={{ duration: 0.5, delay: 1, ease: "easeInOut" }}
+                  />
+                </g>
+              );
+            } else {
+              return (
+                <g key={`pulse-back-${conn.id}`}>
+                  {/* Pulse from tool to server */}
+                  <motion.circle
+                    r="6"
+                    fill={C.pulseColor}
+                    filter="url(#pulseGlow)"
+                    initial={{ x: toolX, y: serverY }}
+                    animate={{ x: 780, y: serverY }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  />
+                  {/* Pulse from server to agent */}
+                  <motion.circle
+                    r="6"
+                    fill={C.pulseColor}
+                    filter="url(#pulseGlow)"
+                    initial={{ offsetDistance: "100%" }}
+                    animate={{ offsetDistance: "0%" }}
+                    transition={{ duration: 1, delay: 0.5, ease: "easeInOut" }}
+                    style={{
+                      offsetPath: `path('${pathToServer}')`,
+                    }}
+                  />
+                </g>
+              );
+            }
+          })}
+        </AnimatePresence>
 
         {/* Bottom text */}
         <text x={W/2} y={H - 20} fill={C.footer} fontSize="14" textAnchor="middle">
