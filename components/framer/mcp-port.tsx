@@ -218,8 +218,8 @@ export default function MCPArchitectureDiagram({ className }: { className?: stri
     return activeConnections.some(conn => {
       if (conn.agent !== agentId) return false;
       const elapsed = Date.now() - conn.startTime;
-      // Active at start (0-600ms) and when return pulse arrives (7500-8100ms)
-      return (elapsed >= 0 && elapsed <= 600) || (elapsed >= 7500 && elapsed <= 8100);
+      // Active at start (0-600ms) and when return pulse arrives (8500-9100ms)
+      return (elapsed >= 0 && elapsed <= 600) || (elapsed >= 8500 && elapsed <= 9100);
     });
   };
   
