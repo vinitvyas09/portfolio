@@ -356,6 +356,44 @@ export default function MCPWeatherFlow({
           </filter>
         </defs>
 
+        {/* Title and Stage Indicator */}
+        <motion.text
+          x={W / 2}
+          y={25}
+          fill={C.textSecondary}
+          fontSize="13"
+          fontWeight="500"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          textAnchor="middle"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          MCP Weather Tool Call Flow
+        </motion.text>
+        
+        {/* Current Stage Indicator */}
+        <motion.text
+          x={W / 2}
+          y={45}
+          fill={C.textMuted}
+          fontSize="11"
+          fontFamily="ui-monospace, monospace"
+          textAnchor="middle"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {stepName === "userType" && "User asking question..."}
+          {stepName === "llmToSw" && "LLM calling function..."}
+          {stepName === "swToApi" && "Software calling API..."}
+          {stepName === "apiToSw" && "API returning data..."}
+          {stepName === "swToLlm" && "Software processing response..."}
+          {stepName === "llmToUser" && "LLM preparing answer..."}
+          {stepName === "llmType" && "LLM responding..."}
+          {stepName === "pause" && "Complete"}
+        </motion.text>
+
       {/* Nodes */}
         <Node {...user} id="user" gradient="userGradient" isActive={activeElements.has("user")} C={C} />
         <Node {...llm} id="llm" gradient="llmGradient" isActive={activeElements.has("llm")} C={C} />
@@ -784,10 +822,10 @@ function SpeechBubble({
             color: C.messageText,
             whiteSpace: "pre-wrap",
           }}
-        >
-          {text}
-          {cursor && (
-            <motion.span
+      >
+        {text}
+        {cursor && (
+          <motion.span
               style={{
                 display: "inline-block",
                 width: 2,
@@ -796,11 +834,11 @@ function SpeechBubble({
                 marginLeft: 2,
                 verticalAlign: "text-bottom",
               }}
-              animate={{ opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 1, repeat: Infinity }}
-            />
-          )}
-        </div>
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1, repeat: Infinity }}
+          />
+        )}
+      </div>
         
         {/* Subtle tail */}
         <div
@@ -825,9 +863,9 @@ function SpeechBubble({
             borderLeft: "6px solid transparent",
             borderRight: "6px solid transparent",
             borderTop: `6px solid ${C.messageBorder}`,
-          }}
-        />
-      </div>
+            }}
+          />
+        </div>
     </motion.div>
   );
 }
