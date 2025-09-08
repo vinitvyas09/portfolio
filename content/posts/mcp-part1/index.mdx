@@ -134,7 +134,7 @@ The weather service now handles authentication, rate limiting, data formatting, 
 
 <MCPPort />
 
-### The Fragmentation Crisis
+### Reflecting on the Current Fragmentation Crisis
 
 Before we move on, we need to understand that the M×N integration problem was just one symptom of a deeper crisis: ecosystem fragmentation. And fragmentation, as the IoT industry learned painfully over two decades, can kill even the most promising technologies. Consider IoT's cautionary tale (which is a space I worked on more than 10 years ago): by 2015, we had Zigbee, Z-Wave, Thread, Bluetooth LE, and dozens of proprietary protocols. Every vendor pushed their "standard," creating islands of incompatible devices. Smart homes became debugging nightmares. The promise of seamless connectivity died in a graveyard of competing protocols. Sound familiar?
 
@@ -148,7 +148,7 @@ But underneath all this complexity lay the most painful fragmentation of all: da
 
 MCP chose to solve exactly one slice of this fragmentation: the tool connectivity layer. Not model selection, not orchestration, not agent definitions. Just the unglamorous problem of "how does any LLM talk to any tool?"
 
-As a bit of foreshadowing for what is discussed next: By solving this narrow problem completely, MCP became the foundation others could build on. Model routers could switch between models without losing tool access. Orchestration frameworks could focus on control flow without worrying about integration details. The ecosystem could finally stop reinventing the plumbing and start building applications.
+By solving this narrow problem completely, MCP became the foundation others could build on. Model routers could switch between models without losing tool access. Orchestration frameworks could focus on control flow without worrying about integration details. The ecosystem could finally stop reinventing the plumbing and start building applications.
 
 ### When to NOT Use MCP
 
