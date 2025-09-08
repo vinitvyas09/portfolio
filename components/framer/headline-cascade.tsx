@@ -48,6 +48,31 @@ const DEFAULT_HEADLINES: Headline[] = [
     source: "Future of Life Institute",
     url: "https://futureoflife.org/open-letter/pause-giant-ai-experiments/",
   },
+  {
+    title: "New York City public schools ban ChatGPT on devices and networks",
+    source: "The Verge",
+    url: "https://www.theverge.com/2023/1/5/23540082/new-york-city-public-schools-ban-chatgpt-devices-networks",
+  },
+  {
+    title: "Reinventing search with a new AI‑powered Bing and Edge",
+    source: "Microsoft Blog",
+    url: "https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-bing-and-edge-your-copilot-for-the-web/",
+  },
+  {
+    title: "Introducing ChatGPT Plugins",
+    source: "OpenAI",
+    url: "https://openai.com/blog/chatgpt-plugins",
+  },
+  {
+    title: "Function calling and other API updates",
+    source: "OpenAI",
+    url: "https://openai.com/blog/function-calling-and-other-api-updates",
+  },
+  {
+    title: "Introducing LLaMA: A foundational, 65‑billion‑parameter LLM",
+    source: "Meta AI",
+    url: "https://ai.facebook.com/blog/large-language-model-llama-meta-ai/",
+  },
 ];
 
 const DEFAULTS: Required<Pick<HeadlineCascadeConfig, "durationMs">> &
