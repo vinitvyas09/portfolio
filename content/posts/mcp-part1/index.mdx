@@ -135,7 +135,22 @@ The weather service now handles authentication, rate limiting, data formatting, 
 <MCPPort />
 <br />
 
+#### When to NOT use MCP
 Having said that, it is not that each situation or AI Agent needs MCP. For example, if you're just shipping a quick prototype with one LLM talking to one tool and don't care about portability, no need to add complexity when a direct integration works fine. Or when your tool requires some highly specialized, non-standard behavior that you know for certain won't be reused elsewhere. Another one would be, if you're in an offline or air-gapped environment where security mandates a narrow, bespoke interface, MCP's standardization won't help you. Basically, if you're building something intentionally isolated and unique, MCP is overkill.
+
+## When Did Lightning Strike?
+The path to dominance wasn't immediate. OpenAI had tried "plugins" in 2023—they failed because they were OpenAI-specific and required complex OAuth flows. Microsoft had "skills," Google had "extensions"—all proprietary, all incompatible. MCP succeeded because it was open source (No vendor lock-in), simple (just JSON-RPC over stdio/SSE/WebSocket) and timing (seemed to have released exactly when everyone realized they needed it).
+
+Here's the adoption timeline:
+
+- **Nov 25, 2024**: MCP open-sourced with Claude Desktop GitHub demo
+- **Early 2025**: OpenAI's Agents SDK announces first-class MCP support
+- **April 2025**: GitHub releases official MCP server; Copilot gains remote MCP support
+- **May 2025**: Microsoft Copilot Studio MCP integration goes GA
+- **June 2025**: Google Gemini adds built-in MCP support
+- **August 2025**: Major spec update with auth standards; legacy SSE deprecated
+
+The timing was perfect, but MCP won because it turned tool access into a portable, governable interface at the exact moment all major vendors converged on the same need. The factors converged such that instead of being yet another protocol, it led to this race where the cheapest, safest path forward with the best chance of adoption became "just use MCP"
 
 ### Reflecting on the Current Fragmentation Crisis
 
@@ -153,28 +168,13 @@ MCP chose to solve exactly one slice of this fragmentation: the tool connectivit
 
 By solving this narrow problem completely, MCP became the foundation others could build on. Model routers could switch between models without losing tool access. Orchestration frameworks could focus on control flow without worrying about integration details. The ecosystem could finally stop reinventing the plumbing and start building applications.
 
-## When Did Lightning Strike?
-
-The path to dominance wasn't immediate. OpenAI had tried "plugins" in 2023—they failed because they were OpenAI-specific and required complex OAuth flows. Microsoft had "skills," Google had "extensions"—all proprietary, all incompatible. MCP succeeded because it was open source (No vendor lock-in), simple (just JSON-RPC over stdio/SSE/WebSocket) and timing (seemed to have released exactly when everyone realized they needed it).
-
-Here's the adoption timeline:
-
-- **Nov 25, 2024**: MCP open-sourced with Claude Desktop GitHub demo
-- **Early 2025**: OpenAI's Agents SDK announces first-class MCP support
-- **April 2025**: GitHub releases official MCP server; Copilot gains remote MCP support
-- **May 2025**: Microsoft Copilot Studio MCP integration goes GA
-- **June 2025**: Google Gemini adds built-in MCP support
-- **August 2025**: Major spec update with auth standards; legacy SSE deprecated
-
-The timing was perfect, but MCP won because it turned tool access into a portable, governable interface at the exact moment all major vendors converged on the same need. The factors converged such that instead of being yet another protocol, it led to this race where the cheapest, safest path forward with the best chance of adoption became "just use MCP"
-
 ## The Benefits, Crystallized
 
-The simple math demonstrates the benefits:
+So let's review what we went through, the simple math demonstrates the benefits:
 - **Before MCP**: M models × N tools = M×N integrations
 - **With MCP**: M models + N tools = M+N integrations
 
-But beyond the math, an ecosystem flywheel occurred where: more MCP‑aware clients led to more incentive to ship MCP servers; more servers led to more pressure for clients to support MCP and as more standardization happened, it led to lower costs for everyone (see GitHub, Azure, and VS Code momentum). This created a race to implement MCP servers. Not supporting it meant being locked out of a rapidly growing ecosystem where developers were converging (or as most call it, 'fomo').
+But it's more than that. Beyond the math, an ecosystem flywheel occurred where: more MCP‑aware clients led to more incentive to ship MCP servers; more servers led to more pressure for clients to support MCP and as more standardization happened, it led to lower costs for everyone (see GitHub, Azure, and VS Code momentum). This created a race to implement MCP servers. Not supporting it meant being locked out of a rapidly growing ecosystem where developers were converging (or as most call it, 'fomo').
 
 ## What MCP Doesn't Do
 
