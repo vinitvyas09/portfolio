@@ -193,8 +193,8 @@ export default function MCPWeatherFlow({
 
   // Reserve space at the top for the two message bubbles
   const MSG_W = nodeW; // keep bubbles similar width to nodes
-  const MSG_Q_Y = PAD; // question bubble Y
-  const MSG_A_Y = MSG_Q_Y + 64; // add a bit more space between bubbles
+  const MSG_Q_Y = PAD - 6; // pull question bubble up slightly
+  const MSG_A_Y = MSG_Q_Y + 70; // increase separation by a few pixels
 
   // Stack nodes vertically below the message area
   const V_GAP = 24; // vertical gap between nodes (tighter)
