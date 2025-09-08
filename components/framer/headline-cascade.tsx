@@ -27,13 +27,13 @@ export type HeadlineCascadeConfig = {
 
 const DEFAULT_HEADLINES: Headline[] = [
   {
-    title: "ChatGPT sets record for fastest-growing user base — analyst note",
+    title: "ChatGPT sets record for fastest-growing user base — analyst notes",
     source: "Reuters",
     url:
       "https://web.archive.org/web/20230202084643/https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/",
   },
   {
-    title: "ChatGPT banned in Italy over privacy concerns",
+    title: "ChatGPT banned in Italy over privacy concerns (BBC Tech News)",
     source: "BBC News",
     url: "https://www.bbc.com/news/technology-65139406",
   },
@@ -44,7 +44,7 @@ const DEFAULT_HEADLINES: Headline[] = [
     url: "https://arxiv.org/abs/2303.12712",
   },
   {
-    title: "Pause Giant AI Experiments: An Open Letter",
+    title: "Pause Giant AI Experiments: An Open Letter (Future of Life Institute)",
     source: "Future of Life Institute",
     url: "https://futureoflife.org/open-letter/pause-giant-ai-experiments/",
   },
@@ -59,12 +59,12 @@ const DEFAULT_HEADLINES: Headline[] = [
     url: "https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-bing-and-edge-your-copilot-for-the-web/",
   },
   {
-    title: "Introducing ChatGPT Plugins",
+    title: "Introducing ChatGPT Plugins in your application (OpenAI)",
     source: "OpenAI",
     url: "https://openai.com/blog/chatgpt-plugins",
   },
   {
-    title: "Function calling and other API updates",
+    title: "Function (tool) calling and other API updates (OpenAI Blog)",
     source: "OpenAI",
     url: "https://openai.com/blog/function-calling-and-other-api-updates",
   },
