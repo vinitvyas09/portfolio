@@ -128,28 +128,39 @@ const NeuronScene = ({ colors }: { colors: any }) => {
   const palette = useMemo(() => {
     const primary = colors.neuronPrimary;
     const secondary = colors.neuronSecondary ?? colors.neuronPrimary;
-    const accentWarm = '#f59e0b';
-    const accentCool = '#14b8a6';
+    const accentWarm = '#ff6b35'; // More vibrant orange-red
+    const accentCool = '#00d4aa'; // Bright cyan-green
+    const accentElectric = '#7c3aed'; // Electric purple
+    const accentGold = '#fbbf24'; // Golden yellow
 
     return {
       somaGradientId: 'neuron-soma-detailed',
-      somaOuter: withAlpha(lightenColor(blendColors(primary, secondary, 0.25), 0.1), 'f0'),
-      somaMid: withAlpha(blendColors(primary, secondary, 0.45), 'd4'),
-      somaInner: withAlpha(darkenColor(primary, 0.2), '70'),
-      membrane: withAlpha(blendColors(primary, '#1f2937', 0.3), 'f0'),
-      dendriteMain: withAlpha(blendColors(primary, secondary, 0.2), 'cc'),
-      dendriteSecondary: withAlpha(lightenColor(primary, 0.25), 'aa'),
-      dendriteFine: withAlpha(blendColors(secondary, accentCool, 0.4), '66'),
-      dendriteSpine: withAlpha(lightenColor(secondary, 0.2), 'aa'),
-      axonHillock: withAlpha(blendColors(primary, secondary, 0.55), '88'),
-      axonCore: withAlpha(blendColors(secondary, accentCool, 0.3), 'd0'),
-      myelinFill: withAlpha(lightenColor(secondary, 0.45), '2a'),
-      myelinStroke: withAlpha(lightenColor(secondary, 0.15), 'a0'),
-      terminal: withAlpha(blendColors(secondary, accentWarm, 0.35), 'dd'),
-      terminalSoft: withAlpha(blendColors(secondary, accentCool, 0.5), 'a5'),
-      vesicle: withAlpha(blendColors(secondary, primary, 0.25), 'cc'),
-      nucleus: withAlpha(blendColors(primary, '#1d4ed8', 0.3), 'f0'),
-      nucleolus: withAlpha(lightenColor(secondary, 0.25), 'ff'),
+      // Enhanced soma with more depth and vibrancy
+      somaOuter: withAlpha(blendColors(lightenColor(primary, 0.3), accentElectric, 0.15), 'f8'),
+      somaMid: withAlpha(blendColors(primary, secondary, 0.6), 'e8'),
+      somaInner: withAlpha(blendColors(darkenColor(primary, 0.1), accentElectric, 0.2), '90'),
+      membrane: withAlpha(blendColors(primary, accentElectric, 0.25), 'f5'),
+      
+      // More dynamic dendrite colors with gradient-like transitions
+      dendriteMain: withAlpha(blendColors(primary, accentCool, 0.3), 'e0'),
+      dendriteSecondary: withAlpha(blendColors(lightenColor(primary, 0.2), accentCool, 0.4), 'c8'),
+      dendriteFine: withAlpha(blendColors(secondary, accentCool, 0.6), '85'),
+      dendriteSpine: withAlpha(blendColors(lightenColor(secondary, 0.3), accentGold, 0.3), 'b8'),
+      
+      // Enhanced axon with more electrical feel
+      axonHillock: withAlpha(blendColors(blendColors(primary, secondary, 0.5), accentElectric, 0.2), 'a8'),
+      axonCore: withAlpha(blendColors(secondary, accentCool, 0.5), 'e5'),
+      myelinFill: withAlpha(blendColors(lightenColor(secondary, 0.4), accentGold, 0.2), '45'),
+      myelinStroke: withAlpha(blendColors(lightenColor(secondary, 0.2), accentCool, 0.3), 'c0'),
+      
+      // More vibrant terminals with energy-like colors
+      terminal: withAlpha(blendColors(secondary, accentWarm, 0.5), 'f0'),
+      terminalSoft: withAlpha(blendColors(secondary, accentCool, 0.6), 'c5'),
+      vesicle: withAlpha(blendColors(blendColors(secondary, primary, 0.3), accentGold, 0.4), 'e0'),
+      
+      // Enhanced nucleus with more biological depth
+      nucleus: withAlpha(blendColors(blendColors(primary, '#1d4ed8', 0.4), accentElectric, 0.2), 'f8'),
+      nucleolus: withAlpha(blendColors(lightenColor(secondary, 0.3), accentGold, 0.3), 'ff'),
     };
   }, [colors.neuronPrimary, colors.neuronSecondary]);
 
@@ -1226,9 +1237,9 @@ const PerceptronContinuum = () => {
       borderColor: "rgba(64, 64, 64, 0.8)",
       sceneBg: "#0a0a0a",
       
-      // Stage-specific colors - more vibrant for dark mode
-      neuronPrimary: "#a78bfa",
-      neuronSecondary: "#34d399",
+      // Stage-specific colors - more vibrant and dynamic for dark mode
+      neuronPrimary: "#8b5cf6", // Rich purple with more saturation
+      neuronSecondary: "#06ffa5", // Electric green with cyan undertones
       circuitPrimary: "#34d399",
       circuitSecondary: "#22d3ee",
       mathPrimary: "#fbbf24",
@@ -1252,9 +1263,9 @@ const PerceptronContinuum = () => {
       borderColor: "rgba(226, 232, 240, 0.8)",
       sceneBg: "#ffffff",
       
-      // Stage-specific colors
-      neuronPrimary: "#6366f1",
-      neuronSecondary: "#10b981",
+      // Stage-specific colors - enhanced vibrancy for light mode
+      neuronPrimary: "#7c3aed", // Deeper purple for better contrast
+      neuronSecondary: "#059669", // Richer emerald green
       circuitPrimary: "#10b981",
       circuitSecondary: "#06b6d4",
       mathPrimary: "#eab308",
