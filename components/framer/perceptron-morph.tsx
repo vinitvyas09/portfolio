@@ -339,11 +339,33 @@ const NeuronScene = ({ colors }: { colors: any }) => {
         fill="none"
       >
         <defs>
-          <radialGradient id={palette.somaGradientId} cx="50%" cy="50%" r="70%">
+          <radialGradient id={palette.somaGradientId} cx="45%" cy="40%" r="85%">
             <stop offset="0%" stopColor={palette.somaOuter} />
-            <stop offset="65%" stopColor={palette.somaMid} />
-            <stop offset="100%" stopColor={palette.somaInner} />
+            <stop offset="35%" stopColor={palette.somaMid} />
+            <stop offset="70%" stopColor={palette.somaInner} />
+            <stop offset="100%" stopColor={withAlpha(darkenColor(colors.neuronPrimary, 0.3), '60')} />
           </radialGradient>
+          <radialGradient id="neuron-membrane-glow" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor={withAlpha(colors.neuronPrimary, '40')} />
+            <stop offset="100%" stopColor={withAlpha(colors.neuronPrimary, '00')} />
+          </radialGradient>
+          <linearGradient id="dendrite-energy" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={palette.dendriteMain} />
+            <stop offset="50%" stopColor={palette.dendriteSecondary} />
+            <stop offset="100%" stopColor={palette.dendriteFine} />
+          </linearGradient>
+          <radialGradient id="axon-pulse" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stopColor={withAlpha(lightenColor(colors.neuronSecondary, 0.2), 'cc')} />
+            <stop offset="60%" stopColor={palette.axonCore} />
+            <stop offset="100%" stopColor={withAlpha(darkenColor(colors.neuronSecondary, 0.2), '80')} />
+          </radialGradient>
+          <filter id="neuron-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
           <clipPath id={revealClipId.current}>
             <motion.rect
               x="0"
