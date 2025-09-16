@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 
@@ -30,7 +30,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
 
   // Generate random weights for each input (between 0.1 and 1)
   const weights = Array.from({ length: inputs }, (_, i) => {
-    const weight = 0.2 + (Math.sin(i * 1.7) + 1) * 0.4; // Deterministic "random" for consistency
+    const weight = 0.2 + (Math.sin(i * 1.7) + 1) * 0.4;
     return Math.min(1, Math.max(0.1, weight));
   });
 
@@ -45,7 +45,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       const signalValues: number[] = [];
       weights.forEach((weight, index) => {
         setTimeout(() => {
-          const signalStrength = Math.random() > 0.3 ? weight : 0; // 70% chance of signal
+          const signalStrength = Math.random() > 0.3 ? weight : 0;
           signalValues[index] = signalStrength;
           
           setSignals([...signalValues]);
@@ -69,8 +69,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
     runAnimation();
   }, []);
 
-  const neuronColor = isFiring ? '#10b981' : '#6b7280';
-  const neuronGlow = isFiring ? '0 0 30px rgba(16, 185, 129, 0.6)' : 'none';
+  const neuronColor = isFiring ? '#10b981' : '#64b5f6';
+  const nucleusColor = isFiring ? '#065f46' : '#1565c0';
 
   return (
     <div className="neuron-container" style={{
@@ -82,41 +82,64 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
     }}>
       <svg
         width="100%"
-        height="300"
-        viewBox="0 0 600 300"
+        height="400"
+        viewBox="0 0 600 400"
         style={{ maxWidth: '600px', margin: '0 auto', display: 'block' }}
       >
-        {/* Dendrites (input lines) */}
+        <defs>
+          <radialGradient id="somaGradient">
+            <stop offset="0%" stopColor={neuronColor} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={neuronColor} stopOpacity="0.6" />
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Dendrites - Tree-like branching structure */}
         {weights.map((weight, index) => {
-          const yPos = 50 + (index * 200) / (inputs - 1);
+          const angle = (index * 120) / inputs - 60;
           const signal = signals[index] || 0;
           const isActive = signal > 0;
           
+          // Main dendrite branch
+          const startX = 300 + Math.cos((angle - 90) * Math.PI / 180) * 60;
+          const startY = 120 + Math.sin((angle - 90) * Math.PI / 180) * 60;
+          const midX = 300 + Math.cos((angle - 90) * Math.PI / 180) * 100;
+          const midY = 120 + Math.sin((angle - 90) * Math.PI / 180) * 100;
+          const endX = 300 + Math.cos((angle - 90) * Math.PI / 180) * 140;
+          const endY = 70 + Math.sin((angle - 90) * Math.PI / 180) * 100;
+          
           return (
             <g key={`dendrite-${index}`}>
-              {/* Input node */}
-              <circle
-                cx="50"
-                cy={yPos}
-                r="8"
-                fill={isActive ? '#3b82f6' : '#374151'}
-                style={{
-                  transition: 'fill 0.3s ease',
-                }}
-              />
-              
-              {/* Connection line */}
-              <line
-                x1="58"
-                y1={yPos}
-                x2="242"
-                y2="150"
+              {/* Main dendrite branch */}
+              <path
+                d={`M ${startX},${startY} Q ${midX},${midY} ${endX},${endY}`}
                 stroke={isActive ? '#3b82f6' : '#4b5563'}
-                strokeWidth={showWeights ? weight * 4 : 2}
-                opacity={isActive ? 1 : 0.3}
+                strokeWidth={showWeights ? weight * 3 : 2}
+                fill="none"
+                opacity={isActive ? 1 : 0.4}
                 style={{
                   transition: 'all 0.3s ease',
                 }}
+              />
+              
+              {/* Sub-branches */}
+              <path
+                d={`M ${midX},${midY} L ${midX - 15},${midY - 20}`}
+                stroke={isActive ? '#3b82f6' : '#4b5563'}
+                strokeWidth={1}
+                opacity={isActive ? 0.8 : 0.3}
+              />
+              <path
+                d={`M ${midX},${midY} L ${midX + 15},${midY - 20}`}
+                stroke={isActive ? '#3b82f6' : '#4b5563'}
+                strokeWidth={1}
+                opacity={isActive ? 0.8 : 0.3}
               />
               
               {/* Signal pulse animation */}
@@ -131,7 +154,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                   <animateMotion
                     dur="0.5s"
                     repeatCount="1"
-                    path={`M 50,${yPos} L 250,150`}
+                    path={`M ${endX},${endY} Q ${midX},${midY} ${startX},${startY}`}
                   />
                   <animate
                     attributeName="opacity"
@@ -145,10 +168,10 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               {/* Weight label */}
               {showWeights && (
                 <text
-                  x="30"
-                  y={yPos + 4}
+                  x={endX}
+                  y={endY - 5}
                   fill="#94a3b8"
-                  fontSize="11"
+                  fontSize="10"
                   textAnchor="middle"
                 >
                   {weight.toFixed(2)}
@@ -158,33 +181,58 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           );
         })}
         
-        {/* Cell body (soma) */}
-        <circle
-          cx="250"
-          cy="150"
-          r="35"
-          fill={neuronColor}
-          stroke={isFiring ? '#10b981' : '#4b5563'}
-          strokeWidth="3"
-          style={{
-            filter: neuronGlow,
-            transition: 'all 0.3s ease',
-          }}
-        />
+        {/* Cell Body (Soma) - Irregular shape like real neuron */}
+        <g filter={isFiring ? "url(#glow)" : ""}>
+          <ellipse
+            cx="300"
+            cy="120"
+            rx="45"
+            ry="40"
+            fill="url(#somaGradient)"
+            stroke={isFiring ? '#10b981' : '#2196f3'}
+            strokeWidth="2"
+            style={{
+              transition: 'all 0.3s ease',
+            }}
+          />
+          
+          {/* Make it more organic with additional circles */}
+          <circle
+            cx="285"
+            cy="115"
+            r="35"
+            fill={neuronColor}
+            opacity="0.7"
+          />
+          <circle
+            cx="315"
+            cy="125"
+            r="30"
+            fill={neuronColor}
+            opacity="0.7"
+          />
+        </g>
         
         {/* Nucleus */}
         <circle
-          cx="250"
-          cy="150"
-          r="12"
-          fill={isFiring ? '#065f46' : '#1f2937'}
+          cx="300"
+          cy="120"
+          r="15"
+          fill={nucleusColor}
+          opacity="0.9"
+        />
+        <circle
+          cx="303"
+          cy="117"
+          r="5"
+          fill="#0d47a1"
           opacity="0.8"
         />
         
-        {/* Threshold indicator */}
+        {/* Sum display */}
         <text
-          x="250"
-          y="155"
+          x="300"
+          y="125"
           fill="white"
           fontSize="10"
           textAnchor="middle"
@@ -193,77 +241,170 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           {currentSum.toFixed(2)}
         </text>
         
-        {/* Axon */}
-        <line
-          x1="285"
-          y1="150"
-          x2="450"
-          y2="150"
-          stroke={isFiring ? '#10b981' : '#4b5563'}
-          strokeWidth="3"
+        {/* Axon Hillock (connection to axon) */}
+        <path
+          d="M 300,160 L 295,175 L 305,175 Z"
+          fill={neuronColor}
           style={{
             transition: 'all 0.3s ease',
           }}
         />
         
-        {/* Axon terminals */}
-        {[0, -30, 30].map((offset, i) => (
+        {/* Axon with Myelin Sheaths */}
+        {[0, 1, 2, 3, 4].map((i) => {
+          const y = 185 + i * 35;
+          return (
+            <g key={`myelin-${i}`}>
+              {/* Myelin sheath segment */}
+              <rect
+                x="292"
+                y={y}
+                width="16"
+                height="25"
+                rx="8"
+                fill={isFiring ? '#bbf7d0' : '#e0f2fe'}
+                stroke={isFiring ? '#10b981' : '#2196f3'}
+                strokeWidth="1.5"
+                style={{
+                  transition: 'all 0.3s ease',
+                }}
+              />
+              
+              {/* Node of Ranvier (gap) */}
+              <line
+                x1="300"
+                y1={y - 5}
+                x2="300"
+                y2={y}
+                stroke={isFiring ? '#10b981' : '#64b5f6'}
+                strokeWidth="3"
+                style={{
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            </g>
+          );
+        })}
+        
+        {/* Axon line (visible in gaps) */}
+        <line
+          x1="300"
+          y1="175"
+          x2="300"
+          y2="360"
+          stroke={isFiring ? '#10b981' : '#64b5f6'}
+          strokeWidth="3"
+          strokeDasharray="0 35"
+          strokeDashoffset="-5"
+          style={{
+            transition: 'all 0.3s ease',
+          }}
+        />
+        
+        {/* Axon Terminals */}
+        {[-30, 0, 30].map((offset, i) => (
           <g key={`terminal-${i}`}>
-            <line
-              x1="450"
-              y1="150"
-              x2="520"
-              y2={150 + offset}
-              stroke={isFiring ? '#10b981' : '#4b5563'}
+            <path
+              d={`M 300,360 Q 300,370 ${300 + offset},380`}
+              stroke={isFiring ? '#10b981' : '#64b5f6'}
               strokeWidth="2"
+              fill="none"
               style={{
                 transition: 'all 0.3s ease',
               }}
             />
+            {/* Terminal buttons */}
             <circle
-              cx="525"
-              cy={150 + offset}
-              r="5"
-              fill={isFiring ? '#10b981' : '#374151'}
+              cx={300 + offset}
+              cy="380"
+              r="6"
+              fill={isFiring ? '#10b981' : '#64b5f6'}
               style={{
                 transition: 'all 0.3s ease',
               }}
+            />
+            {/* Synaptic vesicles */}
+            <circle
+              cx={300 + offset - 2}
+              cy="378"
+              r="2"
+              fill={isFiring ? '#065f46' : '#1565c0'}
+              opacity="0.7"
+            />
+            <circle
+              cx={300 + offset + 2}
+              cy="381"
+              r="2"
+              fill={isFiring ? '#065f46' : '#1565c0'}
+              opacity="0.7"
             />
           </g>
         ))}
         
-        {/* Output pulse when firing */}
+        {/* Output pulse animation when firing */}
         {isFiring && (
-          <circle
-            r="6"
-            fill="#10b981"
-            opacity="0"
-          >
-            <animateMotion
-              dur="0.8s"
-              repeatCount="1"
-              path="M 285,150 L 525,150"
-              begin="0.2s"
-            />
-            <animate
-              attributeName="opacity"
-              values="0;1;1;0"
-              dur="0.8s"
-              repeatCount="1"
-              begin="0.2s"
-            />
-          </circle>
+          <>
+            {/* Pulse down axon */}
+            <circle
+              r="6"
+              fill="#10b981"
+              opacity="0"
+            >
+              <animateMotion
+                dur="0.8s"
+                repeatCount="1"
+                path="M 300,160 L 300,360"
+                begin="0.2s"
+              />
+              <animate
+                attributeName="opacity"
+                values="0;1;0;1;0;1;0"
+                dur="0.8s"
+                repeatCount="1"
+                begin="0.2s"
+              />
+            </circle>
+            
+            {/* Terminal release */}
+            {[-30, 0, 30].map((offset, i) => (
+              <circle
+                key={`release-${i}`}
+                cx={300 + offset}
+                cy="385"
+                r="3"
+                fill="#10b981"
+                opacity="0"
+              >
+                <animate
+                  attributeName="cy"
+                  from="385"
+                  to="395"
+                  dur="0.5s"
+                  begin="1s"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;1;0"
+                  dur="0.5s"
+                  begin="1s"
+                />
+              </circle>
+            ))}
+          </>
         )}
         
         {/* Labels */}
-        <text x="50" y="25" fill="#e2e8f0" fontSize="12" fontWeight="500">
-          Inputs
+        <text x="380" y="50" fill="#e2e8f0" fontSize="12" fontWeight="500">
+          Dendrites
         </text>
-        <text x="230" y="105" fill="#e2e8f0" fontSize="12" fontWeight="500">
+        <text x="355" y="120" fill="#e2e8f0" fontSize="12" fontWeight="500">
           Cell Body
         </text>
-        <text x="460" y="130" fill="#e2e8f0" fontSize="12" fontWeight="500">
-          Output
+        <text x="320" y="270" fill="#e2e8f0" fontSize="12" fontWeight="500">
+          Axon
+        </text>
+        <text x="340" y="380" fill="#e2e8f0" fontSize="12" fontWeight="500">
+          Terminals
         </text>
       </svg>
       
