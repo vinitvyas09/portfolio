@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
@@ -505,52 +505,104 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const weightBlock = { x: 112, width: 26, height: 18 };
   const sumNode = { x: 224, y: 100, radius: 20 };
   const chip = { x: 284, y: 74, width: 66, height: 52 };
+  const moduleEntryX = weightBlock.x - 10;
+  const moduleExitX = weightBlock.x + weightBlock.width + 4;
+  const inputLeadInX = 64;
+  const middleTraceCrest = 12;
+
+  const activationStart = { x: sumNode.x + sumNode.radius, y: sumNode.y };
+  const activationConnectorSegment = `C ${sumNode.x + 38},${sumNode.y - 12} ${chip.x - 12},${sumNode.y - 8} ${chip.x - 6},${sumNode.y} S ${chip.x + 8},${sumNode.y + 12} ${chip.x + 12},${sumNode.y}`;
+  const activationConnector = `M ${activationStart.x},${activationStart.y} ${activationConnectorSegment}`;
+  const outputStart = { x: chip.x + chip.width, y: sumNode.y };
+  const outputConnectorSegment = `C ${outputStart.x + 18},${sumNode.y} ${outputStart.x + 32},${sumNode.y} ${outputStart.x + 40},${sumNode.y}`;
+  const outputConnector = `M ${outputStart.x},${sumNode.y} ${outputConnectorSegment}`;
 
   const createTracePath = (y: number, index: number) => {
-    const startX = 64;
-    const moduleEntry = weightBlock.x - 10;
-    const moduleExit = weightBlock.x + weightBlock.width + 4;
-    const controlX = (moduleExit + sumNode.x) / 2;
+    const controlX = (moduleExitX + sumNode.x) / 2;
     const controlY = y + (sumNode.y - y) * 0.55;
 
     if (index === 1) {
-      const crestOffset = 12;
       return [
-        `M ${startX},${y}`,
-        `L ${moduleEntry},${y}`,
-        `L ${moduleExit},${y}`,
-        `Q ${moduleExit + 32},${y - crestOffset} ${sumNode.x - 26},${sumNode.y - crestOffset / 2}`,
+        `M ${inputLeadInX},${y}`,
+        `L ${moduleEntryX},${y}`,
+        `L ${moduleExitX},${y}`,
+        `Q ${moduleExitX + 32},${y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
         `T ${sumNode.x},${sumNode.y}`,
       ].join(' ');
     }
 
     if (y === sumNode.y) {
       return [
-        `M ${startX},${y}`,
-        `L ${moduleEntry},${y}`,
-        `L ${moduleExit},${y}`,
+        `M ${inputLeadInX},${y}`,
+        `L ${moduleEntryX},${y}`,
+        `L ${moduleExitX},${y}`,
         `L ${sumNode.x - 20},${y}`,
         `L ${sumNode.x},${sumNode.y}`,
       ].join(' ');
     }
 
     return [
-      `M ${startX},${y}`,
-      `L ${moduleEntry},${y}`,
-      `L ${moduleExit},${y}`,
-      `Q ${moduleExit + 28},${y} ${controlX},${controlY}`,
+      `M ${inputLeadInX},${y}`,
+      `L ${moduleEntryX},${y}`,
+      `L ${moduleExitX},${y}`,
+      `Q ${moduleExitX + 28},${y} ${controlX},${controlY}`,
       `T ${sumNode.x},${sumNode.y}`,
     ].join(' ');
   };
 
-  const activationConnector = `M ${sumNode.x + sumNode.radius},${sumNode.y} C ${sumNode.x + 38},${sumNode.y - 12} ${chip.x - 12},${sumNode.y - 8} ${chip.x - 6},${sumNode.y} S ${chip.x + 8},${sumNode.y + 12} ${chip.x + 12},${sumNode.y}`;
-  const outputConnector = `M ${chip.x + chip.width},${sumNode.y} C ${chip.x + chip.width + 18},${sumNode.y} ${chip.x + chip.width + 32},${sumNode.y} ${chip.x + chip.width + 40},${sumNode.y}`;
+  const signalPath = useMemo(() => {
+    return [
+      `M ${inputLeadInX},${sumNode.y}`,
+      `L ${moduleEntryX},${sumNode.y}`,
+      `L ${moduleExitX},${sumNode.y}`,
+      `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
+      `T ${sumNode.x},${sumNode.y}`,
+      `L ${activationStart.x},${activationStart.y}`,
+      activationConnectorSegment,
+      `L ${outputStart.x},${sumNode.y}`,
+      outputConnectorSegment,
+    ].join(' ');
+  }, [activationConnectorSegment, activationStart.x, activationStart.y, inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, outputConnectorSegment, outputStart.x, sumNode.x, sumNode.y]);
 
-  const pulseKeyframes = {
-    x: [50, 92, weightBlock.x + weightBlock.width, sumNode.x, chip.x + chip.width / 2, chip.x + chip.width + 36],
-    y: [sumNode.y, sumNode.y, sumNode.y, sumNode.y, sumNode.y, sumNode.y],
-    opacity: [0, 1, 1, 1, 1, 0],
-  };
+  const signalPathRef = useRef<SVGPathElement | null>(null);
+  const [pulseTrajectory, setPulseTrajectory] = useState<{
+    x: number[];
+    y: number[];
+    opacity: number[];
+  } | null>(null);
+
+  useEffect(() => {
+    const targetPath = signalPathRef.current;
+    if (!targetPath) {
+      return;
+    }
+
+    const totalLength = targetPath.getTotalLength();
+    const steps = 64;
+    const xKeyframes: number[] = [];
+    const yKeyframes: number[] = [];
+    const opacityKeyframes: number[] = [];
+    const fadeWindow = Math.max(4, Math.floor(steps / 8));
+
+    for (let i = 0; i <= steps; i++) {
+      const point = targetPath.getPointAtLength((totalLength * i) / steps);
+      xKeyframes.push(point.x);
+      yKeyframes.push(point.y);
+    }
+
+    const lastIndex = xKeyframes.length - 1;
+    xKeyframes.forEach((_, index) => {
+      let opacity = 1;
+      if (index < fadeWindow) {
+        opacity = index / fadeWindow;
+      } else if (index > lastIndex - fadeWindow) {
+        opacity = Math.max(0, (lastIndex - index) / fadeWindow);
+      }
+      opacityKeyframes.push(opacity);
+    });
+
+    setPulseTrajectory({ x: xKeyframes, y: yKeyframes, opacity: opacityKeyframes });
+  }, [signalPath]);
 
   return (
     <div 
@@ -676,6 +728,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         ))}
 
+        <path ref={signalPathRef} d={signalPath} fill="none" stroke="none" pointerEvents="none" />
+
         {/* Summing junction */}
         <motion.g initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.9, type: 'spring', stiffness: 140, damping: 9 }}>
           <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius + 8} stroke={`${colors.circuitSecondary}33`} strokeWidth={1} strokeDasharray="4 2" fill="none" />
@@ -768,14 +822,20 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         />
 
         {/* Animated signal pulse */}
-        <motion.circle
-          r={4.5}
-          fill={colors.circuitPrimary}
-          filter="url(#circuit-glow)"
-          initial={{ opacity: 0 }}
-          animate={pulseKeyframes}
-          transition={{ delay: 2, duration: 2.8, repeat: Infinity, repeatDelay: 1.4, ease: 'easeInOut' }}
-        />
+        {pulseTrajectory && (
+          <motion.circle
+            r={4.5}
+            fill={colors.circuitPrimary}
+            filter="url(#circuit-glow)"
+            initial={{ opacity: 0 }}
+            animate={{
+              x: pulseTrajectory.x,
+              y: pulseTrajectory.y,
+              opacity: pulseTrajectory.opacity,
+            }}
+            transition={{ delay: 2, duration: 3, repeat: Infinity, repeatDelay: 1.2, ease: 'linear' }}
+          />
+        )}
       </motion.svg>
     </div>
   );
