@@ -655,8 +655,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-            <rect x={chip.x - 4} y={chip.y - 4} width={chip.width + 8} height={chip.height + 8} rx={10} fill="black" />
-            <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={8.5} fill="black" />
+            <circle cx={sumNode.x + 90} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
 
@@ -761,7 +760,10 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 6} fill={`${colors.circuitSecondary}12`} />
           <text x={sumNode.x} y={sumNode.y + 6.5} textAnchor="middle" fontSize={22} fill={colors.circuitSecondary} fontWeight="bold">Σ</text>
           <text x={sumNode.x} y={sumNode.y - sumNode.radius - 8} fontSize={9} fill={colors.textMuted} textAnchor="middle">
-            weighted sum
+            perceptron
+          </text>
+          <text x={sumNode.x} y={sumNode.y + sumNode.radius + 14} fontSize={8} fill={colors.textMuted} textAnchor="middle">
+            Σwᵢxᵢ + b
           </text>
         </motion.g>
 
@@ -804,18 +806,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <text x={sumNode.x + 90} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
         </motion.g>
 
-        {/* Glide highlight along the main bus */}
-        <motion.path
-          d={activationConnector}
-          stroke={`${colors.circuitPrimary}66`}
-          strokeWidth={1.2}
-          strokeDasharray="6 10"
-          strokeDashoffset={40}
-          fill="none"
-          mask={traceMaskUrl}
-          animate={{ strokeDashoffset: [40, -60] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-        />
 
         {/* Animated signal pulse */}
         {pulseTrajectory && (
