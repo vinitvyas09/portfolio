@@ -777,7 +777,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
         {/* Direct connection from summation to output */}
         <motion.path
-          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${sumNode.x + 80},${sumNode.y}`}
+          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
           stroke="url(#circuit-signal)"
           strokeWidth={3.2}
           strokeLinecap="round"
@@ -790,10 +790,10 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
         {/* Output node - positioned closer to summation */}
         <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.4, type: 'spring', stiffness: 180, damping: 12 }}>
-          <circle cx={sumNode.x + 90} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
-          <circle cx={sumNode.x + 90} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
-          <circle cx={sumNode.x + 90} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
-          <text x={sumNode.x + 90} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
+          <circle cx={outputNodeX} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
+          <circle cx={outputNodeX} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
+          <circle cx={outputNodeX} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
+          <text x={outputNodeX} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
         </motion.g>
 
 
