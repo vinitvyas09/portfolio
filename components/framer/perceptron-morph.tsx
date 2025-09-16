@@ -560,12 +560,10 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `L ${moduleExitX},${sumNode.y}`,
       `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
       `T ${sumNode.x},${sumNode.y}`,
-      `L ${activationStart.x},${activationStart.y}`,
-      activationConnectorSegment,
-      `L ${outputStart.x},${sumNode.y}`,
-      outputConnectorSegment,
+      `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
+      `L ${sumNode.x + 90},${sumNode.y}`,
     ].join(' ');
-  }, [activationConnectorSegment, activationStart.x, activationStart.y, inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, outputConnectorSegment, outputStart.x, sumNode.x, sumNode.y, outputEndX]);
+  }, [inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, sumNode.x, sumNode.y, sumNode.radius]);
 
   const signalPathRef = useRef<SVGPathElement | null>(null);
   const [pulseTrajectory, setPulseTrajectory] = useState<{
