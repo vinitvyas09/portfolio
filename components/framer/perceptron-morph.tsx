@@ -559,11 +559,11 @@ const NeuronScene = ({ colors }: { colors: any }) => {
                 {i > 0 && (
                   <path
                     d={`M ${prevSegmentRight},${prevSegmentY} Q ${connectorControlX},${connectorMidY} ${x},${segmentY}`}
-                    stroke={palette.axonCore}
+                    stroke="url(#axon-pulse)"
                     strokeWidth={3}
                     fill="none"
                     strokeLinecap="round"
-                    opacity={0.7}
+                    opacity={0.85}
                   />
                 )}
                 <rect
