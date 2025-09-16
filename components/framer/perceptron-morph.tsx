@@ -672,6 +672,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
     sum: { x: 200, y: 100, radius: 18 },
     activation: { x: 300, y: 100, radius: 16 },
     output: { x: 380, y: 100, radius: 10 },
+    bias: { x: 60, y: 40, radius: 6 },
   };
 
   // Safe color fallbacks (if a theme token ever comes through undefined)
@@ -701,6 +702,14 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
   // A stable marker id for arrowheads that works in SSR/CSR
   const arrowId = React.useId();
+
+  const biasStartX = layout.bias.x + layout.bias.radius;
+  const biasStartY = layout.bias.y;
+  const biasEndX = rightEdge;
+  const biasEndY = layout.sum.y;
+  // Match the offsets so the elbow segment stays near 45° when bias sits above Σ
+  const biasDelta = Math.max(0, biasEndY - biasStartY);
+  const biasBendX = Math.max(biasStartX, biasEndX - biasDelta);
 
   return (
     <div
@@ -756,10 +765,18 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
         {/* BIAS */}
         <g>
-          <circle cx={layout.sum.x - 30} cy={layout.sum.y - 35} r={6} fill={C.secondary} filter="url(#perceptron-glow)" />
-          <text x={layout.sum.x - 30} y={layout.sum.y - 32} fontSize={8} fill={C.bg} textAnchor="middle" fontWeight="bold">+1</text>
-          <text x={layout.sum.x - 30} y={layout.sum.y - 50} fontSize={8} fill={C.text} textAnchor="middle">bias</text>
-          <path d={`M ${layout.sum.x - 24},${layout.sum.y - 35} L ${layout.sum.x - layout.sum.radius},${layout.sum.y - 8}`} stroke={C.secondary} strokeWidth={2} strokeOpacity={0.7} strokeDasharray="4 2" fill="none" vectorEffect="non-scaling-stroke" />
+          <circle cx={layout.bias.x} cy={layout.bias.y} r={layout.bias.radius} fill={C.secondary} filter="url(#perceptron-glow)" />
+          <text x={layout.bias.x} y={layout.bias.y + 3} fontSize={8} fill={C.bg} textAnchor="middle" fontWeight="bold">+1</text>
+          <text x={layout.bias.x - 24} y={layout.bias.y + 3} fontSize={8} fill={C.text} textAnchor="end">bias</text>
+          <path
+            d={`M ${biasStartX},${biasStartY} L ${biasBendX},${biasStartY} L ${biasEndX},${biasEndY}`}
+            stroke={C.secondary}
+            strokeWidth={2}
+            strokeOpacity={0.7}
+            strokeDasharray="4 2"
+            fill="none"
+            vectorEffect="non-scaling-stroke"
+          />
         </g>
 
         {/* ACTIVATION NODE */}
