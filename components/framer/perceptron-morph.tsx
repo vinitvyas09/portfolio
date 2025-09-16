@@ -846,7 +846,7 @@ const ChatScene = ({ colors }: { colors: any }) => (
     style={{ backgroundColor: colors.sceneBg }}
   >
     <motion.div
-      className="max-w-sm rounded-2xl border p-6"
+      className="w-full max-w-md rounded-2xl border p-6"
       style={{
         backgroundColor: colors.cardBg,
         borderColor: colors.borderColor
@@ -857,27 +857,51 @@ const ChatScene = ({ colors }: { colors: any }) => (
     >
       <div className="flex items-center gap-3 mb-4">
         <div className="h-3 w-3 rounded-full" style={{ backgroundColor: colors.circuitPrimary }}></div>
-        <span className="text-sm" style={{ color: colors.textMuted }}>AI Chat</span>
+        <span className="text-sm" style={{ color: colors.textMuted }}>AI Assistant</span>
       </div>
       <div className="space-y-3">
-        <motion.div
-          className="p-3 rounded-lg rounded-br-sm text-sm"
-          style={{ backgroundColor: colors.chatPrimary, color: colors.sceneBg }}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          Hello AI!
-        </motion.div>
-        <motion.div
-          className="p-3 rounded-lg rounded-bl-sm text-sm"
-          style={{ backgroundColor: colors.timelineTrack, color: colors.textPrimary }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1 }}
-        >
-          Hello! How can I help?
-        </motion.div>
+        {/* User message - right aligned */}
+        <div className="flex justify-end">
+          <motion.div
+            className="max-w-[70%] p-3 rounded-2xl rounded-br-sm text-sm"
+            style={{ backgroundColor: colors.chatPrimary, color: colors.sceneBg }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            Write a haiku about a 986 Boxster
+          </motion.div>
+        </div>
+        
+        {/* AI response - left aligned */}
+        <div className="flex justify-start">
+          <motion.div
+            className="max-w-[70%] p-3 rounded-2xl rounded-bl-sm text-sm"
+            style={{ backgroundColor: colors.timelineTrack, color: colors.textPrimary }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1 }}
+          >
+            <div className="whitespace-pre-line">
+              Mid-engine purrs soft,{'\n'}
+              Silver curves catch morning sun—{'\n'}
+              Freedom has no roof.
+            </div>
+          </motion.div>
+        </div>
+        
+        {/* User follow-up - right aligned */}
+        <div className="flex justify-end">
+          <motion.div
+            className="max-w-[70%] p-3 rounded-2xl rounded-br-sm text-sm"
+            style={{ backgroundColor: colors.chatPrimary, color: colors.sceneBg }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.5 }}
+          >
+            Beautiful!
+          </motion.div>
+        </div>
       </div>
     </motion.div>
   </div>
