@@ -553,7 +553,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
       `T ${sumNode.x},${sumNode.y}`,
       `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
-      `L ${sumNode.x + 60},${sumNode.y}`,
+      `L ${sumNode.x + 86},${sumNode.y}`,
+      `L ${outputNodeX - 10},${sumNode.y}`,
       `L ${outputNodeX},${sumNode.y}`,
     ].join(' ');
   }, [inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, sumNode.x, sumNode.y, sumNode.radius, outputNodeX]);
@@ -646,7 +647,15 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-            <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
+              <rect
+                x={sumNode.x + 58}
+                y={sumNode.y - weightBlock.height / 2 - 2}
+                width={weightBlock.width + 4}
+                height={weightBlock.height + 4}
+                rx={6}
+                fill="black"
+              />
+              <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
 
@@ -789,33 +798,61 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           filter="url(#circuit-shadow)"
         />
 
-        {/* Threshold comparison indicator */}
-        <motion.text 
-          x={sumNode.x + 60} 
-          y={sumNode.y + 3} 
-          fontSize={18} 
-          fill={colors.mathPrimary} 
-          textAnchor="middle" 
-          fontWeight="bold"
-          initial={{ scale: 0, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }} 
-          transition={{ delay: 1.2, type: 'spring', stiffness: 180, damping: 12 }}
-        >
-          &gt;
-        </motion.text>
+         {/* Activation to Output connector block - similar to weight blocks */}
+         <motion.g
+           initial={{ opacity: 0, scale: 0.9 }}
+           animate={{ opacity: 1, scale: 1 }}
+           transition={{ delay: 1.3, duration: 0.4 }}
+         >
+           <rect
+             x={sumNode.x + 60}
+             y={sumNode.y - weightBlock.height / 2}
+             width={weightBlock.width}
+             height={weightBlock.height}
+             rx={4}
+             fill={`${colors.mathPrimary}25`}
+             stroke={`${colors.mathPrimary}88`}
+             strokeWidth={1.2}
+             filter="url(#circuit-shadow)"
+           />
+           <path
+             d={`M ${sumNode.x + 64},${sumNode.y - 4} L ${sumNode.x + 82},${sumNode.y - 4} M ${sumNode.x + 64},${sumNode.y + 4} L ${sumNode.x + 82},${sumNode.y + 4}`}
+             stroke={`${colors.mathPrimary}66`}
+             strokeWidth={0.9}
+           />
+           <text
+             x={sumNode.x + 73}
+             y={sumNode.y + 2}
+             fontSize={11}
+             fill={colors.mathPrimary}
+             textAnchor="middle"
+             fontWeight="bold"
+           >
+             f(·)
+           </text>
+           <text
+             x={sumNode.x + 73}
+             y={sumNode.y - weightBlock.height / 2 - 6}
+             fontSize={7}
+             fill={colors.textMuted}
+             textAnchor="middle"
+           >
+             activation
+           </text>
+         </motion.g>
 
-        {/* Connection from threshold to output */}
-        <motion.path
-          d={`M ${sumNode.x + 72},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
-          stroke={`${colors.mathPrimary}cc`}
-          strokeWidth={3}
-          strokeLinecap="round"
-          fill="none"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 1.35, duration: 0.4, ease: 'easeOut' }}
-          filter="url(#circuit-shadow)"
-        />
+         {/* Connection from activation block to output */}
+         <motion.path
+           d={`M ${sumNode.x + 86},${sumNode.y} L ${outputNodeX - 20},${sumNode.y}`}
+           stroke={`${colors.mathPrimary}cc`}
+           strokeWidth={3}
+           strokeLinecap="round"
+           fill="none"
+           initial={{ pathLength: 0, opacity: 0 }}
+           animate={{ pathLength: 1, opacity: 1 }}
+           transition={{ delay: 1.45, duration: 0.4, ease: 'easeOut' }}
+           filter="url(#circuit-shadow)"
+         />
 
         {/* Output node */}
         <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.5, type: 'spring', stiffness: 180, damping: 12 }}>
