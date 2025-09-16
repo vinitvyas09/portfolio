@@ -843,7 +843,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
          {/* Connection from activation block to output */}
          <motion.path
-           d={`M ${sumNode.x + 86},${sumNode.y} L ${outputNodeX - 20},${sumNode.y}`}
+           d={`M ${sumNode.x + 86},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
            stroke={`${colors.mathPrimary}cc`}
            strokeWidth={3}
            strokeLinecap="round"
