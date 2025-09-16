@@ -553,9 +553,9 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
       `T ${sumNode.x},${sumNode.y}`,
       `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
-      `L ${sumNode.x + 90},${sumNode.y}`,
+      `L ${outputNodeX},${sumNode.y}`,
     ].join(' ');
-  }, [inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, sumNode.x, sumNode.y, sumNode.radius]);
+  }, [inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, sumNode.x, sumNode.y, sumNode.radius, outputNodeX]);
 
   const signalPathRef = useRef<SVGPathElement | null>(null);
   const [pulseTrajectory, setPulseTrajectory] = useState<{
@@ -645,7 +645,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-            <circle cx={sumNode.x + 90} cy={sumNode.y} r={8.5} fill="black" />
+            <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
 
