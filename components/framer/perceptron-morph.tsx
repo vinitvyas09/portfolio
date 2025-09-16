@@ -793,7 +793,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
           <circle cx={chip.x - 6} cy={sumNode.y} r={2.4} fill={`${colors.mathPrimary}aa`} />
           <text x={chip.x - 10} y={sumNode.y - 8} fontSize={8} fill={colors.textMuted} textAnchor="end">
-            input z
+            z
           </text>
           <circle cx={chip.x + chip.width + 10} cy={sumNode.y} r={2.4} fill={`${colors.mathPrimary}aa`} />
           <text x={chip.x + chip.width + 14} y={sumNode.y - 10} fontSize={8} fill={colors.textMuted}>
