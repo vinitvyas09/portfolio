@@ -1006,7 +1006,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               transition: 'all 0.3s ease',
               boxShadow: isFiring ? '0 0 20px rgba(34, 197, 94, 0.5)' : 'none'
             }}>
-              {isFiring ? '⚡ FIRING!' : '💤 Inactive'}
+              {isFiring ? 'Neuron Firing!' : '💤 Inactive'}
             </div>
           </div>
           
