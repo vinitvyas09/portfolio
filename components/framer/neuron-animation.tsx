@@ -53,12 +53,19 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const terminalBaseY = axonBaselineY + Math.sin((axonSegmentCount + 1) * 0.9) * axonCurveAmplitude;
   const axonSignalPath = `M 210,${axonBaselineY} C ${axonStartX + 32},${axonBaselineY - 14} ${axonStartX + axonSegmentSpacing * 1.6},${axonBaselineY + 18} ${axonTerminalX},${terminalBaseY}`;
 
-  // Generate random weights for each input (between 0.1 and 1)
+  // Generate deterministic weights for each input (between 0.1 and 1)
+  // Using sine function for consistent but varied weights across inputs
   const weights = Array.from({ length: inputs }, (_, i) => {
     const weight = 0.2 + (Math.sin(i * 1.7) + 1) * 0.4;
     return Math.min(1, Math.max(0.1, weight));
   });
   const totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+  
+  // Threshold explanation:
+  // fireThreshold is a value between 0-1 representing the percentage of total possible
+  // signal strength needed to trigger the neuron. For example:
+  // - 0.5 = 50% of total possible activation needed
+  // - 0.7 = 70% of total possible activation needed
 
   useEffect(() => {
     const runAnimation = () => {
@@ -73,7 +80,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       const signalValues: number[] = [];
       weights.forEach((weight, index) => {
         setTimeout(() => {
-          const signalStrength = pseudoRandom(animationCycle * 1000 + index) > 0.3 ? weight : 0;
+          const signalStrength = pseudoRandom(animationCycle * 1000 + index) > 0.4 ? weight : 0;
           signalValues[index] = signalStrength;
           
           setSignals([...signalValues]);
@@ -781,7 +788,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           textAnchor="middle"
           opacity="0.7"
         >
-          threshold: {fireThreshold}
+          threshold: {(fireThreshold * 100).toFixed(0)}%
         </text>
         
         {/* Labels */}
@@ -799,39 +806,42 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         </text>
       </svg>
       
-      {/* Status bar */}
-      <div style={{
-        marginTop: '1.5rem',
-        padding: '0.75rem',
-        background: 'rgba(30, 41, 59, 0.5)',
-        borderRadius: '8px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        fontSize: '14px',
-        color: '#e2e8f0'
-      }}>
-        <div>
-          <span style={{ color: '#94a3b8' }}>Signal Strength: </span>
-          <span style={{ 
-            fontWeight: 'bold',
-            color: currentSum >= fireThreshold ? '#22c55e' : '#f59e0b'
-          }}>
-            {currentSum.toFixed(3)}
-          </span>
-          <span style={{ color: '#64748b' }}> / {fireThreshold}</span>
-        </div>
+        {/* Status bar */}
         <div style={{
-          padding: '0.25rem 0.75rem',
-          background: isFiring ? 'linear-gradient(135deg, #16a34a, #22c55e)' : '#374151',
-          borderRadius: '4px',
-          fontWeight: '500',
-          transition: 'all 0.3s ease',
-          boxShadow: isFiring ? '0 0 20px rgba(34, 197, 94, 0.5)' : 'none'
+          marginTop: '1.5rem',
+          padding: '0.75rem',
+          background: 'rgba(30, 41, 59, 0.5)',
+          borderRadius: '8px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: '14px',
+          color: '#e2e8f0'
         }}>
-          {isFiring ? 'Action Potential!' : '💤 Below Threshold'}
+          <div>
+            <span style={{ color: '#94a3b8' }}>Signal Strength: </span>
+            <span style={{ 
+              fontWeight: 'bold',
+              color: currentSum >= fireThreshold ? '#22c55e' : '#f59e0b'
+            }}>
+              {(currentSum * 100).toFixed(1)}%
+            </span>
+            <span style={{ color: '#64748b' }}> / {(fireThreshold * 100).toFixed(0)}%</span>
+            <span style={{ color: '#64748b', fontSize: '12px', marginLeft: '8px' }}>
+              ({signals.filter(s => s > 0).length}/{inputs} active)
+            </span>
+          </div>
+          <div style={{
+            padding: '0.25rem 0.75rem',
+            background: isFiring ? 'linear-gradient(135deg, #16a34a, #22c55e)' : '#374151',
+            borderRadius: '4px',
+            fontWeight: '500',
+            transition: 'all 0.3s ease',
+            boxShadow: isFiring ? '0 0 20px rgba(34, 197, 94, 0.5)' : 'none'
+          }}>
+            {isFiring ? 'Action Potential!' : '💤 Below Threshold'}
+          </div>
         </div>
-      </div>
       
       {/* Description */}
       {description && (
