@@ -504,7 +504,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const board = { x: 32, y: 34, width: 336, height: 132 };
   const weightBlock = { x: 112, width: 26, height: 18 };
   const sumNode = { x: 224, y: 100, radius: 20 };
-  const outputNodeX = sumNode.x + 90; // Position output node relative to summation
+  const outputNodeX = sumNode.x + 160; // Position output node further right for spacing
   const moduleEntryX = weightBlock.x - 10;
   const moduleExitX = weightBlock.x + weightBlock.width + 4;
   const inputLeadInX = 64;
