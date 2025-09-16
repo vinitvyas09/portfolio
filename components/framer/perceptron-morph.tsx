@@ -1236,8 +1236,8 @@ const PerceptronContinuum = () => {
         sceneBg: "#ffffff",
         
         // Stage-specific colors
-        neuronPrimary: "#6366f1",
-        neuronSecondary: "#10b981",
+        neuronPrimary: "#7c3aed",
+        neuronSecondary: "#059669",
         circuitPrimary: "#10b981",
         circuitSecondary: "#06b6d4",
         mathPrimary: "#eab308",
