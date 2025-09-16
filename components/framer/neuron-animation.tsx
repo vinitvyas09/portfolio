@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 
+const pseudoRandom = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
 interface NeuronAnimationProps {
   config?: {
     inputs?: number;
@@ -26,6 +31,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const [currentSum, setCurrentSum] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [terminalLit, setTerminalLit] = useState(false);
+  const [animationCycle, setAnimationCycle] = useState(0);
 
   const { inputs = 5, showWeights = true, fireThreshold = 0.4, animationMs = 3000, description } = config;
   const axonSegmentCount = 4;
@@ -51,6 +57,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
 
   useEffect(() => {
     const runAnimation = () => {
+      setAnimationCycle(prev => prev + 1);
       setIsAnimating(true);
       setSignals([]);
       setCurrentSum(0);
@@ -269,7 +276,11 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             />
                             
                             {/* Signal animation for active inputs */}
-                            {isActive && isAnimating && Math.random() > 0.5 && (
+                            {(() => {
+                              const seed = branchIdx * 1000 + pIdx * 100 + sIdx * 10 + animationCycle;
+                              const shouldShowSignal = isActive && isAnimating && pseudoRandom(seed) > 0.5;
+                              return shouldShowSignal;
+                            })() && (
                               <circle
                                 r="2.5"
                                 fill="#60a5fa"
