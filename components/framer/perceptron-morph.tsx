@@ -504,13 +504,26 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const board = { x: 32, y: 34, width: 336, height: 132 };
   const weightBlock = { x: 112, width: 26, height: 18 };
   const sumNode = { x: 224, y: 100, radius: 20 };
-  const outputNodeX = sumNode.x + 160; // Position output node further right for spacing
+  const activationBlock = { x: sumNode.x + 60, width: weightBlock.width, height: weightBlock.height };
+  const outputNodeX = sumNode.x + 136; // Position output node with tighter spacing
   const moduleEntryX = weightBlock.x - 10;
   const moduleExitX = weightBlock.x + weightBlock.width + 4;
   const inputLeadInX = 64;
   const middleTraceCrest = 12;
   const traceMaskId = 'circuit-trace-mask';
   const traceMaskUrl = `url(#${traceMaskId})`;
+
+  const activationConnectorPath = [
+    `M ${sumNode.x + sumNode.radius},${sumNode.y}`,
+    `Q ${sumNode.x + sumNode.radius + 28},${sumNode.y - 18} ${activationBlock.x - 10},${sumNode.y - 8}`,
+    `T ${activationBlock.x},${sumNode.y}`,
+  ].join(' ');
+
+  const activationToOutputPath = [
+    `M ${activationBlock.x + activationBlock.width},${sumNode.y}`,
+    `Q ${activationBlock.x + activationBlock.width + 28},${sumNode.y + 16} ${outputNodeX - 18},${sumNode.y + 8}`,
+    `T ${outputNodeX},${sumNode.y}`,
+  ].join(' ');
 
   const createTracePath = (y: number, index: number) => {
     const controlX = (moduleExitX + sumNode.x) / 2;
@@ -553,11 +566,24 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
       `T ${sumNode.x},${sumNode.y}`,
       `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
-      `L ${sumNode.x + 86},${sumNode.y}`,
-      `L ${outputNodeX - 10},${sumNode.y}`,
-      `L ${outputNodeX},${sumNode.y}`,
+      `Q ${sumNode.x + sumNode.radius + 28},${sumNode.y - 18} ${activationBlock.x - 10},${sumNode.y - 8}`,
+      `T ${activationBlock.x},${sumNode.y}`,
+      `L ${activationBlock.x + activationBlock.width},${sumNode.y}`,
+      `Q ${activationBlock.x + activationBlock.width + 28},${sumNode.y + 16} ${outputNodeX - 18},${sumNode.y + 8}`,
+      `T ${outputNodeX},${sumNode.y}`,
     ].join(' ');
-  }, [inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, sumNode.x, sumNode.y, sumNode.radius, outputNodeX]);
+  }, [
+    inputLeadInX,
+    middleTraceCrest,
+    moduleEntryX,
+    moduleExitX,
+    sumNode.x,
+    sumNode.y,
+    sumNode.radius,
+    activationBlock.x,
+    activationBlock.width,
+    outputNodeX,
+  ]);
 
   const signalPathRef = useRef<SVGPathElement | null>(null);
   const [pulseTrajectory, setPulseTrajectory] = useState<{
@@ -647,15 +673,15 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-              <rect
-                x={sumNode.x + 58}
-                y={sumNode.y - weightBlock.height / 2 - 2}
-                width={weightBlock.width + 4}
-                height={weightBlock.height + 4}
-                rx={6}
-                fill="black"
-              />
-              <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
+            <rect
+              x={activationBlock.x - 2}
+              y={sumNode.y - activationBlock.height / 2 - 2}
+              width={activationBlock.width + 4}
+              height={activationBlock.height + 4}
+              rx={6}
+              fill="black"
+            />
+            <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
 
@@ -785,30 +811,31 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         </motion.g>
 
-        {/* Connection from summation through threshold to output */}
+        {/* Connection from summation to activation */}
         <motion.path
-          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${sumNode.x + 55},${sumNode.y}`}
-          stroke="url(#circuit-signal)"
+          d={activationConnectorPath}
+          stroke="url(#circuit-trace)"
           strokeWidth={3.2}
           strokeLinecap="round"
           fill="none"
+          mask={traceMaskUrl}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.05, duration: 0.5, ease: 'easeInOut' }}
           filter="url(#circuit-shadow)"
         />
 
-         {/* Activation to Output connector block - similar to weight blocks */}
-         <motion.g
-           initial={{ opacity: 0, scale: 0.9 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ delay: 1.3, duration: 0.4 }}
-         >
+        {/* Activation to Output connector block - similar to weight blocks */}
+        <motion.g
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.3, duration: 0.4 }}
+        >
            <rect
-             x={sumNode.x + 60}
-             y={sumNode.y - weightBlock.height / 2}
-             width={weightBlock.width}
-             height={weightBlock.height}
+             x={activationBlock.x}
+             y={sumNode.y - activationBlock.height / 2}
+             width={activationBlock.width}
+             height={activationBlock.height}
              rx={4}
              fill={`${colors.mathPrimary}25`}
              stroke={`${colors.mathPrimary}88`}
@@ -816,12 +843,12 @@ const CircuitScene = ({ colors }: { colors: any }) => {
              filter="url(#circuit-shadow)"
            />
            <path
-             d={`M ${sumNode.x + 64},${sumNode.y - 4} L ${sumNode.x + 82},${sumNode.y - 4} M ${sumNode.x + 64},${sumNode.y + 4} L ${sumNode.x + 82},${sumNode.y + 4}`}
+             d={`M ${activationBlock.x + 4},${sumNode.y - 4} L ${activationBlock.x + activationBlock.width - 4},${sumNode.y - 4} M ${activationBlock.x + 4},${sumNode.y + 4} L ${activationBlock.x + activationBlock.width - 4},${sumNode.y + 4}`}
              stroke={`${colors.mathPrimary}66`}
              strokeWidth={0.9}
            />
            <text
-             x={sumNode.x + 73}
+             x={activationBlock.x + activationBlock.width / 2}
              y={sumNode.y + 2}
              fontSize={11}
              fill={colors.mathPrimary}
@@ -831,28 +858,29 @@ const CircuitScene = ({ colors }: { colors: any }) => {
              f(·)
            </text>
            <text
-             x={sumNode.x + 73}
-             y={sumNode.y - weightBlock.height / 2 - 6}
+             x={activationBlock.x + activationBlock.width / 2}
+             y={sumNode.y - activationBlock.height / 2 - 6}
              fontSize={7}
              fill={colors.textMuted}
              textAnchor="middle"
            >
              activation
            </text>
-         </motion.g>
+        </motion.g>
 
-         {/* Connection from activation block to output */}
-         <motion.path
-           d={`M ${sumNode.x + 86},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
-           stroke={`${colors.mathPrimary}cc`}
-           strokeWidth={3}
-           strokeLinecap="round"
-           fill="none"
-           initial={{ pathLength: 0, opacity: 0 }}
-           animate={{ pathLength: 1, opacity: 1 }}
-           transition={{ delay: 1.45, duration: 0.4, ease: 'easeOut' }}
-           filter="url(#circuit-shadow)"
-         />
+        {/* Connection from activation block to output */}
+        <motion.path
+          d={activationToOutputPath}
+          stroke="url(#circuit-trace)"
+          strokeWidth={3}
+          strokeLinecap="round"
+          fill="none"
+          mask={traceMaskUrl}
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ delay: 1.45, duration: 0.4, ease: 'easeOut' }}
+          filter="url(#circuit-shadow)"
+        />
 
         {/* Output node */}
         <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.5, type: 'spring', stiffness: 180, damping: 12 }}>
