@@ -690,13 +690,12 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   ].join(' ');
 
   const createTracePath = (y: number, index: number) => {
-    // All paths are now straight lines
+    // Create individual straight line paths from each input through its weight block to summation
     return [
-      `M ${inputLeadInX},${y}`,
-      `L ${moduleEntryX},${y}`,
-      `L ${moduleExitX},${y}`,
-      `L ${sumNode.x - 20},${sumNode.y}`,
-      `L ${sumNode.x},${sumNode.y}`,
+      `M ${inputLeadInX},${y}`,           // Start at input lead-in
+      `L ${moduleEntryX},${y}`,           // Line to weight block entry
+      `L ${moduleExitX},${y}`,            // Line through weight block
+      `L ${sumNode.x - sumNode.radius},${sumNode.y}`, // Line to summation node edge
     ].join(' ');
   };
 
