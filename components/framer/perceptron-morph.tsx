@@ -686,8 +686,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
   const activationToOutputPath = [
     `M ${activationBlock.x + activationBlock.width},${sumNode.y}`,
-    `Q ${activationBlock.x + activationBlock.width + 28},${sumNode.y + 16} ${outputNodeX - 18},${sumNode.y + 8}`,
-    `T ${outputNodeX},${sumNode.y}`,
+    `L ${outputNodeX},${sumNode.y}`,
   ].join(' ');
 
   const createTracePath = (y: number, index: number) => {
@@ -706,18 +705,15 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `M ${inputLeadInX},${sumNode.y}`,
       `L ${moduleEntryX},${sumNode.y}`,
       `L ${moduleExitX},${sumNode.y}`,
-      `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
-      `T ${sumNode.x},${sumNode.y}`,
+      `L ${sumNode.x - 20},${sumNode.y}`,
+      `L ${sumNode.x},${sumNode.y}`,
       `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
-      `Q ${sumNode.x + sumNode.radius + 28},${sumNode.y - 18} ${activationBlock.x - 10},${sumNode.y - 8}`,
-      `T ${activationBlock.x},${sumNode.y}`,
+      `L ${activationBlock.x},${sumNode.y}`,
       `L ${activationBlock.x + activationBlock.width},${sumNode.y}`,
-      `Q ${activationBlock.x + activationBlock.width + 28},${sumNode.y + 16} ${outputNodeX - 18},${sumNode.y + 8}`,
-      `T ${outputNodeX},${sumNode.y}`,
+      `L ${outputNodeX},${sumNode.y}`,
     ].join(' ');
   }, [
     inputLeadInX,
-    middleTraceCrest,
     moduleEntryX,
     moduleExitX,
     sumNode.x,
