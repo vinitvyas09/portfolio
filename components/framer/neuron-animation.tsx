@@ -16,7 +16,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   config = {
     inputs: 5,
     showWeights: true,
-    fireThreshold: 0.7,
+    fireThreshold: 0.4,
     animationMs: 3000,
     description: "Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!"
   }
@@ -27,7 +27,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [terminalLit, setTerminalLit] = useState(false);
 
-  const { inputs = 5, showWeights = true, fireThreshold = 0.7, animationMs = 3000, description } = config;
+  const { inputs = 5, showWeights = true, fireThreshold = 0.4, animationMs = 3000, description } = config;
 
   // Generate random weights for each input (between 0.1 and 1)
   const weights = Array.from({ length: inputs }, (_, i) => {
