@@ -681,8 +681,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
   const activationConnectorPath = [
     `M ${sumNode.x + sumNode.radius},${sumNode.y}`,
-    `Q ${sumNode.x + sumNode.radius + 28},${sumNode.y - 18} ${activationBlock.x - 10},${sumNode.y - 8}`,
-    `T ${activationBlock.x},${sumNode.y}`,
+    `L ${activationBlock.x},${sumNode.y}`,
   ].join(' ');
 
   const activationToOutputPath = [
@@ -692,35 +691,13 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   ].join(' ');
 
   const createTracePath = (y: number, index: number) => {
-    const controlX = (moduleExitX + sumNode.x) / 2;
-    const controlY = y + (sumNode.y - y) * 0.55;
-
-    if (index === 1) {
-      return [
-        `M ${inputLeadInX},${y}`,
-        `L ${moduleEntryX},${y}`,
-        `L ${moduleExitX},${y}`,
-        `Q ${moduleExitX + 32},${y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
-        `T ${sumNode.x},${sumNode.y}`,
-      ].join(' ');
-    }
-
-    if (y === sumNode.y) {
-      return [
-        `M ${inputLeadInX},${y}`,
-        `L ${moduleEntryX},${y}`,
-        `L ${moduleExitX},${y}`,
-        `L ${sumNode.x - 20},${y}`,
-        `L ${sumNode.x},${sumNode.y}`,
-      ].join(' ');
-    }
-
+    // All paths are now straight lines
     return [
       `M ${inputLeadInX},${y}`,
       `L ${moduleEntryX},${y}`,
       `L ${moduleExitX},${y}`,
-      `Q ${moduleExitX + 28},${y} ${controlX},${controlY}`,
-      `T ${sumNode.x},${sumNode.y}`,
+      `L ${sumNode.x - 20},${sumNode.y}`,
+      `L ${sumNode.x},${sumNode.y}`,
     ].join(' ');
   };
 
