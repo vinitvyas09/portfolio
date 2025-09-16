@@ -36,8 +36,11 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const axonBaselineY = 160;
   const axonCurveAmplitude = 6;
   const firstSegmentY = axonBaselineY + Math.sin(0.9) * axonCurveAmplitude;
+  const axonEndX = axonStartX + (axonSegmentCount - 1) * axonSegmentSpacing + axonSegmentWidth;
+  const axonEndY = axonBaselineY + Math.sin(axonSegmentCount * 0.9) * axonCurveAmplitude;
+  const axonTerminalX = 570;
   const terminalBaseY = axonBaselineY + Math.sin((axonSegmentCount + 1) * 0.9) * axonCurveAmplitude;
-  const axonSignalPath = `M 210,${axonBaselineY} C ${axonStartX + 32},${axonBaselineY - 14} ${axonStartX + axonSegmentSpacing * 1.6},${axonBaselineY + 18} 570,${terminalBaseY}`;
+  const axonSignalPath = `M 210,${axonBaselineY} C ${axonStartX + 32},${axonBaselineY - 14} ${axonStartX + axonSegmentSpacing * 1.6},${axonBaselineY + 18} ${axonTerminalX},${terminalBaseY}`;
 
   // Generate random weights for each input (between 0.1 and 1)
   const weights = Array.from({ length: inputs }, (_, i) => {
@@ -350,6 +353,16 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             </g>
           );
         })}
+
+        {/* Link final myelin segment into terminal branches */}
+        <path
+          d={`M ${axonEndX},${axonEndY} Q ${(axonEndX + axonTerminalX) / 2},${(axonEndY + terminalBaseY) / 2 + Math.sin(axonSegmentCount * 1.3) * 3} ${axonTerminalX},${terminalBaseY}`}
+          stroke={isFiring ? '#22c55e' : '#60a5fa'}
+          strokeWidth="3"
+          fill="none"
+          opacity={0.85}
+          strokeLinecap="round"
+        />
         
         {/* Signal propagation along axon when firing */}
         {isFiring && (
@@ -383,7 +396,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             <g key={`terminal-${i}`}>
               {/* Branch to terminal */}
               <path
-                d={`M 570,${terminalBaseY} Q 600,${terminalBaseY + offset * 0.3} 618,${terminalY}`}
+                d={`M ${axonTerminalX},${terminalBaseY} Q 600,${terminalBaseY + offset * 0.3} 618,${terminalY}`}
                 stroke={isLit ? '#22c55e' : '#60a5fa'}
                 strokeWidth="2.5"
                 fill="none"
