@@ -591,11 +591,12 @@ const NeuronScene = ({ colors }: { colors: any }) => {
 
           <path
             d={`M ${axonEndX},${axonEndY} Q ${(axonEndX + axonTerminalX) / 2},${(axonEndY + terminalBaseY) / 2 + Math.sin(axonSegmentCount * 1.3) * 3} ${axonTerminalX},${terminalBaseY}`}
-            stroke={palette.axonCore}
+            stroke="url(#axon-pulse)"
             strokeWidth={3}
             fill="none"
             strokeLinecap="round"
-            opacity={0.75}
+            opacity={0.9}
+            filter="url(#neuron-glow)"
           />
 
           {/* Axon terminals */}
