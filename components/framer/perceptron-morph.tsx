@@ -66,11 +66,8 @@ const stageVariants = {
 
 const CODE_LINES = [
   { content: 'def perceptron(inputs, weights, bias):', accent: true },
-  { content: '    total = 0.0' },
-  { content: '    for x, w in zip(inputs, weights):' },
-  { content: '        total += x * w' },
-  { content: '    total += bias' },
-  { content: '    return 1 if total > 0 else 0', accent: true },
+  { content: '    weighted_sum = sum(x * w for x, w in zip(inputs, weights))' },
+  { content: '    return 1 if weighted_sum + bias > 0 else 0', accent: true },
 ] as const;
 
 
