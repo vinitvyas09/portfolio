@@ -518,6 +518,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const outputConnector = `M ${outputStart.x},${sumNode.y} ${outputConnectorSegment}`;
   const activationArrow = `M ${chip.x - 8},${sumNode.y - 4} L ${chip.x + 4},${sumNode.y} L ${chip.x - 8},${sumNode.y + 4} Z`;
   const outputArrow = `M ${chip.x + chip.width + 16},${sumNode.y - 4} L ${chip.x + chip.width + 30},${sumNode.y} L ${chip.x + chip.width + 16},${sumNode.y + 4} Z`;
+  const traceMaskId = 'circuit-trace-mask';
+  const traceMaskUrl = `url(#${traceMaskId})`;
 
   const createTracePath = (y: number, index: number) => {
     const controlX = (moduleExitX + sumNode.x) / 2;
@@ -637,6 +639,26 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <filter id="circuit-shadow">
             <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.18" />
           </filter>
+          <mask id={traceMaskId} maskUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="400" height="200" fill="white" />
+            {inputYs.map((y, i) => (
+              <circle key={`mask-input-${i}`} cx={50} cy={y} r={11} fill="black" />
+            ))}
+            {inputYs.map((y, i) => (
+              <rect
+                key={`mask-weight-${i}`}
+                x={weightBlock.x - 2}
+                y={y - weightBlock.height / 2 - 2}
+                width={weightBlock.width + 6}
+                height={weightBlock.height + 4}
+                rx={6}
+                fill="black"
+              />
+            ))}
+            <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
+            <rect x={chip.x - 4} y={chip.y - 4} width={chip.width + 8} height={chip.height + 8} rx={10} fill="black" />
+            <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={8.5} fill="black" />
+          </mask>
         </defs>
 
         {/* Board backplate with subtle texture */}
@@ -723,6 +745,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             strokeWidth={i === 1 ? 3.4 : 3}
             strokeLinecap="round"
             fill="none"
+            mask={traceMaskUrl}
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ delay: 0.35 + i * 0.12, duration: 0.9, ease: 'easeInOut' }}
@@ -768,6 +791,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           strokeWidth={3.2}
           strokeLinecap="round"
           fill="none"
+          mask={traceMaskUrl}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.05, duration: 0.7, ease: 'easeInOut' }}
@@ -808,6 +832,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           strokeWidth={3}
           strokeLinecap="round"
           fill="none"
+          mask={traceMaskUrl}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.55, duration: 0.5, ease: 'easeOut' }}
@@ -834,6 +859,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           strokeDasharray="6 10"
           strokeDashoffset={40}
           fill="none"
+          mask={traceMaskUrl}
           animate={{ strokeDashoffset: [40, -60] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
         />
@@ -845,6 +871,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             fill={colors.circuitPrimary}
             filter="url(#circuit-glow)"
             initial={{ opacity: 0 }}
+            mask={traceMaskUrl}
             animate={{
               x: pulseTrajectory.x,
               y: pulseTrajectory.y,
