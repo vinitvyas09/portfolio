@@ -90,7 +90,11 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         statusInactiveBg: "#e2e8f0",
         progressBarBg: "rgba(148, 163, 184, 0.2)",
         progressBarFill1: "#10b981",
-        progressBarFill2: "#4ade80"
+        progressBarFill2: "#4ade80",
+        
+        // Border colors
+        borderColor: "#e2e8f0",
+        borderColorHover: "#cbd5e1"
       };
     }
     
@@ -133,7 +137,11 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       statusInactiveBg: "#262626",
       progressBarBg: "rgba(64, 64, 64, 0.5)",
       progressBarFill1: "#34d399",
-      progressBarFill2: "#4ade80"
+      progressBarFill2: "#4ade80",
+      
+      // Border colors
+      borderColor: "#404040",
+      borderColorHover: "#525252"
     } : {
       // Light mode - classy whites and subtle colors
       bgGradient1: "#ffffff",
@@ -173,7 +181,11 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       statusInactiveBg: "#e2e8f0",
       progressBarBg: "rgba(148, 163, 184, 0.2)",
       progressBarFill1: "#10b981",
-      progressBarFill2: "#4ade80"
+      progressBarFill2: "#4ade80",
+      
+      // Border colors
+      borderColor: "#e2e8f0",
+      borderColorHover: "#cbd5e1"
     };
   }, [isDark, mounted]);
   
@@ -270,9 +282,14 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
     <div className="neuron-container" style={{
       padding: '2rem',
       background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
+      border: `1px solid ${colors.borderColor}`,
       borderRadius: '12px',
       margin: '2rem 0',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      boxShadow: isDark 
+        ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' 
+        : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      transition: 'all 0.3s ease'
     }}>
       <svg
         width="100%"
