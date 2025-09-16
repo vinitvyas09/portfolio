@@ -909,6 +909,51 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           transition={{ delay: 0.2, duration: 0.6 }}
         />
 
+        {/* Input traces for x₁ and x₃ - render these FIRST */}
+        {inputYs.map((y, i) => {
+          if (i === 1) {
+            return null;
+          }
+
+          return (
+            <motion.path
+              key={`trace-${i}`}
+              d={createTracePath(y, i)}
+              stroke={colors.circuitPrimary}
+              strokeWidth={3.2}
+              strokeLinecap="round"
+              fill="none"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ delay: 0.35 + i * 0.12, duration: 0.9, ease: 'easeInOut' }}
+              filter="url(#circuit-shadow)"
+            />
+          );
+        })}
+
+        {/* Central trace for x₂ - render BEFORE components */}
+        {centralTraceSegments.map((segment, segmentIndex) => (
+          <motion.path
+            key={segment.key}
+            d={segment.d}
+            stroke={segment.stroke}
+            strokeWidth={segment.strokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{
+              delay: 0.35 + 1 * 0.12 + segmentIndex * 0.08,
+              duration: 0.55,
+              ease: 'easeInOut',
+            }}
+            filter="url(#circuit-shadow)"
+          />
+        ))}
+
+        {/* THEN render all components on top of traces */}
+        
         {/* Input nodes */}
         {inputYs.map((y, i) => (
           <motion.g
@@ -994,7 +1039,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         </motion.g>
 
-        {/* Activation to Output connector block - similar to weight blocks */}
+        {/* Activation block */}
         <motion.g
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -1044,49 +1089,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <circle cx={outputNodeX} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
           <text x={outputNodeX} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
         </motion.g>
-
-        {/* Input traces for x₁ and x₃ */}
-        {inputYs.map((y, i) => {
-          if (i === 1) {
-            return null;
-          }
-
-          return (
-            <motion.path
-              key={`trace-${i}`}
-              d={createTracePath(y, i)}
-              stroke={colors.circuitPrimary}
-              strokeWidth={3.2}
-              strokeLinecap="round"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ delay: 0.35 + i * 0.12, duration: 0.9, ease: 'easeInOut' }}
-              filter="url(#circuit-shadow)"
-            />
-          );
-        })}
-
-        {/* Central trace showing x₂ travelling through each module */}
-        {centralTraceSegments.map((segment, segmentIndex) => (
-          <motion.path
-            key={segment.key}
-            d={segment.d}
-            stroke={segment.stroke}
-            strokeWidth={segment.strokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{
-              delay: 0.35 + 1 * 0.12 + segmentIndex * 0.08,
-              duration: 0.55,
-              ease: 'easeInOut',
-            }}
-            filter="url(#circuit-shadow)"
-          />
-        ))}
 
 
         {/* Animated signal pulse */}
