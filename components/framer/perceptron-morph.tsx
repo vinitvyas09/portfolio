@@ -783,9 +783,9 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         </motion.g>
 
-        {/* Summation to activation - with flow arrow */}
+        {/* Direct connection from summation to output */}
         <motion.path
-          d={activationConnector}
+          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${chip.x + chip.width + 44},${sumNode.y}`}
           stroke="url(#circuit-signal)"
           strokeWidth={3.2}
           strokeLinecap="round"
@@ -795,19 +795,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.05, duration: 0.7, ease: 'easeInOut' }}
           filter="url(#circuit-shadow)"
-        />
-        
-        {/* Arrow indicator showing flow direction */}
-        <motion.path
-          d={`M ${sumNode.x + sumNode.radius + 10},${sumNode.y - 3} L ${sumNode.x + sumNode.radius + 15},${sumNode.y} L ${sumNode.x + sumNode.radius + 10},${sumNode.y + 3}`}
-          stroke={colors.circuitSecondary}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
         />
 
         {/* Activation chip */}
