@@ -1,465 +1,465 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 
-const PerceptronContinuum = () => {
-  const [stage, setStage] = useState(0);
-  const [typedText, setTypedText] = useState('');
-  const [showResponse, setShowResponse] = useState(false);
-  
-  const stages = [
-    'neuron',
-    'circuit',
-    'math',
-    'code',
-    'chat'
-  ];
-  
-  const haikuLines = [
-    "Mid-engine beauty,",
-    "Ninety-eight-six carved corners—",
-    "Pure driving, distilled."
-  ];
-  
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStage((prev) => (prev + 1) % stages.length);
-    }, 3500);
-    
-    return () => clearInterval(timer);
-  }, []);
-  
-  useEffect(() => {
-    if (stage === 4) {
-      // Type out the question
-      const question = "Write a haiku about a 986 Boxster";
-      let index = 0;
-      setTypedText('');
-      setShowResponse(false);
-      
-      const typeTimer = setInterval(() => {
-        if (index < question.length) {
-          setTypedText(question.slice(0, index + 1));
-          index++;
-        } else {
-          clearInterval(typeTimer);
-          setTimeout(() => setShowResponse(true), 500);
-        }
-      }, 40);
-      
-      return () => clearInterval(typeTimer);
-    }
-  }, [stage]);
-  
-  const renderNeuron = () => (
-    <svg viewBox="0 0 400 300" className="w-full h-full">
+type StageId = 'neuron' | 'circuit' | 'math' | 'code' | 'chat';
+
+interface StageDefinition {
+  id: StageId;
+  step: number;
+  title: string;
+  accent: string;
+}
+
+const STAGES: StageDefinition[] = [
+  {
+    id: 'neuron',
+    step: 1,
+    title: 'Biological Neuron',
+    accent: '#60a5fa',
+  },
+  {
+    id: 'circuit',
+    step: 2,
+    title: 'Electronic Circuit',
+    accent: '#34d399',
+  },
+  {
+    id: 'math',
+    step: 3,
+    title: 'Mathematical Model',
+    accent: '#facc15',
+  },
+  {
+    id: 'code',
+    step: 4,
+    title: 'Code Implementation',
+    accent: '#f97316',
+  },
+  {
+    id: 'chat',
+    step: 5,
+    title: 'AI Interface',
+    accent: '#a855f7',
+  },
+];
+
+const STAGE_DURATION = 4000;
+
+const stageVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 300 : -300,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -300 : 300,
+    opacity: 0,
+  }),
+};
+
+const CODE_LINES = [
+  { content: 'def perceptron(inputs, weights, bias):', accent: true },
+  { content: '    total = 0.0' },
+  { content: '    for x, w in zip(inputs, weights):' },
+  { content: '        total += x * w' },
+  { content: '    total += bias' },
+  { content: '    return 1 if total > 0 else 0', accent: true },
+] as const;
+
+
+const NeuronScene = () => (
+  <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-slate-900">
+    <motion.svg viewBox="0 0 400 200" className="h-full w-full" fill="none">
       <defs>
-        {/* Gradient for cell body */}
-        <radialGradient id="cellGradient">
-          <stop offset="0%" stopColor="#475569" />
-          <stop offset="100%" stopColor="#1e293b" />
-        </radialGradient>
-        
-        {/* Gradient for signal flow */}
-        <linearGradient id="signalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-          <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#10b981" stopOpacity="1" />
+        <linearGradient id="neuron-signal" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#34d399" stopOpacity="0.8" />
         </linearGradient>
-        
-        {/* Filter for glow effect */}
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
       </defs>
       
-      {/* Dendrites (inputs) - more organic branching structure */}
-      <g opacity="0.9">
-        {/* Main dendrite branches */}
-        <path
-          d="M 30 80 Q 70 90 120 130"
-          stroke="#475569"
-          strokeWidth="2.5"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 35 120 Q 75 125 120 140"
-          stroke="#475569"
-          strokeWidth="2.5"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 30 160 Q 70 155 120 150"
-          stroke="#475569"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 35 200 Q 75 185 120 160"
-          stroke="#475569"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 30 240 Q 70 220 120 170"
-          stroke="#475569"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-        />
-        
-        {/* Smaller dendrite branches */}
-        <path
-          d="M 50 90 Q 60 85 65 78"
-          stroke="#475569"
-          strokeWidth="1"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 55 95 Q 65 100 70 95"
-          stroke="#475569"
-          strokeWidth="1"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 60 155 Q 70 150 75 145"
-          stroke="#475569"
-          strokeWidth="1"
-          fill="none"
-          strokeLinecap="round"
-        />
-        
-        {/* Synaptic terminals (input points) */}
-        <circle cx="30" cy="80" r="3" fill="#3b82f6" opacity="0.8" />
-        <circle cx="35" cy="120" r="3" fill="#3b82f6" opacity="0.8" />
-        <circle cx="30" cy="160" r="3" fill="#3b82f6" opacity="0.8" />
-        <circle cx="35" cy="200" r="3" fill="#3b82f6" opacity="0.8" />
-        <circle cx="30" cy="240" r="3" fill="#3b82f6" opacity="0.8" />
-      </g>
-      
-      {/* Cell body (soma) with nucleus */}
-      <g>
-        {/* Outer membrane */}
-        <ellipse
-          cx="150"
-          cy="150"
-          rx="38"
-          ry="35"
-          fill="url(#cellGradient)"
-          stroke="#64748b"
-          strokeWidth="2"
-          opacity="0.95"
-        />
-        
-        {/* Nucleus */}
-        <circle
-          cx="150"
-          cy="150"
-          r="15"
-          fill="#1e293b"
-          stroke="#334155"
-          strokeWidth="1"
-          opacity="0.8"
-        />
-        
-        {/* Nucleolus */}
-        <circle
-          cx="153"
-          cy="148"
-          r="5"
-          fill="#0f172a"
-          opacity="0.6"
-        />
-      </g>
-      
-      {/* Axon hillock and axon */}
-      <g>
-        {/* Axon hillock (cone shape) */}
-        <path
-          d="M 188 150 L 200 145 L 200 155 Z"
-          fill="#475569"
-          stroke="#64748b"
-          strokeWidth="1"
-        />
-        
-        {/* Axon with myelin sheaths */}
-        {[0, 1, 2, 3].map((i) => (
-          <g key={`myelin-${i}`}>
-            <rect
-              x={210 + i * 28}
-              y="145"
-              width="20"
-              height="10"
-              rx="5"
-              fill="#334155"
-              stroke="#475569"
-              strokeWidth="1"
-            />
-          </g>
-        ))}
-        
-        {/* Nodes of Ranvier (gaps between myelin) */}
-        {[0, 1, 2].map((i) => (
-          <line
-            key={`node-${i}`}
-            x1={230 + i * 28}
-            y1="150"
-            x2={238 + i * 28}
-            y2="150"
-            stroke="#64748b"
-            strokeWidth="2"
-          />
-        ))}
-      </g>
-      
-      {/* Axon terminals */}
-      <g>
-        <path
-          d="M 318 150 Q 330 145 340 143"
-          stroke="#475569"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 318 150 Q 330 150 340 150"
-          stroke="#475569"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 318 150 Q 330 155 340 157"
-          stroke="#475569"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        
-        {/* Synaptic boutons */}
-        <circle cx="340" cy="143" r="3" fill="#10b981" opacity="0.8" />
-        <circle cx="340" cy="150" r="3" fill="#10b981" opacity="0.8" />
-        <circle cx="340" cy="157" r="3" fill="#10b981" opacity="0.8" />
-      </g>
-      
-      {/* Subtle signal flow visualization */}
-      <rect
-        x="30"
-        y="148"
-        width="310"
-        height="4"
-        fill="url(#signalGradient)"
-        opacity="0.3"
-        rx="2"
+      {/* Dendrites */}
+      <motion.path
+        d="M50 80L120 100"
+        stroke="url(#neuron-signal)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1, delay: 0.2 }}
+      />
+      <motion.path
+        d="M50 100L120 100"
+        stroke="url(#neuron-signal)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1, delay: 0.3 }}
+      />
+      <motion.path
+        d="M50 120L120 100"
+        stroke="url(#neuron-signal)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1, delay: 0.4 }}
       />
       
-      {/* Elegant labels */}
-      <text x="25" y="60" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
-        Dendrites
-      </text>
-      <text x="135" y="200" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
-        Soma
-      </text>
-      <text x="240" y="175" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
-        Axon
-      </text>
-      <text x="320" y="180" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
-        Terminals
-      </text>
-    </svg>
-  );
-  
-  const renderCircuit = () => (
-    <svg viewBox="0 0 400 300" className="w-full h-full">
+      {/* Cell body */}
+      <motion.circle
+        cx="150"
+        cy="100"
+        r="25"
+        fill="rgba(96, 165, 250, 0.3)"
+        stroke="#60a5fa"
+        strokeWidth="2"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      />
+      
+      {/* Axon */}
+      <motion.path
+        d="M175 100L320 100"
+        stroke="url(#neuron-signal)"
+        strokeWidth="4"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.2, delay: 0.8 }}
+      />
+      
+      {/* Terminals */}
+      <motion.circle
+        cx="320"
+        cy="90"
+        r="4"
+        fill="#34d399"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3, delay: 1.5 }}
+      />
+      <motion.circle
+        cx="320"
+        cy="100"
+        r="4"
+        fill="#34d399"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3, delay: 1.6 }}
+      />
+      <motion.circle
+        cx="320"
+        cy="110"
+        r="4"
+        fill="#34d399"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3, delay: 1.7 }}
+      />
+    </motion.svg>
+  </div>
+);
+
+const CircuitScene = () => (
+  <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-slate-900">
+    <motion.svg viewBox="0 0 400 200" className="h-full w-full" fill="none">
+      <defs>
+        <linearGradient id="circuit-signal" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#34d399" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.8" />
+        </linearGradient>
+      </defs>
+      
       {/* Input nodes */}
-      {[0, 1, 2].map((i) => (
-        <g key={`input-${i}`}>
-          <rect
-            x="50"
-            y={80 + i * 50}
-            width="40"
-            height="30"
-            fill="#1e293b"
-            stroke="#3b82f6"
-            strokeWidth="2"
-          />
-          <text x="70" y={100 + i * 50} textAnchor="middle" fill="#f1f5f9" fontSize="11">
-            x{i + 1}
-          </text>
-        </g>
-      ))}
+      <motion.circle cx="50" cy="70" r="8" fill="#34d399" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} />
+      <motion.circle cx="50" cy="100" r="8" fill="#34d399" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }} />
+      <motion.circle cx="50" cy="130" r="8" fill="#34d399" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} />
       
-      {/* Connections with weights */}
-      {[0, 1, 2].map((i) => (
-        <g key={`wire-${i}`}>
-          <line
-            x1="90"
-            y1={95 + i * 50}
-            x2="180"
-            y2="150"
-            stroke="#64748b"
-            strokeWidth="2"
-          />
-          <text x="135" y={90 + i * 40} fill="#3b82f6" fontSize="10">
-            w{i + 1}
-          </text>
-        </g>
-      ))}
+      {/* Input lines */}
+      <motion.line x1="58" y1="70" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.5 }} />
+      <motion.line x1="58" y1="100" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.6 }} />
+      <motion.line x1="58" y1="130" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.7 }} />
       
-      {/* Summation node */}
-      <rect
-        x="180"
-        y="130"
-        width="50"
-        height="40"
-        fill="#1e293b"
-        stroke="#3b82f6"
+      {/* Summing junction */}
+      <motion.circle
+        cx="150"
+        cy="100"
+        r="20"
+        fill="rgba(34, 211, 238, 0.2)"
+        stroke="#22d3ee"
         strokeWidth="2"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.8 }}
       />
-      <text x="205" y="155" textAnchor="middle" fill="#f1f5f9" fontSize="14">
+      <motion.text
+        x="150"
+        y="108"
+        textAnchor="middle"
+        fontSize="24"
+        fill="#22d3ee"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
         Σ
-      </text>
+      </motion.text>
       
-      {/* Activation */}
-      <line x1="230" y1="150" x2="270" y2="150" stroke="#64748b" strokeWidth="2" />
-      <rect
-        x="270"
-        y="135"
-        width="40"
-        height="30"
-        fill="#1e293b"
-        stroke="#10b981"
+      {/* Output line */}
+      <motion.line x1="170" y1="100" x2="280" y2="100" stroke="url(#circuit-signal)" strokeWidth="3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1.2 }} />
+      
+      {/* Activation function */}
+      <motion.rect
+        x="280"
+        y="80"
+        width="60"
+        height="40"
+        rx="8"
+        fill="rgba(250, 204, 21, 0.2)"
+        stroke="#facc15"
         strokeWidth="2"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 1.4 }}
       />
-      <text x="290" y="155" textAnchor="middle" fill="#f1f5f9" fontSize="10">
+      <motion.text
+        x="310"
+        y="105"
+        textAnchor="middle"
+        fontSize="16"
+        fill="#facc15"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.6 }}
+      >
         f(x)
-      </text>
+      </motion.text>
       
       {/* Output */}
-      <line x1="310" y1="150" x2="340" y2="150" stroke="#64748b" strokeWidth="2" />
-      <circle cx="345" cy="150" r="5" fill="#10b981" />
-    </svg>
-  );
-  
-  const renderMath = () => (
-    <div className="flex flex-col items-center justify-center h-full p-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg">
-      <div className="text-3xl text-white font-serif mb-4">
-        y = f(Σ w<sub>i</sub>x<sub>i</sub> + b)
+      <motion.circle cx="360" cy="100" r="6" fill="#f97316" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.8 }} />
+    </motion.svg>
+  </div>
+);
+
+const MathScene = () => (
+  <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-slate-900 px-8 text-center">
+    <motion.div
+      className="font-mono text-3xl text-slate-100 md:text-4xl"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      <span style={{ color: '#facc15' }}>y</span> = f<span className="text-slate-400">(</span>
+      <span style={{ color: '#22d3ee' }}>∑</span> 
+      <span style={{ color: '#34d399' }}>w</span><sub className="text-slate-400">i</sub>
+      <span style={{ color: '#60a5fa' }}>x</span><sub className="text-slate-400">i</sub> + 
+      <span style={{ color: '#f97316' }}>b</span>
+      <span className="text-slate-400">)</span>
+    </motion.div>
+  </div>
+);
+
+const CodeScene = () => (
+  <div className="relative flex h-full w-full flex-col justify-center overflow-hidden bg-slate-900 px-8 py-8">
+    <motion.div
+      className="rounded-lg border border-slate-700 bg-slate-950 p-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      <div className="space-y-2 font-mono text-sm text-slate-200">
+        {CODE_LINES.map((line, index) => (
+          <motion.div
+            key={line.content}
+            className={'accent' in line && line.accent ? 'text-orange-300' : 'text-slate-300'}
+            initial={{ opacity: 0, x: -14 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+          >
+            {line.content}
+          </motion.div>
+        ))}
       </div>
-      <div className="text-sm text-slate-400 mt-4 space-y-1">
-        <div>where:</div>
-        <div className="ml-4">f = activation function</div>
-        <div className="ml-4">w<sub>i</sub> = weights</div>
-        <div className="ml-4">x<sub>i</sub> = inputs</div>
-        <div className="ml-4">b = bias</div>
+    </motion.div>
+  </div>
+);
+
+const ChatScene = () => (
+  <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-slate-900 px-8">
+    <motion.div
+      className="max-w-sm rounded-2xl border border-slate-700 bg-slate-800 p-6"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <div className="h-3 w-3 rounded-full bg-emerald-400"></div>
+        <span className="text-slate-400 text-sm">AI Chat</span>
       </div>
-    </div>
-  );
-  
-  const renderCode = () => (
-    <div className="bg-slate-900 p-6 rounded-lg h-full font-mono text-sm">
-      <pre className="text-green-400">
-{`def perceptron(inputs, weights, bias):
-    # Sum weighted inputs
-    total = sum(x * w for x, w in 
-                zip(inputs, weights))
-    total += bias
-    
-    # Apply activation (step function)
-    return 1 if total > 0 else 0`}
-      </pre>
-      <div className="mt-4 text-slate-500 text-xs">
-        # That's it. That's a neuron.
+      <div className="space-y-3">
+        <motion.div
+          className="bg-indigo-500 text-white p-3 rounded-lg rounded-br-sm text-sm"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          Hello AI!
+        </motion.div>
+        <motion.div
+          className="bg-slate-700 text-slate-200 p-3 rounded-lg rounded-bl-sm text-sm"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1 }}
+        >
+          Hello! How can I help?
+        </motion.div>
       </div>
-    </div>
-  );
-  
-  const renderChat = () => (
-    <div className="bg-slate-900 rounded-lg p-4 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-700">
-        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-        <span className="text-slate-400 text-xs">Claude</span>
-      </div>
-      
-      {/* User message */}
-      <div className="flex justify-end mb-4">
-        <div className="bg-blue-600 text-white px-4 py-2 rounded-2xl rounded-br-sm max-w-[80%]">
-          <p className="text-sm">{typedText}</p>
-        </div>
-      </div>
-      
-      {/* AI response */}
-      {showResponse && (
-        <div className="flex justify-start">
-          <div className="bg-slate-800 text-slate-100 px-4 py-3 rounded-2xl rounded-bl-sm max-w-[80%]">
-            <div className="text-sm space-y-1">
-              {haikuLines.map((line, i) => (
-                <div
-                  key={i}
-                  className="animate-fadeIn italic"
-                  style={{ animationDelay: `${i * 0.3}s` }}
-                >
-                  {line}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-  
-  const getStageContent = () => {
-    switch (stage) {
-      case 0: return renderNeuron();
-      case 1: return renderCircuit();
-      case 2: return renderMath();
-      case 3: return renderCode();
-      case 4: return renderChat();
-      default: return renderNeuron();
-    }
-  };
-  
-  const stageLabels = [
-    'Biological Neuron',
-    'Circuit Diagram',
-    'Mathematical Model',
-    'Code Implementation',
-    'Modern AI Chat'
-  ];
-  
+    </motion.div>
+  </div>
+);
+
+const STAGE_COMPONENTS: Record<StageId, () => React.JSX.Element> = {
+  neuron: NeuronScene,
+  circuit: CircuitScene,
+  math: MathScene,
+  code: CodeScene,
+  chat: ChatScene,
+};
+
+const PerceptronContinuum = () => {
+  const [stageIndex, setStageIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDirection(1);
+      setStageIndex((current) => (current + 1) % STAGES.length);
+    }, STAGE_DURATION);
+
+    return () => window.clearTimeout(timeout);
+  }, [stageIndex]);
+
+  const stage = STAGES[stageIndex];
+  const StageVisual = STAGE_COMPONENTS[stage.id];
+
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-xl shadow-2xl border border-slate-800 overflow-hidden">        
-        {/* Main content area */}
-        <div className="h-96 p-8 flex items-center justify-center">
-          <div className="w-full h-full transition-all duration-700 ease-in-out transform">
-            {getStageContent()}
-          </div>
+    <div className="mx-auto w-full max-w-4xl">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/60 shadow-2xl backdrop-blur">
+        {/* Step Number Indicator */}
+        <motion.div
+          key={`step-${stage.step}`}
+          className="absolute right-6 top-6 z-20 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold"
+          style={{ backgroundColor: stage.accent, color: '#0f172a' }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {stage.step}
+        </motion.div>
+
+        <div className="relative h-[24rem] md:h-[28rem]">
+          <AnimatePresence initial={false} custom={direction} mode="wait">
+            <motion.div
+              key={stage.id}
+              className="absolute inset-0"
+              variants={stageVariants}
+              custom={direction}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+            >
+              <StageVisual />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        
+        <div className="border-t border-slate-800/80 bg-slate-950/70 px-6 py-6">
+          <motion.h3
+            key={`${stage.id}-title`}
+            className="text-xl font-semibold text-slate-100 md:text-2xl"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {stage.title}
+          </motion.h3>
+        </div>
+        
+        <div className="px-6 pb-6">
+          <Timeline
+            stageIndex={stageIndex}
+            onSelectStage={(index) => {
+              if (index === stageIndex) {
+                return;
+              }
+              setDirection(index > stageIndex ? 1 : -1);
+              setStageIndex(index);
+            }}
+          />
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(5px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-          opacity: 0;
-        }
-      `}</style>
+    </div>
+  );
+};
+
+interface TimelineProps {
+  stageIndex: number;
+  onSelectStage: (index: number) => void;
+}
+
+const Timeline = ({ stageIndex, onSelectStage }: TimelineProps) => {
+  const accent = STAGES[stageIndex].accent;
+  const progress = (stageIndex / (STAGES.length - 1)) * 100;
+
+  return (
+    <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 px-4 py-4">
+      <div className="relative h-1 w-full overflow-hidden rounded-full bg-slate-800/70">
+        <motion.div
+          className="absolute left-0 top-0 h-full rounded-full"
+          initial={false}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
+          style={{ backgroundColor: accent }}
+        />
+      </div>
+      <LayoutGroup>
+        <div className="mt-4 flex items-center justify-between">
+          {STAGES.map((stage, index) => {
+            const isActive = index === stageIndex;
+            return (
+              <button
+                key={stage.id}
+                type="button"
+                onClick={() => onSelectStage(index)}
+                className="group relative flex flex-col items-center gap-2 text-xs text-slate-500 transition-colors hover:text-slate-300"
+              >
+                <span className="relative flex h-6 w-6 items-center justify-center">
+                  <span className="h-2 w-2 rounded-full bg-slate-600/80 transition-transform group-hover:scale-125" />
+                  {isActive && (
+                    <motion.span
+                      layoutId="timeline-dot"
+                      className="absolute h-3 w-3 rounded-full"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      style={{ backgroundColor: accent }}
+                    />
+                  )}
+                </span>
+                <span className={isActive ? 'font-medium' : ''} style={isActive ? { color: accent } : undefined}>
+                  {stage.step}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </LayoutGroup>
     </div>
   );
 };
