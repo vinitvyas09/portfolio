@@ -914,8 +914,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <motion.path
             key={`trace-${i}`}
             d={createTracePath(y, i)}
-            stroke="url(#circuit-trace)"
-            strokeWidth={i === 1 ? 3.4 : 3}
+            stroke={colors.circuitPrimary}
+            strokeWidth={i === 1 ? 3.6 : 3.2}
             strokeLinecap="round"
             fill="none"
             initial={{ pathLength: 0 }}
@@ -962,8 +962,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         {/* Connection from summation to activation */}
         <motion.path
           d={activationConnectorPath}
-          stroke="url(#circuit-trace)"
-          strokeWidth={3.2}
+          stroke={colors.circuitSecondary}
+          strokeWidth={3.4}
           strokeLinecap="round"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
@@ -1018,8 +1018,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         {/* Connection from activation block to output */}
         <motion.path
           d={activationToOutputPath}
-          stroke="url(#circuit-trace)"
-          strokeWidth={3}
+          stroke={colors.mathPrimary}
+          strokeWidth={3.2}
           strokeLinecap="round"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
