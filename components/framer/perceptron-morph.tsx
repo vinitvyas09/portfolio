@@ -553,6 +553,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `Q ${moduleExitX + 32},${sumNode.y - middleTraceCrest} ${sumNode.x - 26},${sumNode.y - middleTraceCrest / 2}`,
       `T ${sumNode.x},${sumNode.y}`,
       `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
+      `L ${sumNode.x + 60},${sumNode.y}`,
       `L ${outputNodeX},${sumNode.y}`,
     ].join(' ');
   }, [inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, sumNode.x, sumNode.y, sumNode.radius, outputNodeX]);
@@ -645,6 +646,10 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
+            <path 
+              d={`M ${sumNode.x + 60},${sumNode.y - 10} L ${sumNode.x + 70},${sumNode.y} L ${sumNode.x + 60},${sumNode.y + 10} L ${sumNode.x + 50},${sumNode.y} Z`}
+              fill="black"
+            />
             <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
@@ -775,21 +780,48 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         </motion.g>
 
-        {/* Direct connection from summation to output */}
+        {/* Connection from summation through threshold to output */}
         <motion.path
-          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
+          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${sumNode.x + 55},${sumNode.y}`}
           stroke="url(#circuit-signal)"
           strokeWidth={3.2}
           strokeLinecap="round"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 1.05, duration: 0.7, ease: 'easeInOut' }}
+          transition={{ delay: 1.05, duration: 0.5, ease: 'easeInOut' }}
           filter="url(#circuit-shadow)"
         />
 
-        {/* Output node - positioned closer to summation */}
-        <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.4, type: 'spring', stiffness: 180, damping: 12 }}>
+        {/* Minimal threshold/step function indicator */}
+        <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.2, type: 'spring', stiffness: 180, damping: 12 }}>
+          {/* Small diamond shape to represent threshold decision */}
+          <path
+            d={`M ${sumNode.x + 60},${sumNode.y - 8} L ${sumNode.x + 68},${sumNode.y} L ${sumNode.x + 60},${sumNode.y + 8} L ${sumNode.x + 52},${sumNode.y} Z`}
+            fill={`${colors.mathPrimary}22`}
+            stroke={colors.mathPrimary}
+            strokeWidth={1.5}
+          />
+          <text x={sumNode.x + 60} y={sumNode.y - 12} fontSize={7} fill={colors.textMuted} textAnchor="middle">
+            step
+          </text>
+        </motion.g>
+
+        {/* Connection from threshold to output */}
+        <motion.path
+          d={`M ${sumNode.x + 68},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
+          stroke={`${colors.mathPrimary}cc`}
+          strokeWidth={3}
+          strokeLinecap="round"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ delay: 1.35, duration: 0.4, ease: 'easeOut' }}
+          filter="url(#circuit-shadow)"
+        />
+
+        {/* Output node */}
+        <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.5, type: 'spring', stiffness: 180, damping: 12 }}>
           <circle cx={outputNodeX} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
           <circle cx={outputNodeX} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
           <circle cx={outputNodeX} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
