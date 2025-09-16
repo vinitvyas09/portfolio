@@ -500,7 +500,7 @@ const PerceptronContinuum = () => {
         }}
       >
 
-        <div className="relative h-[24rem] md:h-[28rem]">
+        <div className="relative h-[18rem] md:h-[20rem]">
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
               key={stage.id}
@@ -517,30 +517,12 @@ const PerceptronContinuum = () => {
           </AnimatePresence>
         </div>
         
-        <div 
-          className="border-t px-6 py-6"
-          style={{
-            borderColor: colors.borderColor,
-            backgroundColor: colors.cardBg
-          }}
-        >
-          <motion.h3
-            key={`${stage.id}-title`}
-            className="text-xl font-semibold md:text-2xl"
-            style={{ color: colors.textPrimary }}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            {stage.title}
-          </motion.h3>
-        </div>
-        
-        <div className="px-6 pb-6">
+        <div className="px-6 py-4">
           <Timeline
             stages={STAGES}
             stageIndex={stageIndex}
             colors={colors}
+            currentTitle={stage.title}
             onSelectStage={(index) => {
               if (index === stageIndex) {
                 return;
@@ -559,70 +541,95 @@ interface TimelineProps {
   stages: StageDefinition[];
   stageIndex: number;
   colors: any;
+  currentTitle: string;
   onSelectStage: (index: number) => void;
 }
 
-const Timeline = ({ stages, stageIndex, colors, onSelectStage }: TimelineProps) => {
+const Timeline = ({ stages, stageIndex, colors, currentTitle, onSelectStage }: TimelineProps) => {
   const accent = stages[stageIndex].accent;
-  const progress = (stageIndex / (stages.length - 1)) * 100;
+  
+  // Calculate exact percentage based on dot positions
+  // For 5 stages: 0%, 25%, 50%, 75%, 100%
+  const dotPositions = stages.map((_, i) => (i / (stages.length - 1)) * 100);
+  const currentProgress = dotPositions[stageIndex];
 
   return (
     <div 
-      className="rounded-xl border px-4 py-4"
+      className="rounded-xl border px-5 py-4"
       style={{
         backgroundColor: colors.timelineBg,
         borderColor: colors.borderColor
       }}
     >
-      <div 
-        className="relative h-1 w-full overflow-hidden rounded-full"
-        style={{ backgroundColor: colors.timelineTrack }}
+      {/* Integrated Title */}
+      <motion.h3
+        key={`${currentTitle}-title`}
+        className="text-lg font-semibold md:text-xl mb-3"
+        style={{ color: colors.textPrimary }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
       >
-        <motion.div
-          className="absolute left-0 top-0 h-full rounded-full"
-          initial={false}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
-          style={{ backgroundColor: accent }}
-        />
-      </div>
-      <LayoutGroup>
-        <div className="mt-4 flex items-center justify-between">
-          {stages.map((stage, index) => {
-            const isActive = index === stageIndex;
-            return (
-              <button
-                key={stage.id}
-                type="button"
-                onClick={() => onSelectStage(index)}
-                className="group relative flex flex-col items-center gap-2 text-xs transition-colors"
-                style={{ 
-                  color: colors.textMuted,
-                  ['&:hover' as any]: { color: colors.textSecondary }
-                }}
-              >
-                <span className="relative flex h-6 w-6 items-center justify-center">
-                  <span 
-                    className="h-2 w-2 rounded-full transition-transform group-hover:scale-125"
-                    style={{ backgroundColor: colors.timelineDot }}
-                  />
-                  {isActive && (
-                    <motion.span
-                      layoutId="timeline-dot"
-                      className="absolute h-3 w-3 rounded-full"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      style={{ backgroundColor: accent }}
+        {currentTitle}
+      </motion.h3>
+      
+      <div className="relative">
+        <LayoutGroup>
+          <div className="relative flex items-center justify-between">
+            {stages.map((stage, index) => {
+              const isActive = index === stageIndex;
+              const dotX = dotPositions[index];
+              
+              return (
+                <button
+                  key={stage.id}
+                  type="button"
+                  onClick={() => onSelectStage(index)}
+                  className="group relative z-10 flex flex-col items-center gap-1.5 text-xs transition-colors"
+                  style={{ 
+                    color: colors.textMuted,
+                    ['&:hover' as any]: { color: colors.textSecondary }
+                  }}
+                >
+                  <span className="relative flex h-5 w-5 items-center justify-center">
+                    <span 
+                      className="h-2 w-2 rounded-full transition-transform group-hover:scale-125"
+                      style={{ backgroundColor: colors.timelineDot }}
                     />
-                  )}
-                </span>
-                <span className={isActive ? 'font-medium' : ''} style={isActive ? { color: accent } : undefined}>
-                  {stage.step}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </LayoutGroup>
+                    {isActive && (
+                      <motion.span
+                        layoutId="timeline-dot"
+                        className="absolute h-3 w-3 rounded-full"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                        style={{ backgroundColor: accent }}
+                      />
+                    )}
+                  </span>
+                  <span className={isActive ? 'font-medium' : ''} style={isActive ? { color: accent } : undefined}>
+                    {stage.step}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          
+          {/* Progress bar positioned under dots, perfectly aligned */}
+          <div className="absolute top-2.5 left-2.5 right-2.5 -translate-y-1/2">
+            <div 
+              className="relative h-0.5 w-full overflow-hidden rounded-full"
+              style={{ backgroundColor: colors.timelineTrack }}
+            >
+              <motion.div
+                className="absolute left-0 top-0 h-full rounded-full"
+                initial={false}
+                animate={{ width: `${currentProgress}%` }}
+                transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
+                style={{ backgroundColor: accent }}
+              />
+            </div>
+          </div>
+        </LayoutGroup>
+      </div>
     </div>
   );
 };
