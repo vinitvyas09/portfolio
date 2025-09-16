@@ -499,21 +499,6 @@ const PerceptronContinuum = () => {
           borderColor: colors.borderColor
         }}
       >
-        {/* Step Number Indicator */}
-        <motion.div
-          key={`step-${stage.step}`}
-          className="absolute right-6 top-6 z-20 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold"
-          style={{ 
-            backgroundColor: stage.accent, 
-            color: isDark ? '#0a0a0a' : '#ffffff',
-            boxShadow: isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 0, 0, 0.1)'
-          }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {stage.step}
-        </motion.div>
 
         <div className="relative h-[24rem] md:h-[28rem]">
           <AnimatePresence initial={false} custom={direction} mode="wait">
