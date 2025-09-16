@@ -733,7 +733,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           <path
             d={`M 208,160 
                 C 218,160 228,${160 + Math.sin(0.8) * 3} ${axonStartX},${firstSegmentY}`}
-            stroke={isFiring ? '#22c55e' : '#3b82f6'}
+            stroke={isFiring ? colors.axonActive : colors.axonInactive}
             strokeWidth="4"
             strokeLinecap="round"
             fill="none"
@@ -785,7 +785,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                 height={axonSegmentHeight}
                 rx="10"
                 fill={isFiring ? colors.myelinActive : colors.myelinInactive}
-                stroke={isFiring ? '#22c55e' : '#3b82f6'}
+                stroke={isFiring ? colors.myelinStrokeActive : colors.myelinStrokeInactive}
                 strokeWidth="1.5"
                 opacity="0.9"
                 transform={`rotate(${Math.sin((i + 1) * 0.6) * 2} ${x + axonSegmentWidth / 2} ${segmentY})`}
