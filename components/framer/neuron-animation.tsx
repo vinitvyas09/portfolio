@@ -692,7 +692,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             cx="170"
             cy="157"
             r="4"
-            fill={colors.nucleusResting}
+            fill={nucleusColor}
             opacity="0.9"
           />
         </g>
