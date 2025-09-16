@@ -506,18 +506,41 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const sumNode = { x: 224, y: 100, radius: 20 };
   const chip = { x: 284, y: 74, width: 66, height: 52 };
 
-  const createTracePath = (y: number) => {
+  const createTracePath = (y: number, index: number) => {
     const startX = 64;
     const moduleEntry = weightBlock.x - 10;
     const moduleExit = weightBlock.x + weightBlock.width + 4;
     const controlX = (moduleExit + sumNode.x) / 2;
     const controlY = y + (sumNode.y - y) * 0.55;
 
-    if (y === sumNode.y) {
-      return `M ${startX},${y} L ${moduleEntry},${y} L ${moduleExit},${y} L ${sumNode.x - 18},${y} L ${sumNode.x},${sumNode.y}`;
+    if (index === 1) {
+      const crestOffset = 12;
+      return [
+        `M ${startX},${y}`,
+        `L ${moduleEntry},${y}`,
+        `L ${moduleExit},${y}`,
+        `Q ${moduleExit + 32},${y - crestOffset} ${sumNode.x - 26},${sumNode.y - crestOffset / 2}`,
+        `T ${sumNode.x},${sumNode.y}`,
+      ].join(' ');
     }
 
-    return `M ${startX},${y} L ${moduleEntry},${y} L ${moduleExit},${y} Q ${moduleExit + 28},${y} ${controlX},${controlY} T ${sumNode.x},${sumNode.y}`;
+    if (y === sumNode.y) {
+      return [
+        `M ${startX},${y}`,
+        `L ${moduleEntry},${y}`,
+        `L ${moduleExit},${y}`,
+        `L ${sumNode.x - 20},${y}`,
+        `L ${sumNode.x},${sumNode.y}`,
+      ].join(' ');
+    }
+
+    return [
+      `M ${startX},${y}`,
+      `L ${moduleEntry},${y}`,
+      `L ${moduleExit},${y}`,
+      `Q ${moduleExit + 28},${y} ${controlX},${controlY}`,
+      `T ${sumNode.x},${sumNode.y}`,
+    ].join(' ');
   };
 
   const activationConnector = `M ${sumNode.x + sumNode.radius},${sumNode.y} C ${sumNode.x + 38},${sumNode.y - 12} ${chip.x - 12},${sumNode.y - 8} ${chip.x - 6},${sumNode.y} S ${chip.x + 8},${sumNode.y + 12} ${chip.x + 12},${sumNode.y}`;
@@ -641,9 +664,9 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         {inputYs.map((y, i) => (
           <motion.path
             key={`trace-${i}`}
-            d={createTracePath(y)}
+            d={createTracePath(y, i)}
             stroke="url(#circuit-trace)"
-            strokeWidth={3}
+            strokeWidth={i === 1 ? 3.4 : 3}
             strokeLinecap="round"
             fill="none"
             initial={{ pathLength: 0 }}
