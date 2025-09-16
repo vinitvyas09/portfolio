@@ -135,25 +135,30 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           // Create dendrites radiating in all directions from the soma
           const somaX = 170;
           const somaY = 160;
+          const somaRadius = 35; // Define soma radius for proper connection
           
           // Create main dendrite trunks radiating outward
           // More branches for denser canopy, but only on left/top/bottom (not right where axon is)
           const mainBranches = [];
-          const numMainBranches = 7; // More main branches for density
+          const numMainBranches = 8; // More main branches for density
           
           for (let i = 0; i < numMainBranches; i++) {
             // Distribute branches around the left hemisphere (avoiding the right side where axon emerges)
             const baseAngle = 90 + (i / (numMainBranches - 1)) * 180; // From 90° (top) to 270° (bottom)
-            const angleVariation = Math.sin(i * 2.7) * 15; // Natural variation
+            const angleVariation = Math.sin(i * 2.7) * 12; // Natural variation
             const angle = baseAngle + angleVariation;
             
-            const length = 45 + Math.sin(i * 1.3) * 15; // Varying lengths
-            const endX = somaX + Math.cos(angle * Math.PI / 180) * length;
-            const endY = somaY + Math.sin(angle * Math.PI / 180) * length;
+            // Start from soma edge, not center
+            const startX = somaX + Math.cos(angle * Math.PI / 180) * somaRadius;
+            const startY = somaY + Math.sin(angle * Math.PI / 180) * somaRadius;
+            
+            const length = 90 + Math.sin(i * 1.3) * 25; // DOUBLED the lengths for bigger dendrites
+            const endX = somaX + Math.cos(angle * Math.PI / 180) * (length + somaRadius);
+            const endY = somaY + Math.sin(angle * Math.PI / 180) * (length + somaRadius);
             
             mainBranches.push({
-              startX: somaX,
-              startY: somaY,
+              startX,
+              startY,
               endX,
               endY,
               angle,
@@ -209,7 +214,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                       // Create 2-3 sub-branches at each point
                       return [-30, 0, 30].map((angleOffset, sIdx) => {
                         const subAngle = branch.angle + angleOffset + Math.sin((pIdx + sIdx) * 2.1) * 10;
-                        const subLength = 20 + Math.sin((pIdx + sIdx) * 1.7) * 8;
+                        const subLength = 40 + Math.sin((pIdx + sIdx) * 1.7) * 15; // Doubled sub-branch lengths
                         const subEndX = trunkX + Math.cos(subAngle * Math.PI / 180) * subLength;
                         const subEndY = trunkY + Math.sin(subAngle * Math.PI / 180) * subLength;
                         
@@ -238,7 +243,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             {/* Tertiary spikes for dense canopy effect */}
                             {[-20, 20].map((tAngle, tIdx) => {
                               const spikeAngle = subAngle + tAngle;
-                              const spikeLength = 8 + Math.sin((tIdx + sIdx) * 3.1) * 3;
+                              const spikeLength = 15 + Math.sin((tIdx + sIdx) * 3.1) * 5; // Doubled spike lengths
                               const spikeEndX = subEndX + Math.cos(spikeAngle * Math.PI / 180) * spikeLength;
                               const spikeEndY = subEndY + Math.sin(spikeAngle * Math.PI / 180) * spikeLength;
                               
@@ -291,7 +296,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                     {/* Terminal branches at the end */}
                     {[-25, 0, 25].map((angleOffset, tIdx) => {
                       const termAngle = branch.angle + angleOffset;
-                      const termLength = 12;
+                      const termLength = 24; // Doubled terminal lengths
                       const termEndX = branch.endX + Math.cos(termAngle * Math.PI / 180) * termLength;
                       const termEndY = branch.endY + Math.sin(termAngle * Math.PI / 180) * termLength;
                       
@@ -312,15 +317,17 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               
               {/* Additional fine dendrites for extra density */}
               {[45, 135, 180, 225, 315].map((angle, idx) => {
-                const length = 25 + Math.sin(idx * 2.3) * 10;
-                const endX = somaX + Math.cos(angle * Math.PI / 180) * length;
-                const endY = somaY + Math.sin(angle * Math.PI / 180) * length;
+                const length = 50 + Math.sin(idx * 2.3) * 20; // Doubled fine dendrite lengths
+                const startX = somaX + Math.cos(angle * Math.PI / 180) * somaRadius;
+                const startY = somaY + Math.sin(angle * Math.PI / 180) * somaRadius;
+                const endX = somaX + Math.cos(angle * Math.PI / 180) * (length + somaRadius);
+                const endY = somaY + Math.sin(angle * Math.PI / 180) * (length + somaRadius);
                 const isActive = signals[idx % signals.length] > 0;
                 
                 return (
                   <g key={`extra-dendrite-${idx}`}>
                     <path
-                      d={`M ${somaX},${somaY} L ${endX},${endY}`}
+                      d={`M ${startX},${startY} L ${endX},${endY}`}
                       stroke={isActive ? '#60a5fa' : '#475569'}
                       strokeWidth="1.5"
                       opacity={isActive ? 0.4 : 0.1}
@@ -331,8 +338,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                       <path
                         key={i}
                         d={`M ${endX},${endY} 
-                            L ${endX + Math.cos((angle + offset) * Math.PI / 180) * 8},
-                              ${endY + Math.sin((angle + offset) * Math.PI / 180) * 8}`}
+                            L ${endX + Math.cos((angle + offset) * Math.PI / 180) * 16},
+                              ${endY + Math.sin((angle + offset) * Math.PI / 180) * 16}`}
                         stroke={isActive ? '#60a5fa' : '#475569'}
                         strokeWidth="0.6"
                         opacity={isActive ? 0.3 : 0.08}
@@ -346,77 +353,131 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           );
         })()}
         
-        {/* Cell Body (Soma) - Star-shaped irregular organic form */}
+        {/* Cell Body (Soma) - Organic integrated form with dendrite connection points */}
         <g filter={isFiring ? "url(#glow)" : ""}>
-          {/* Create a more irregular, star-like soma shape */}
+          {/* Main soma body - organic blob with dendrite protrusions */}
           <path
-            d={`M 170,160
-                m 0,-35
-                c 8,-5 15,-3 20,2
-                c 5,5 7,12 5,18
-                c 3,4 12,5 15,10
-                c 3,5 2,10 -2,15
-                c 4,3 8,8 7,14
-                c -1,6 -5,10 -10,12
-                c 0,5 -2,10 -7,13
-                c -5,3 -11,3 -16,0
-                c -4,2 -9,3 -14,0
-                c -5,-3 -8,-8 -8,-13
-                c -5,-2 -10,-6 -11,-12
-                c -1,-6 2,-11 6,-14
-                c -4,-5 -5,-10 -2,-15
-                c 3,-5 10,-6 15,-10
-                c -2,-6 0,-13 5,-18
-                c 5,-5 12,-7 20,-2
-                Z`}
+            d={(() => {
+              // Generate organic soma shape with connection points for dendrites
+              const points = [];
+              const numPoints = 24; // More points for smoother shape
+              const centerX = 170;
+              const centerY = 160;
+              
+              for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * Math.PI * 2;
+                const baseRadius = 32;
+                
+                // Add variation for organic shape
+                // Make protrusions where dendrites connect
+                let radius = baseRadius;
+                const angleInDegrees = angle * 180 / Math.PI;
+                
+                // Create bulges where main dendrites connect (left side)
+                if (angleInDegrees > 90 && angleInDegrees < 270) {
+                  radius += Math.sin(angle * 4) * 5 + Math.cos(angle * 3) * 3;
+                } else {
+                  // Smoother on the right side where axon emerges
+                  radius += Math.sin(angle * 2) * 2;
+                }
+                
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                points.push({ x, y, angle });
+              }
+              
+              // Create smooth bezier path through points
+              let path = `M ${points[0].x},${points[0].y}`;
+              
+              for (let i = 0; i < points.length; i++) {
+                const current = points[i];
+                const next = points[(i + 1) % points.length];
+                const nextNext = points[(i + 2) % points.length];
+                
+                // Control points for smooth curves
+                const cp1x = current.x + Math.cos(current.angle + Math.PI/2) * 8;
+                const cp1y = current.y + Math.sin(current.angle + Math.PI/2) * 8;
+                const cp2x = next.x + Math.cos(next.angle - Math.PI/2) * 8;
+                const cp2y = next.y + Math.sin(next.angle - Math.PI/2) * 8;
+                
+                path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${next.x},${next.y}`;
+              }
+              
+              path += ' Z';
+              return path;
+            })()}
             fill="url(#somaGradient)"
-            opacity="0.8"
+            opacity="0.85"
           />
           
-          {/* Additional organic irregularities */}
+          {/* Inner soma texture for depth */}
           <ellipse
-            cx="165"
-            cy="158"
-            rx="28"
-            ry="26"
-            fill={neuronColor}
-            opacity="0.4"
-            transform="rotate(25 165 158)"
-          />
-          <ellipse
-            cx="175"
-            cy="162"
-            rx="25"
-            ry="28"
+            cx="168"
+            cy="160"
+            rx="26"
+            ry="24"
             fill={neuronColor}
             opacity="0.3"
-            transform="rotate(-20 175 162)"
+            transform="rotate(15 168 160)"
           />
           
-          {/* Cell membrane with irregular outline */}
+          {/* Cytoplasm texture */}
+          <ellipse
+            cx="172"
+            cy="158"
+            rx="22"
+            ry="20"
+            fill={neuronColor}
+            opacity="0.25"
+            transform="rotate(-25 172 158)"
+          />
+          
+          {/* Cell membrane - matching the main soma shape */}
           <path
-            d={`M 170,160
-                m 0,-35
-                c 8,-5 15,-3 20,2
-                c 5,5 7,12 5,18
-                c 3,4 12,5 15,10
-                c 3,5 2,10 -2,15
-                c 4,3 8,8 7,14
-                c -1,6 -5,10 -10,12
-                c 0,5 -2,10 -7,13
-                c -5,3 -11,3 -16,0
-                c -4,2 -9,3 -14,0
-                c -5,-3 -8,-8 -8,-13
-                c -5,-2 -10,-6 -11,-12
-                c -1,-6 2,-11 6,-14
-                c -4,-5 -5,-10 -2,-15
-                c 3,-5 10,-6 15,-10
-                c -2,-6 0,-13 5,-18
-                c 5,-5 12,-7 20,-2
-                Z`}
+            d={(() => {
+              // Same shape generation for outline
+              const points = [];
+              const numPoints = 24;
+              const centerX = 170;
+              const centerY = 160;
+              
+              for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * Math.PI * 2;
+                const baseRadius = 32;
+                let radius = baseRadius;
+                const angleInDegrees = angle * 180 / Math.PI;
+                
+                if (angleInDegrees > 90 && angleInDegrees < 270) {
+                  radius += Math.sin(angle * 4) * 5 + Math.cos(angle * 3) * 3;
+                } else {
+                  radius += Math.sin(angle * 2) * 2;
+                }
+                
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                points.push({ x, y, angle });
+              }
+              
+              let path = `M ${points[0].x},${points[0].y}`;
+              
+              for (let i = 0; i < points.length; i++) {
+                const current = points[i];
+                const next = points[(i + 1) % points.length];
+                
+                const cp1x = current.x + Math.cos(current.angle + Math.PI/2) * 8;
+                const cp1y = current.y + Math.sin(current.angle + Math.PI/2) * 8;
+                const cp2x = next.x + Math.cos(next.angle - Math.PI/2) * 8;
+                const cp2y = next.y + Math.sin(next.angle - Math.PI/2) * 8;
+                
+                path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${next.x},${next.y}`;
+              }
+              
+              path += ' Z';
+              return path;
+            })()}
             fill="none"
             stroke={isFiring ? '#22c55e' : '#3b82f6'}
-            strokeWidth="2"
+            strokeWidth="2.5"
             opacity="0.9"
           />
         </g>
@@ -708,10 +769,10 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         </text>
         
         {/* Labels */}
-        <text x="90" y="85" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="50" y="50" fill="#e2e8f0" fontSize="11" fontWeight="500">
           Dendrites
         </text>
-        <text x="170" y="125" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="170" y="120" fill="#e2e8f0" fontSize="11" fontWeight="500">
           Cell Body
         </text>
         <text x="400" y="135" fill="#e2e8f0" fontSize="11" fontWeight="500">
