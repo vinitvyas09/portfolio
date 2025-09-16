@@ -889,7 +889,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             />
             <text
               x={weightBlock.x + weightBlock.width / 2}
-              y={y - weightBlock.height / 2 - 6}
+              y={y - weightBlock.height / 2 - 2}
               fontSize={7}
               fill={colors.textMuted}
               textAnchor="middle"
@@ -956,7 +956,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           strokeWidth={3.2}
           strokeLinecap="round"
           fill="none"
-          mask={traceMaskUrl}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.05, duration: 0.5, ease: 'easeInOut' }}
@@ -1013,7 +1012,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           strokeWidth={3}
           strokeLinecap="round"
           fill="none"
-          mask={traceMaskUrl}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.45, duration: 0.4, ease: 'easeOut' }}
@@ -1036,7 +1034,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             fill={colors.circuitPrimary}
             filter="url(#circuit-glow)"
             initial={{ opacity: 0 }}
-            mask={traceMaskUrl}
             animate={{
               x: pulseTrajectory.x,
               y: pulseTrajectory.y,
