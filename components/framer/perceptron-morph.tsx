@@ -13,36 +13,37 @@ interface StageDefinition {
   accent: string;
 }
 
-const STAGES: StageDefinition[] = [
+// Stage definitions moved to component to access theme
+const getStages = (isDark: boolean): StageDefinition[] => [
   {
     id: 'neuron',
     step: 1,
     title: 'Biological Neuron',
-    accent: '#60a5fa',
+    accent: isDark ? '#818cf8' : '#6366f1',
   },
   {
     id: 'circuit',
     step: 2,
     title: 'Electronic Circuit',
-    accent: '#34d399',
+    accent: isDark ? '#4ade80' : '#10b981',
   },
   {
     id: 'math',
     step: 3,
     title: 'Mathematical Model',
-    accent: '#facc15',
+    accent: isDark ? '#fbbf24' : '#eab308',
   },
   {
     id: 'code',
     step: 4,
     title: 'Code Implementation',
-    accent: '#f97316',
+    accent: isDark ? '#fb923c' : '#f97316',
   },
   {
     id: 'chat',
     step: 5,
     title: 'AI Interface',
-    accent: '#a855f7',
+    accent: isDark ? '#c084fc' : '#a855f7',
   },
 ];
 
@@ -375,6 +376,9 @@ const PerceptronContinuum = () => {
   const [stageIndex, setStageIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   
+  // Get theme-aware stages (use light theme stages as default before mount)
+  const STAGES = useMemo(() => getStages(isDark), [isDark]);
+  
   // Sophisticated color palette
   const colors = useMemo(() => {
     // Default to light colors before mount to avoid hydration mismatch
@@ -410,9 +414,9 @@ const PerceptronContinuum = () => {
     
     return isDark ? {
       // Dark mode - sophisticated blacks and grays
-      containerBg: "rgba(15, 23, 42, 0.95)",
-      borderColor: "rgba(51, 65, 85, 0.8)",
-      sceneBg: "#0f172a",
+      containerBg: "rgba(10, 10, 10, 0.95)",
+      borderColor: "rgba(64, 64, 64, 0.8)",
+      sceneBg: "#0a0a0a",
       
       // Stage-specific colors - more vibrant for dark mode
       neuronPrimary: "#a78bfa",
@@ -499,7 +503,11 @@ const PerceptronContinuum = () => {
         <motion.div
           key={`step-${stage.step}`}
           className="absolute right-6 top-6 z-20 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold"
-          style={{ backgroundColor: stage.accent, color: '#0f172a' }}
+          style={{ 
+            backgroundColor: stage.accent, 
+            color: isDark ? '#0a0a0a' : '#ffffff',
+            boxShadow: isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 0, 0, 0.1)'
+          }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -545,6 +553,7 @@ const PerceptronContinuum = () => {
         
         <div className="px-6 pb-6">
           <Timeline
+            stages={STAGES}
             stageIndex={stageIndex}
             colors={colors}
             onSelectStage={(index) => {
@@ -562,14 +571,15 @@ const PerceptronContinuum = () => {
 };
 
 interface TimelineProps {
+  stages: StageDefinition[];
   stageIndex: number;
   colors: any;
   onSelectStage: (index: number) => void;
 }
 
-const Timeline = ({ stageIndex, colors, onSelectStage }: TimelineProps) => {
-  const accent = STAGES[stageIndex].accent;
-  const progress = (stageIndex / (STAGES.length - 1)) * 100;
+const Timeline = ({ stages, stageIndex, colors, onSelectStage }: TimelineProps) => {
+  const accent = stages[stageIndex].accent;
+  const progress = (stageIndex / (stages.length - 1)) * 100;
 
   return (
     <div 
@@ -593,7 +603,7 @@ const Timeline = ({ stageIndex, colors, onSelectStage }: TimelineProps) => {
       </div>
       <LayoutGroup>
         <div className="mt-4 flex items-center justify-between">
-          {STAGES.map((stage, index) => {
+          {stages.map((stage, index) => {
             const isActive = index === stageIndex;
             return (
               <button
