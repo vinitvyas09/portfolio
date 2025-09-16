@@ -666,394 +666,378 @@ const NeuronScene = ({ colors }: { colors: any }) => {
 };
 
 const CircuitScene = ({ colors }: { colors: any }) => {
-  const inputYs = [70, 100, 130];
-  const board = { x: 32, y: 34, width: 336, height: 132 };
-  const weightBlock = { x: 112, width: 26, height: 18 };
-  const sumNode = { x: 224, y: 100, radius: 20 };
-  const activationBlock = { x: sumNode.x + 60, width: weightBlock.width, height: weightBlock.height };
-  const outputNodeX = sumNode.x + 136;
-
-  const inputNode = { x: 50, radius: 13 };
-  const weightEntryX = weightBlock.x;
-  const weightExitX = weightBlock.x + weightBlock.width;
-  const sumEntryX = sumNode.x - sumNode.radius;
-  const sumExitX = sumNode.x + sumNode.radius;
-  const activationEntryX = activationBlock.x;
-  const activationExitX = activationBlock.x + activationBlock.width;
-  const angledTraceExitX = weightExitX + 20;
-
-  const inputLeadInX = inputNode.x + inputNode.radius;
-
-  // FIXED: Only connection segments, no "through" segments
-  const centralTraceSegments = useMemo(() => {
-    const y = sumNode.y;
-    return [
-      {
-        key: 'x2-to-weight',
-        d: `M ${inputLeadInX},${y} L ${weightEntryX},${y}`,
-        stroke: colors.circuitPrimary,
-        strokeWidth: 3.6,
-      },
-      {
-        key: 'weight-to-sum',
-        d: `M ${weightExitX},${y} L ${sumEntryX},${y}`,
-        stroke: colors.circuitSecondary,
-        strokeWidth: 3.6,
-      },
-      {
-        key: 'sum-to-activation',
-        d: `M ${sumExitX},${y} L ${activationEntryX},${y}`,
-        stroke: colors.circuitSecondary,
-        strokeWidth: 3.4,
-      },
-      {
-        key: 'activation-to-output',
-        d: `M ${activationExitX},${y} L ${outputNodeX - 10},${y}`,
-        stroke: colors.mathPrimary,
-        strokeWidth: 3.2,
-      },
-    ];
-  }, [
-    activationEntryX,
-    activationExitX,
-    colors.circuitPrimary,
-    colors.circuitSecondary,
-    colors.mathPrimary,
-    inputLeadInX,
-    outputNodeX,
-    sumEntryX,
-    sumExitX,
-    sumNode.y,
-    weightEntryX,
-    weightExitX,
-  ]);
-
-  const createTracePath = (y: number, index: number) => {
-    if (index === 1) {
-      return '';
-    }
-    return [
-      `M ${inputLeadInX},${y}`,
-      `L ${weightEntryX},${y}`,
-      `L ${weightExitX},${y}`,
-      `L ${angledTraceExitX},${y}`,
-      `L ${sumEntryX},${sumNode.y}`,
-    ].join(' ');
+  // Simple perceptron layout: left to right flow
+  const layout = {
+    inputs: { x: 60, ys: [70, 100, 130], radius: 8 },
+    sum: { x: 200, y: 100, radius: 18 },
+    activation: { x: 300, y: 100, radius: 16 },
+    output: { x: 380, y: 100, radius: 10 }
   };
 
-  const signalPath = useMemo(() => {
-    return [
-      `M ${inputLeadInX},${sumNode.y}`,
-      `L ${weightEntryX},${sumNode.y}`,
-      `L ${weightExitX},${sumNode.y}`,
-      `L ${sumEntryX},${sumNode.y}`,
-      `L ${sumExitX},${sumNode.y}`,
-      `L ${activationEntryX},${sumNode.y}`,
-      `L ${activationExitX},${sumNode.y}`,
-      `L ${outputNodeX},${sumNode.y}`,
-    ].join(' ');
-  }, [
-    inputLeadInX,
-    weightEntryX,
-    weightExitX,
-    sumEntryX,
-    sumExitX,
-    sumNode.y,
-    activationEntryX,
-    activationExitX,
-    outputNodeX,
-  ]);
-
-  const signalPathRef = useRef<SVGPathElement | null>(null);
-  const [pulseTrajectory, setPulseTrajectory] = useState<{
-    x: number[];
-    y: number[];
-    opacity: number[];
-  } | null>(null);
-
-  useEffect(() => {
-    const targetPath = signalPathRef.current;
-    if (!targetPath) {
-      return;
-    }
-
-    const totalLength = targetPath.getTotalLength();
-    const steps = 64;
-    const xKeyframes: number[] = [];
-    const yKeyframes: number[] = [];
-    const opacityKeyframes: number[] = [];
-    const fadeWindow = Math.max(4, Math.floor(steps / 8));
-
-    for (let i = 0; i <= steps; i++) {
-      const point = targetPath.getPointAtLength((totalLength * i) / steps);
-      xKeyframes.push(point.x);
-      yKeyframes.push(point.y);
-    }
-
-    const lastIndex = xKeyframes.length - 1;
-    xKeyframes.forEach((_, index) => {
-      let opacity = 1;
-      if (index < fadeWindow) {
-        opacity = index / fadeWindow;
-      } else if (index > lastIndex - fadeWindow) {
-        opacity = Math.max(0, (lastIndex - index) / fadeWindow);
-      }
-      opacityKeyframes.push(opacity);
+  // Create simple connection lines
+  const connections = useMemo(() => {
+    const lines = [];
+    
+    // Input to summation connections
+    layout.inputs.ys.forEach((y, i) => {
+      lines.push({
+        key: `input-${i}`,
+        x1: layout.inputs.x + layout.inputs.radius,
+        y1: y,
+        x2: layout.sum.x - layout.sum.radius,
+        y2: layout.sum.y,
+        color: colors.circuitPrimary,
+        label: `w${i + 1}`
+      });
     });
-
-    setPulseTrajectory({ x: xKeyframes, y: yKeyframes, opacity: opacityKeyframes });
-  }, [signalPath]);
+    
+    // Summation to activation
+    lines.push({
+      key: 'sum-to-activation',
+      x1: layout.sum.x + layout.sum.radius,
+      y1: layout.sum.y,
+      x2: layout.activation.x - layout.activation.radius,
+      y2: layout.activation.y,
+      color: colors.circuitSecondary
+    });
+    
+    // Activation to output
+    lines.push({
+      key: 'activation-to-output',
+      x1: layout.activation.x + layout.activation.radius,
+      y1: layout.activation.y,
+      x2: layout.output.x - layout.output.radius,
+      y2: layout.output.y,
+      color: colors.mathPrimary
+    });
+    
+    return lines;
+  }, [colors.circuitPrimary, colors.circuitSecondary, colors.mathPrimary, layout.inputs.ys, layout.inputs.x, layout.inputs.radius, layout.sum.x, layout.sum.y, layout.sum.radius, layout.activation.x, layout.activation.y, layout.activation.radius, layout.output.x, layout.output.y, layout.output.radius]);
 
   return (
     <div 
       className="relative flex h-full w-full items-center justify-center overflow-hidden"
       style={{ backgroundColor: colors.sceneBg }}
     >
-      <motion.svg viewBox="0 0 400 200" className="h-full w-full" fill="none">
+      <motion.svg viewBox="0 0 450 200" className="h-full w-full" fill="none">
         <defs>
-          <linearGradient id="circuit-signal" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={colors.circuitPrimary} stopOpacity="0.95" />
-            <stop offset="45%" stopColor={colors.circuitSecondary} stopOpacity="0.85" />
-            <stop offset="100%" stopColor={colors.mathPrimary} stopOpacity="0.8" />
-          </linearGradient>
-          <linearGradient id="circuit-trace" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={`${colors.circuitPrimary}dd`} />
-            <stop offset="100%" stopColor={`${colors.circuitSecondary}cc`} />
-          </linearGradient>
-          <radialGradient id="circuit-node" cx="50%" cy="50%" r="60%">
-            <stop offset="0%" stopColor={`${colors.circuitPrimary}f5`} />
+          <radialGradient id="perceptron-node" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stopColor={`${colors.circuitPrimary}f0`} />
             <stop offset="60%" stopColor={`${colors.circuitSecondary}d0`} />
-            <stop offset="100%" stopColor={`${colors.mathPrimary}a0`} />
+            <stop offset="100%" stopColor={`${colors.mathPrimary}80`} />
           </radialGradient>
-          <filter id="circuit-glow">
-            <feGaussianBlur stdDeviation="2.4" result="blur" />
+          <filter id="perceptron-glow">
+            <feGaussianBlur stdDeviation="2" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <filter id="circuit-shadow">
-            <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.18" />
+          <filter id="perceptron-shadow">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodOpacity="0.2" />
           </filter>
         </defs>
 
-        {/* Board backplate */}
-        <motion.rect
-          x={board.x}
-          y={board.y}
-          width={board.width}
-          height={board.height}
-          rx={10}
-          fill={`${colors.containerBg}cc`}
-          stroke={`${colors.borderColor}55`}
-          strokeWidth={0.75}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        />
-        <motion.path
-          d={`M ${board.x + 16},${board.y + 18} H ${board.x + board.width - 16} M ${board.x + 12},${board.y + board.height - 18} H ${board.x + board.width - 12}`}
-          stroke={`${colors.borderColor}33`}
-          strokeWidth={0.7}
-          strokeLinecap="round"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-        />
-
-        {/* Traces for x₁ and x₃ - render FIRST */}
-        {inputYs.map((y, i) => {
-          if (i === 1) {
-            return null;
-          }
-          return (
-            <motion.path
-              key={`trace-${i}`}
-              d={createTracePath(y, i)}
-              stroke={colors.circuitPrimary}
-              strokeWidth={3.2}
-              strokeLinecap="round"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ delay: 0.35 + i * 0.12, duration: 0.9, ease: 'easeInOut' }}
-              filter="url(#circuit-shadow)"
-            />
-          );
-        })}
-
-        {/* Central trace for x₂ - render BEFORE components */}
-        {centralTraceSegments.map((segment, segmentIndex) => (
-          <motion.path
-            key={segment.key}
-            d={segment.d}
-            stroke={segment.stroke}
-            strokeWidth={segment.strokeWidth}
+        {/* Connection lines - render first */}
+        {connections.map((conn, index) => (
+          <motion.line
+            key={conn.key}
+            x1={conn.x1}
+            y1={conn.y1}
+            x2={conn.x2}
+            y2={conn.y2}
+            stroke={conn.color}
+            strokeWidth={2.5}
+            strokeOpacity={0.7}
             strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{
-              delay: 0.35 + 1 * 0.12 + segmentIndex * 0.08,
-              duration: 0.55,
-              ease: 'easeInOut',
+            animate={{ pathLength: 1, opacity: 0.7 }}
+            transition={{ 
+              delay: 0.3 + index * 0.1, 
+              duration: 0.8, 
+              ease: 'easeInOut' 
             }}
-            filter="url(#circuit-shadow)"
+            filter="url(#perceptron-shadow)"
           />
         ))}
 
+        {/* Weight labels */}
+        {layout.inputs.ys.map((y, i) => {
+          const midX = (layout.inputs.x + layout.inputs.radius + layout.sum.x - layout.sum.radius) / 2;
+          const midY = (y + layout.sum.y) / 2;
+          return (
+            <motion.text
+              key={`weight-label-${i}`}
+              x={midX}
+              y={midY - 6}
+              fontSize={9}
+              fill={colors.textMuted}
+              textAnchor="middle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 + i * 0.1 }}
+            >
+              w{i + 1}
+            </motion.text>
+          );
+        })}
+
         {/* Input nodes */}
-        {inputYs.map((y, i) => (
+        {layout.inputs.ys.map((y, i) => (
           <motion.g
             key={`input-${i}`}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2 + i * 0.1, type: 'spring', stiffness: 160, damping: 10 }}
+            transition={{ 
+              delay: 0.2 + i * 0.1, 
+              type: 'spring', 
+              stiffness: 200, 
+              damping: 12 
+            }}
           >
-            <circle cx={50} cy={y} r={13} stroke={`${colors.circuitPrimary}66`} strokeWidth={1.5} fill="none" filter="url(#circuit-shadow)" />
-            <circle cx={50} cy={y} r={9} fill="url(#circuit-node)" filter="url(#circuit-glow)" />
-            <circle cx={50} cy={y} r={3} fill={colors.sceneBg} />
-            <text x={24} y={y + 2} fontSize={8} fill={colors.textMuted} textAnchor="middle">x{i + 1}</text>
-          </motion.g>
-        ))}
-
-        {/* Weight modules */}
-        {inputYs.map((y, i) => (
-          <motion.g
-            key={`weight-${i}`}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.45 + i * 0.08, duration: 0.4 }}
-          >
-            <rect
-              x={weightBlock.x}
-              y={y - weightBlock.height / 2}
-              width={weightBlock.width}
-              height={weightBlock.height}
-              rx={4}
-              fill={`${colors.circuitSecondary}25`}
-              stroke={`${colors.circuitSecondary}88`}
-              strokeWidth={1.2}
-              filter="url(#circuit-shadow)"
+            <circle 
+              cx={layout.inputs.x} 
+              cy={y} 
+              r={layout.inputs.radius} 
+              fill="url(#perceptron-node)" 
+              filter="url(#perceptron-glow)"
             />
-            <path
-              d={`M ${weightBlock.x + 4},${y - 4} L ${weightBlock.x + weightBlock.width - 4},${y - 4} M ${weightBlock.x + 4},${y + 4} L ${weightBlock.x + weightBlock.width - 4},${y + 4}`}
-              stroke={`${colors.circuitSecondary}66`}
-              strokeWidth={0.9}
+            <circle 
+              cx={layout.inputs.x} 
+              cy={y} 
+              r={layout.inputs.radius - 3} 
+              fill={colors.sceneBg} 
+              opacity={0.8}
             />
-            <text
-              x={weightBlock.x + weightBlock.width / 2}
-              y={y - weightBlock.height / 2 - 2}
-              fontSize={7}
-              fill={colors.textMuted}
+            <text 
+              x={layout.inputs.x - 20} 
+              y={y + 3} 
+              fontSize={10} 
+              fill={colors.textMuted} 
               textAnchor="middle"
+              fontWeight="medium"
             >
-              w{i + 1}
+              x{i + 1}
             </text>
           </motion.g>
         ))}
 
-        <path ref={signalPathRef} d={signalPath} fill="none" stroke="none" pointerEvents="none" />
-
-        {/* Summing junction */}
-        <motion.g initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.9, type: 'spring', stiffness: 140, damping: 9 }}>
-          <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius + 8} stroke={`${colors.circuitSecondary}33`} strokeWidth={1} strokeDasharray="4 2" fill="none" />
-          <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius} fill={`${colors.circuitSecondary}18`} stroke={colors.circuitSecondary} strokeWidth={2} filter="url(#circuit-shadow)" />
-          <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 6} fill={`${colors.circuitSecondary}12`} />
-          <text x={sumNode.x} y={sumNode.y + 6.5} textAnchor="middle" fontSize={22} fill={colors.circuitSecondary} fontWeight="bold">Σ</text>
-          <text x={sumNode.x} y={sumNode.y - sumNode.radius - 8} fontSize={9} fill={colors.textMuted} textAnchor="middle">
-            perceptron
+        {/* Summation node */}
+        <motion.g
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ 
+            delay: 0.8, 
+            type: 'spring', 
+            stiffness: 180, 
+            damping: 10 
+          }}
+        >
+          <circle 
+            cx={layout.sum.x} 
+            cy={layout.sum.y} 
+            r={layout.sum.radius + 4} 
+            stroke={`${colors.circuitSecondary}40`} 
+            strokeWidth={1} 
+            strokeDasharray="3 2" 
+            fill="none" 
+          />
+          <circle 
+            cx={layout.sum.x} 
+            cy={layout.sum.y} 
+            r={layout.sum.radius} 
+            fill={colors.circuitSecondary}
+            fillOpacity={0.8}
+            filter="url(#perceptron-glow)"
+          />
+          <circle 
+            cx={layout.sum.x} 
+            cy={layout.sum.y} 
+            r={layout.sum.radius - 6} 
+            fill={colors.sceneBg} 
+            opacity={0.9}
+          />
+          <text 
+            x={layout.sum.x} 
+            y={layout.sum.y + 6} 
+            fontSize={20} 
+            fill={colors.circuitSecondary} 
+            textAnchor="middle"
+            fontWeight="bold"
+          >
+            Σ
           </text>
-          <text x={sumNode.x} y={sumNode.y + sumNode.radius + 14} fontSize={8} fill={colors.textMuted} textAnchor="middle">
-            Σwᵢxᵢ + b
+          <text 
+            x={layout.sum.x} 
+            y={layout.sum.y - 32} 
+            fontSize={9} 
+            fill={colors.textMuted} 
+            textAnchor="middle"
+          >
+            summation
           </text>
         </motion.g>
 
         {/* Bias input */}
-        <motion.g initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 170, damping: 10 }}>
-          <circle cx={100} cy={44} r={9} fill={colors.circuitSecondary} filter="url(#circuit-glow)" />
-          <text x={100} y={47} fontSize={10} fill={colors.sceneBg} textAnchor="middle" fontWeight="bold">+1</text>
-          <text x={100} y={28} fontSize={7} fill={colors.textMuted} textAnchor="middle">bias</text>
-          <motion.path
-            d={`M 108,44 L ${sumNode.x - 12},${sumNode.y - 10}`}
-            stroke={`${colors.circuitSecondary}aa`}
+        <motion.g
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 12 }}
+        >
+          <circle 
+            cx={layout.sum.x - 30} 
+            cy={layout.sum.y - 35} 
+            r={6} 
+            fill={colors.circuitSecondary}
+            filter="url(#perceptron-glow)"
+          />
+          <text 
+            x={layout.sum.x - 30} 
+            y={layout.sum.y - 32} 
+            fontSize={8} 
+            fill={colors.sceneBg} 
+            textAnchor="middle"
+            fontWeight="bold"
+          >
+            +1
+          </text>
+          <text 
+            x={layout.sum.x - 30} 
+            y={layout.sum.y - 50} 
+            fontSize={8} 
+            fill={colors.textMuted} 
+            textAnchor="middle"
+          >
+            bias
+          </text>
+          <motion.line
+            x1={layout.sum.x - 24}
+            y1={layout.sum.y - 35}
+            x2={layout.sum.x - layout.sum.radius}
+            y2={layout.sum.y - 8}
+            stroke={colors.circuitSecondary}
             strokeWidth={2}
-            strokeDasharray="6 3"
-            fill="none"
+            strokeOpacity={0.6}
+            strokeDasharray="4 2"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
-            transition={{ delay: 0.72, duration: 0.7 }}
-            opacity={0.75}
+            transition={{ delay: 0.7, duration: 0.6 }}
           />
         </motion.g>
 
-        {/* Activation block */}
+        {/* Activation function */}
         <motion.g
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.3, duration: 0.4 }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ 
+            delay: 1.1, 
+            type: 'spring', 
+            stiffness: 180, 
+            damping: 10 
+          }}
         >
-           <rect
-             x={activationBlock.x}
-             y={sumNode.y - activationBlock.height / 2}
-             width={activationBlock.width}
-             height={activationBlock.height}
-             rx={4}
-             fill={`${colors.mathPrimary}25`}
-             stroke={`${colors.mathPrimary}88`}
-             strokeWidth={1.2}
-             filter="url(#circuit-shadow)"
-           />
-           <path
-             d={`M ${activationBlock.x + 4},${sumNode.y - 4} L ${activationBlock.x + activationBlock.width - 4},${sumNode.y - 4} M ${activationBlock.x + 4},${sumNode.y + 4} L ${activationBlock.x + activationBlock.width - 4},${sumNode.y + 4}`}
-             stroke={`${colors.mathPrimary}66`}
-             strokeWidth={0.9}
-           />
-           <text
-             x={activationBlock.x + activationBlock.width / 2}
-             y={sumNode.y + 2}
-             fontSize={11}
-             fill={colors.mathPrimary}
-             textAnchor="middle"
-             fontWeight="bold"
-           >
-             f(·)
-           </text>
-           <text
-             x={activationBlock.x + activationBlock.width / 2}
-             y={sumNode.y - activationBlock.height / 2 - 6}
-             fontSize={7}
-             fill={colors.textMuted}
-             textAnchor="middle"
-           >
-             activation
-           </text>
+          <circle 
+            cx={layout.activation.x} 
+            cy={layout.activation.y} 
+            r={layout.activation.radius} 
+            fill={colors.mathPrimary}
+            fillOpacity={0.8}
+            filter="url(#perceptron-glow)"
+          />
+          <circle 
+            cx={layout.activation.x} 
+            cy={layout.activation.y} 
+            r={layout.activation.radius - 5} 
+            fill={colors.sceneBg} 
+            opacity={0.9}
+          />
+          <text 
+            x={layout.activation.x} 
+            y={layout.activation.y + 4} 
+            fontSize={12} 
+            fill={colors.mathPrimary} 
+            textAnchor="middle"
+            fontWeight="bold"
+          >
+            f
+          </text>
+          <text 
+            x={layout.activation.x} 
+            y={layout.activation.y - 28} 
+            fontSize={9} 
+            fill={colors.textMuted} 
+            textAnchor="middle"
+          >
+            activation
+          </text>
         </motion.g>
 
         {/* Output node */}
-        <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.5, type: 'spring', stiffness: 180, damping: 12 }}>
-          <circle cx={outputNodeX} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
-          <circle cx={outputNodeX} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
-          <circle cx={outputNodeX} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
-          <text x={outputNodeX} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
+        <motion.g
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ 
+            delay: 1.4, 
+            type: 'spring', 
+            stiffness: 200, 
+            damping: 12 
+          }}
+        >
+          <circle 
+            cx={layout.output.x} 
+            cy={layout.output.y} 
+            r={layout.output.radius} 
+            fill={colors.codePrimary}
+            fillOpacity={0.9}
+            filter="url(#perceptron-glow)"
+          />
+          <circle 
+            cx={layout.output.x} 
+            cy={layout.output.y} 
+            r={layout.output.radius - 4} 
+            fill={colors.sceneBg} 
+            opacity={0.8}
+          />
+          <text 
+            x={layout.output.x + 25} 
+            y={layout.output.y + 3} 
+            fontSize={10} 
+            fill={colors.textMuted} 
+            textAnchor="middle"
+            fontWeight="medium"
+          >
+            y
+          </text>
+          <text 
+            x={layout.output.x} 
+            y={layout.output.y - 22} 
+            fontSize={9} 
+            fill={colors.textMuted} 
+            textAnchor="middle"
+          >
+            output
+          </text>
         </motion.g>
 
         {/* Animated signal pulse */}
-        {pulseTrajectory && (
-          <motion.circle
-            r={4.5}
-            fill={colors.circuitPrimary}
-            filter="url(#circuit-glow)"
-            initial={{ opacity: 0 }}
-            animate={{
-              x: pulseTrajectory.x,
-              y: pulseTrajectory.y,
-              opacity: pulseTrajectory.opacity,
-            }}
-            transition={{ delay: 2, duration: 3, repeat: Infinity, repeatDelay: 1.2, ease: 'linear' }}
-          />
-        )}
+        <motion.circle
+          r={3}
+          fill={colors.circuitPrimary}
+          filter="url(#perceptron-glow)"
+          initial={{ opacity: 0 }}
+          animate={{
+            x: [layout.inputs.x + layout.inputs.radius, layout.sum.x, layout.activation.x, layout.output.x],
+            y: [layout.inputs.ys[1], layout.sum.y, layout.activation.y, layout.output.y],
+            opacity: [0, 1, 1, 0],
+          }}
+          transition={{ 
+            delay: 2, 
+            duration: 2.5, 
+            repeat: Infinity, 
+            repeatDelay: 1.5, 
+            ease: 'easeInOut' 
+          }}
+        />
       </motion.svg>
     </div>
   );
