@@ -15,7 +15,9 @@ Here's the thing: the perceptron isn't a stepping stone to neural networks. It *
 
 That origin story matters because it reveals the core insight that makes everything else click. When you understand where the perceptron came from, suddenly the math isn't just formulas to memorize. The code isn't just syntax to copy. The limitations and breakthroughs that followed become inevitable, obvious even.
 
-<!-- TODO: Insert animation that is a split-screen morph showing a biological neuron gradually transforming into circuit diagrams, then into mathematical notation, then into code, then into a chat interface where someone asks an LLM to recite a haiku on a 986 Boxster and the model obliges—emphasizing the "it's all the same thing" revelation. -->
+{/*
+TODO: Insert animation that is a split-screen morph showing a biological neuron gradually transforming into circuit diagrams, then into mathematical notation, then into code, then into a chat interface where someone asks an LLM to recite a haiku on a 986 Boxster and the model obliges—emphasizing the "it's all the same thing" revelation.
+*/}
 
 So we're starting at the real beginning. Not with equations or Python classes, but with the moment a psychologist in 1958 looked at a brain cell and thought, "I can build that with wires and motors."
 
@@ -23,15 +25,18 @@ So we're starting at the real beginning. Not with equations or Python classes, b
 
 Before we meet the perceptron (our star of the show), we need a 30-second neuroscience lesson. Don't worry, I'm not going to make you memorize dendrites and axons. Just the fun parts.
 
-<!-- TODO: Replace with <NeuronAnimation /> once the component exists.
-NeuronAnimation config={{
-inputs: 5,
-showWeights: true,
-fireThreshold: 0.7,
-animationMs: 3000,
-description: "Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!"
-}}
--->
+{/*
+TODO: Replace with <NeuronAnimation /> once the component exists.
+<NeuronAnimation
+  config={{
+    inputs: 5,
+    showWeights: true,
+    fireThreshold: 0.7,
+    animationMs: 3000,
+    description: "Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!",
+  }}
+/>
+*/}
 
 A biological neuron is basically nature's tiny decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). Here's where it gets interesting: the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold—BOOM—it fires its own signal down the axon to the next neurons in line.
 
@@ -43,13 +48,23 @@ Picture this: it's 1958. Eisenhower is president, the Space Race is heating up, 
 
 Rosenblatt looked at the biological process above and had an audacious thought: "What if I rebuilt this in hardware?" Not metaphorically. He literally built a machine called the Mark 1 Perceptron with motors, wheels, and photocells that could learn to recognize letters. It weighed a ton (literally) and looked like a telephone switchboard had a baby with a camera.
 
-<!-- TODO: Insert photo of Mark 1 perceptron rig. -->
+{/* TODO: Insert photo of Mark 1 perceptron rig. */}
 
 But here's where it gets beautiful—strip away the motors and wires, and the perceptron is just math doing exactly what your neurons do:
 
-<!-- TODO: Replace with <NeuronVsPerceptron /> once the component exists.
-NeuronVsPerceptron config={{ side: "split", animateTransition: true, showLabels: true, neuronLabels: ["Dendrites", "Cell Body", "Axon", "Chemical Signals"], perceptronLabels: ["Inputs (x₁, x₂...)", "Weighted Sum", "Activation Function", "Output"], transitionMs: 2000 }}
--->
+{/*
+TODO: Replace with <NeuronVsPerceptron /> once the component exists.
+<NeuronVsPerceptron
+  config={{
+    side: "split",
+    animateTransition: true,
+    showLabels: true,
+    neuronLabels: ["Dendrites", "Cell Body", "Axon", "Chemical Signals"],
+    perceptronLabels: ["Inputs (x₁, x₂...)", "Weighted Sum", "Activation Function", "Output"],
+    transitionMs: 2000,
+  }}
+/>
+*/}
 
 Look at that comparison. On the left: millions of years of evolution. On the right: some math we can code in 10 lines of Python. Same exact principle. The perceptron takes inputs, multiplies each by a weight (importance), adds them up, and decides whether to "fire" (output 1) or stay quiet (output 0).
 
