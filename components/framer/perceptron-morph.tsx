@@ -646,7 +646,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-            <circle cx={sumNode.x + 60} cy={sumNode.y} r={14} fill="black" />
             <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
@@ -791,23 +790,19 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         />
 
         {/* Threshold comparison indicator */}
-        <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.2, type: 'spring', stiffness: 180, damping: 12 }}>
-          {/* Simple circle background for the > symbol */}
-          <circle
-            cx={sumNode.x + 60}
-            cy={sumNode.y}
-            r={12}
-            fill={`${colors.mathPrimary}15`}
-            stroke={`${colors.mathPrimary}60`}
-            strokeWidth={1}
-          />
-          <text x={sumNode.x + 60} y={sumNode.y + 3} fontSize={16} fill={colors.mathPrimary} textAnchor="middle" fontWeight="bold">
-            &gt;
-          </text>
-          <text x={sumNode.x + 60} y={sumNode.y - 18} fontSize={7} fill={colors.textMuted} textAnchor="middle">
-            threshold
-          </text>
-        </motion.g>
+        <motion.text 
+          x={sumNode.x + 60} 
+          y={sumNode.y + 3} 
+          fontSize={18} 
+          fill={colors.mathPrimary} 
+          textAnchor="middle" 
+          fontWeight="bold"
+          initial={{ scale: 0, opacity: 0 }} 
+          animate={{ scale: 1, opacity: 1 }} 
+          transition={{ delay: 1.2, type: 'spring', stiffness: 180, damping: 12 }}
+        >
+          &gt;
+        </motion.text>
 
         {/* Connection from threshold to output */}
         <motion.path
