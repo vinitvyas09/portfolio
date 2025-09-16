@@ -691,12 +691,24 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
   const createTracePath = (y: number, index: number) => {
     // Create individual straight line paths from each input through its weight block to summation
-    return [
-      `M ${inputLeadInX},${y}`,           // Start at input lead-in
-      `L ${moduleEntryX},${y}`,           // Line to weight block entry
-      `L ${moduleExitX},${y}`,            // Line through weight block
-      `L ${sumNode.x - sumNode.radius},${sumNode.y}`, // Line to summation node edge
-    ].join(' ');
+    if (y === sumNode.y) {
+      // Middle trace (x2) - straight horizontal line
+      return [
+        `M ${inputLeadInX},${y}`,           // Start at input lead-in
+        `L ${moduleEntryX},${y}`,           // Line to weight block entry
+        `L ${moduleExitX},${y}`,            // Line through weight block
+        `L ${sumNode.x - sumNode.radius},${sumNode.y}`, // Line to summation node edge
+      ].join(' ');
+    } else {
+      // Top and bottom traces (x1 and x3) - need to angle to summation node
+      return [
+        `M ${inputLeadInX},${y}`,           // Start at input lead-in
+        `L ${moduleEntryX},${y}`,           // Line to weight block entry
+        `L ${moduleExitX},${y}`,            // Line through weight block
+        `L ${moduleExitX + 20},${y}`,       // Extend horizontally a bit
+        `L ${sumNode.x - sumNode.radius},${sumNode.y}`, // Angle to summation node
+      ].join(' ');
+    }
   };
 
   const signalPath = useMemo(() => {
