@@ -672,20 +672,28 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const sumNode = { x: 224, y: 100, radius: 20 };
   const activationBlock = { x: sumNode.x + 60, width: weightBlock.width, height: weightBlock.height };
   const outputNodeX = sumNode.x + 136; // Position output node with tighter spacing
-  const moduleEntryX = weightBlock.x - 10;
-  const moduleExitX = weightBlock.x + weightBlock.width + 4;
-  const inputLeadInX = 64;
+
+  const inputNode = { x: 50, radius: 13 };
+  const weightEntryX = weightBlock.x;
+  const weightExitX = weightBlock.x + weightBlock.width;
+  const sumEntryX = sumNode.x - sumNode.radius;
+  const sumExitX = sumNode.x + sumNode.radius;
+  const activationEntryX = activationBlock.x;
+  const activationExitX = activationBlock.x + activationBlock.width;
+  const angledTraceExitX = weightExitX + 20;
+
+  const inputLeadInX = inputNode.x + inputNode.radius + 1; // Hard-connect the central trace to x₂
   const middleTraceCrest = 12;
   const traceMaskId = 'circuit-trace-mask';
   const traceMaskUrl = `url(#${traceMaskId})`;
 
   const activationConnectorPath = [
-    `M ${sumNode.x + sumNode.radius},${sumNode.y}`,
-    `L ${activationBlock.x},${sumNode.y}`,
+    `M ${sumExitX},${sumNode.y}`,
+    `L ${activationEntryX},${sumNode.y}`,
   ].join(' ');
 
   const activationToOutputPath = [
-    `M ${activationBlock.x + activationBlock.width},${sumNode.y}`,
+    `M ${activationExitX},${sumNode.y}`,
     `L ${outputNodeX},${sumNode.y}`,
   ].join(' ');
 
@@ -694,19 +702,19 @@ const CircuitScene = ({ colors }: { colors: any }) => {
     if (y === sumNode.y) {
       // Middle trace (x2) - straight horizontal line
       return [
-        `M ${inputLeadInX},${y}`,           // Start at input lead-in
-        `L ${moduleEntryX},${y}`,           // Line to weight block entry
-        `L ${moduleExitX},${y}`,            // Line through weight block
-        `L ${sumNode.x - sumNode.radius},${sumNode.y}`, // Line to summation node edge
+        `M ${inputLeadInX},${y}`,           // Start flush with input node
+        `L ${weightEntryX},${y}`,           // Line to weight block entry
+        `L ${weightExitX},${y}`,            // Line through weight block
+        `L ${sumEntryX},${sumNode.y}`,      // Line to summation node edge
       ].join(' ');
     } else {
       // Top and bottom traces (x1 and x3) - need to angle to summation node
       return [
         `M ${inputLeadInX},${y}`,           // Start at input lead-in
-        `L ${moduleEntryX},${y}`,           // Line to weight block entry
-        `L ${moduleExitX},${y}`,            // Line through weight block
-        `L ${moduleExitX + 20},${y}`,       // Extend horizontally a bit
-        `L ${sumNode.x - sumNode.radius},${sumNode.y}`, // Angle to summation node
+        `L ${weightEntryX},${y}`,           // Line to weight block entry
+        `L ${weightExitX},${y}`,            // Line through weight block
+        `L ${angledTraceExitX},${y}`,       // Extend horizontally a bit
+        `L ${sumEntryX},${sumNode.y}`,      // Angle to summation node
       ].join(' ');
     }
   };
@@ -714,23 +722,23 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const signalPath = useMemo(() => {
     return [
       `M ${inputLeadInX},${sumNode.y}`,
-      `L ${moduleEntryX},${sumNode.y}`,
-      `L ${moduleExitX},${sumNode.y}`,
-      `L ${sumNode.x - sumNode.radius},${sumNode.y}`,
-      `L ${sumNode.x + sumNode.radius},${sumNode.y}`,
-      `L ${activationBlock.x},${sumNode.y}`,
-      `L ${activationBlock.x + activationBlock.width},${sumNode.y}`,
+      `L ${weightEntryX},${sumNode.y}`,
+      `L ${weightExitX},${sumNode.y}`,
+      `L ${sumEntryX},${sumNode.y}`,
+      `L ${sumExitX},${sumNode.y}`,
+      `L ${activationEntryX},${sumNode.y}`,
+      `L ${activationExitX},${sumNode.y}`,
       `L ${outputNodeX},${sumNode.y}`,
     ].join(' ');
   }, [
     inputLeadInX,
-    moduleEntryX,
-    moduleExitX,
-    sumNode.x,
+    weightEntryX,
+    weightExitX,
+    sumEntryX,
+    sumExitX,
     sumNode.y,
-    sumNode.radius,
-    activationBlock.x,
-    activationBlock.width,
+    activationEntryX,
+    activationExitX,
     outputNodeX,
   ]);
 
