@@ -130,157 +130,217 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           </filter>
         </defs>
 
-        {/* Dendrites - Branching tree structure on the left */}
-        {weights.map((weight, index) => {
-          const signal = signals[index] || 0;
-          const isActive = signal > 0;
+        {/* Dendrites - Simplified conceptual branching structure */}
+        {(() => {
+          // Group inputs into 3 bunches
+          const bunchSize = Math.ceil(inputs / 3);
+          const bunches = [];
           
-          const normalizedIndex = inputs > 1 ? index / (inputs - 1) : 0.5;
-          const yBase = 60 + normalizedIndex * 220 + Math.sin(index * 1.1) * 10;
-          const branchTargetY =
-            150 + (index - (inputs - 1) / 2) * 22 + Math.cos(index * 0.9) * 8;
-          const bend = Math.sin(index * 1.3) * 18;
-          const outward = 42 + Math.cos(index * 1.7) * 12;
-          const path1 = `M 15,${yBase} C ${35 + outward / 2},${yBase + bend} ${90 + outward},${branchTargetY - bend / 2} 148,${branchTargetY}`;
-          const path2 = `M 28,${yBase + 14} C ${54 + outward / 2},${yBase + bend * 0.6} ${108 + outward},${branchTargetY + bend * 0.8} 155,${branchTargetY + 12}`;
-          const twigPath = `M ${60 + outward / 4},${yBase - 6} Q ${66 + outward / 5},${yBase - 18} ${74 + outward / 4},${yBase - 2}`;
+          for (let b = 0; b < 3; b++) {
+            const startIdx = b * bunchSize;
+            const endIdx = Math.min(startIdx + bunchSize, inputs);
+            const bunchInputs = [];
+            
+            for (let i = startIdx; i < endIdx; i++) {
+              bunchInputs.push({
+                index: i,
+                weight: weights[i],
+                signal: signals[i] || 0
+              });
+            }
+            
+            if (bunchInputs.length > 0) {
+              bunches.push({
+                index: b,
+                inputs: bunchInputs,
+                // Deterministic positioning based on bunch index
+                yPosition: 80 + b * 80,
+                convergenceY: 145 + b * 20
+              });
+            }
+          }
           
-          return (
-            <g key={`dendrite-${index}`}>
-              {/* Main dendrite branches */}
-              <path
-                d={path1}
-                stroke={isActive ? '#3b82f6' : '#475569'}
-                strokeWidth={showWeights ? weight * 3.5 : 2.5}
-                fill="none"
-                opacity={isActive ? 1 : 0.35}
-                strokeLinecap="round"
-                style={{
-                  transition: 'all 0.3s ease',
-                }}
-              />
-              
-              {/* Secondary branches */}
-              <path
-                d={path2}
-                stroke={isActive ? '#3b82f6' : '#475569'}
-                strokeWidth={showWeights ? weight * 2 : 1.5}
-                fill="none"
-                opacity={isActive ? 0.8 : 0.25}
-                strokeLinecap="round"
-                style={{
-                  transition: 'all 0.3s ease',
-                }}
-              />
-              
-              {/* Small sub-branches for more organic look */}
-              <path
-                d={twigPath}
-                stroke={isActive ? '#3b82f6' : '#475569'}
-                strokeWidth={1}
-                opacity={isActive ? 0.7 : 0.2}
-                strokeLinecap="round"
-              />
-              
-              {/* Signal pulse animation */}
-              {isActive && isAnimating && (
-                <circle
-                  r="5"
-                  fill="#60a5fa"
+          return bunches.map((bunch) => {
+            const bunchActive = bunch.inputs.some(inp => inp.signal > 0);
+            const avgWeight = bunch.inputs.reduce((sum, inp) => sum + inp.weight, 0) / bunch.inputs.length;
+            
+            return (
+              <g key={`bunch-${bunch.index}`}>
+                {/* Individual dendrite terminals */}
+                {bunch.inputs.map((input, localIdx) => {
+                  const isActive = input.signal > 0;
+                  const yOffset = localIdx * 25 - (bunch.inputs.length - 1) * 12.5;
+                  const terminalY = bunch.yPosition + yOffset;
+                  
+                  // Simple curved path from terminal to convergence point
+                  const dendritePath = `M 10,${terminalY} 
+                    Q 35,${terminalY} 60,${bunch.yPosition}
+                    T 90,${bunch.convergenceY}`;
+                  
+                  return (
+                    <g key={`dendrite-${input.index}`}>
+                      {/* Main dendrite branch */}
+                      <path
+                        d={dendritePath}
+                        stroke={isActive ? '#3b82f6' : '#475569'}
+                        strokeWidth={showWeights ? input.weight * 3 : 2}
+                        fill="none"
+                        opacity={isActive ? 0.9 : 0.3}
+                        strokeLinecap="round"
+                        style={{
+                          transition: 'all 0.3s ease',
+                        }}
+                      />
+                      
+                      {/* Small branches for organic look */}
+                      <path
+                        d={`M 30,${terminalY - 5} L 35,${terminalY}`}
+                        stroke={isActive ? '#3b82f6' : '#475569'}
+                        strokeWidth="1"
+                        opacity={isActive ? 0.7 : 0.2}
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d={`M 30,${terminalY + 5} L 35,${terminalY}`}
+                        stroke={isActive ? '#3b82f6' : '#475569'}
+                        strokeWidth="1"
+                        opacity={isActive ? 0.7 : 0.2}
+                        strokeLinecap="round"
+                      />
+                      
+                      {/* Signal pulse animation */}
+                      {isActive && isAnimating && (
+                        <circle
+                          r="4"
+                          fill="#60a5fa"
+                          style={{
+                            filter: 'blur(2px)',
+                          }}
+                        >
+                          <animateMotion
+                            dur="0.6s"
+                            repeatCount="1"
+                            path={dendritePath}
+                          />
+                          <animate
+                            attributeName="opacity"
+                            values="0;1;1;0"
+                            dur="0.6s"
+                            repeatCount="1"
+                          />
+                        </circle>
+                      )}
+                      
+                      {/* Weight label */}
+                      {showWeights && (
+                        <text
+                          x="10"
+                          y={terminalY - 8}
+                          fill="#94a3b8"
+                          fontSize="9"
+                          textAnchor="middle"
+                        >
+                          {input.weight.toFixed(2)}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
+                
+                {/* Convergence trunk connecting to soma */}
+                <path
+                  d={`M 90,${bunch.convergenceY}
+                    C 110,${bunch.convergenceY} 125,${bunch.convergenceY + 5} 145,${160}`}
+                  stroke={bunchActive ? '#3b82f6' : '#475569'}
+                  strokeWidth={avgWeight * 4}
+                  fill="none"
+                  opacity={bunchActive ? 0.9 : 0.4}
+                  strokeLinecap="round"
                   style={{
-                    filter: 'blur(3px)',
+                    transition: 'all 0.3s ease',
                   }}
-                >
-                  <animateMotion
-                    dur="0.6s"
-                    repeatCount="1"
-                    path={path1}
-                  />
-                  <animate
-                    attributeName="opacity"
-                    values="0;1;1;0"
-                    dur="0.6s"
-                    repeatCount="1"
-                  />
-                </circle>
-              )}
-              
-              {/* Weight label at dendrite start */}
-              {showWeights && (
-                <text
-                  x="20"
-                  y={yBase - 8}
-                  fill="#94a3b8"
-                  fontSize="10"
-                  textAnchor="middle"
-                >
-                  {weight.toFixed(2)}
-                </text>
-              )}
-            </g>
-          );
-        })}
+                />
+                
+                {/* Junction point */}
+                <circle
+                  cx="90"
+                  cy={bunch.convergenceY}
+                  r="3"
+                  fill={bunchActive ? '#3b82f6' : '#475569'}
+                  opacity={bunchActive ? 0.7 : 0.3}
+                />
+              </g>
+            );
+          });
+        })()}
         
-        {/* Cell Body (Soma) - Organic irregular shape */}
+        {/* Cell Body (Soma) - Simplified organic shape */}
         <g filter={isFiring ? "url(#glow)" : ""}>
-          {/* Create organic shape with multiple overlapping circles */}
+          {/* Main cell body - slightly irregular circle */}
           <ellipse
             cx="170"
             cy="160"
-            rx="42"
-            ry="38"
-            fill="url(#somaGradient)"
-            transform="rotate(-5 170 160)"
-          />
-          <ellipse
-            cx="155"
-            cy="155"
-            rx="35"
-            ry="32"
-            fill={neuronColor}
-            opacity="0.7"
-            transform="rotate(15 155 155)"
-          />
-          <ellipse
-            cx="180"
-            cy="165"
-            rx="30"
+            rx="38"
             ry="35"
+            fill="url(#somaGradient)"
+            transform="rotate(-8 170 160)"
+          />
+          
+          {/* Subtle organic bumps for natural look */}
+          <ellipse
+            cx="158"
+            cy="155"
+            rx="32"
+            ry="28"
             fill={neuronColor}
-            opacity="0.6"
-            transform="rotate(-20 180 165)"
+            opacity="0.5"
+            transform="rotate(12 158 155)"
+          />
+          <ellipse
+            cx="175"
+            cy="165"
+            rx="28"
+            ry="30"
+            fill={neuronColor}
+            opacity="0.4"
+            transform="rotate(-15 175 165)"
           />
           
           {/* Cell membrane */}
           <ellipse
             cx="170"
             cy="160"
-            rx="42"
-            ry="38"
+            rx="38"
+            ry="35"
             fill="none"
             stroke={isFiring ? '#22c55e' : '#3b82f6'}
             strokeWidth="2.5"
-            opacity="0.8"
-            transform="rotate(-5 170 160)"
+            opacity="0.9"
+            transform="rotate(-8 170 160)"
           />
         </g>
         
-        {/* Nucleus with nucleolus */}
-        <ellipse
-          cx="168"
-          cy="158"
-          rx="16"
-          ry="14"
-          fill={nucleusColor}
-          opacity="0.9"
-        />
-        <circle
-          cx="171"
-          cy="156"
-          r="5"
-          fill="#1e40af"
-          opacity="0.8"
-        />
+        {/* Nucleus */}
+        <g>
+          {/* Main nucleus */}
+          <ellipse
+            cx="168"
+            cy="158"
+            rx="14"
+            ry="12"
+            fill={nucleusColor}
+            opacity="0.85"
+            transform="rotate(10 168 158)"
+          />
+          {/* Nucleolus */}
+          <circle
+            cx="170"
+            cy="157"
+            r="4"
+            fill="#1e40af"
+            opacity="0.9"
+          />
+        </g>
         
         {/* Sum display */}
         <text
@@ -294,14 +354,29 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           {currentSum.toFixed(2)}
         </text>
         
-        {/* Axon Hillock */}
-        <path
-          d={`M 210,${axonBaselineY} C 220,${axonBaselineY - 6} ${axonStartX - 24},${firstSegmentY - 6} ${axonStartX},${firstSegmentY}`}
-          stroke={neuronColor}
-          strokeWidth="8"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
+        {/* Axon Hillock - Simple cone transition */}
+        <g>
+          {/* Tapered cone shape */}
+          <path
+            d={`M 205,155 
+                L ${axonStartX},${firstSegmentY - 3}
+                L ${axonStartX},${firstSegmentY + 3}
+                L 205,165 Z`}
+            fill={neuronColor}
+            opacity="0.6"
+          />
+          
+          {/* Main axon initial segment */}
+          <path
+            d={`M 208,160 
+                C 220,160 230,${firstSegmentY} ${axonStartX},${firstSegmentY}`}
+            stroke={neuronColor}
+            strokeWidth="5"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.9"
+          />
+        </g>
         
         {/* Axon with Myelin Sheaths */}
         {Array.from({ length: axonSegmentCount }).map((_, i) => {
