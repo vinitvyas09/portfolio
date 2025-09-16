@@ -684,7 +684,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         <text
           x="168"
           y="162"
-          fill="white"
+            fill={colors.textPrimary}
           fontSize="11"
           textAnchor="middle"
           fontWeight="bold"
@@ -1144,15 +1144,15 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             alignItems: 'center',
             marginBottom: '0.75rem'
           }}>
-            <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+            <div style={{ fontSize: '13px', color: colors.textMuted }}>
               <span>Firing threshold: </span>
-              <span style={{ color: '#e2e8f0', fontWeight: '500' }}>
+              <span style={{ color: colors.textPrimary, fontWeight: '500' }}>
                 {(fireThreshold * 100).toFixed(0)}%
               </span>
             </div>
             <div style={{
               padding: '0.25rem 0.75rem',
-              background: isFiring ? 'linear-gradient(135deg, #16a34a, #22c55e)' : '#374151',
+              background: isFiring ? `linear-gradient(135deg, ${colors.statusActiveGradient1}, ${colors.statusActiveGradient2})` : colors.statusInactiveBg,
               borderRadius: '4px',
               fontWeight: '500',
               fontSize: '13px',
@@ -1169,25 +1169,25 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             alignItems: 'center',
             gap: '0.5rem'
           }}>
-            <span style={{ color: '#94a3b8', fontSize: '13px' }}>Current signal:</span>
+            <span style={{ color: colors.textMuted, fontSize: '13px' }}>Current signal:</span>
             <div style={{
               flex: 1,
               height: '6px',
-              background: 'rgba(100, 116, 139, 0.3)',
+              background: colors.progressBarBg,
               borderRadius: '3px',
               overflow: 'hidden'
             }}>
               <div style={{
                 height: '100%',
                 width: `${Math.min(currentSum * 100, 100)}%`,
-                background: 'linear-gradient(90deg, #22c55e, #4ade80)',
+                background: `linear-gradient(90deg, ${colors.progressBarFill1}, ${colors.progressBarFill2})`,
                 borderRadius: '3px',
                 transition: 'all 0.3s ease'
               }} />
             </div>
             <span style={{ 
               fontWeight: 'bold',
-              color: currentSum >= fireThreshold ? '#22c55e' : '#f59e0b',
+              color: currentSum >= fireThreshold ? colors.terminalActive : colors.textSecondary,
               minWidth: '45px',
               textAlign: 'right'
             }}>
@@ -1200,7 +1200,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       {description && (
         <p style={{
           marginTop: '1rem',
-          color: '#94a3b8',
+          color: colors.textMuted,
           fontSize: '13px',
           textAlign: 'center',
           lineHeight: '1.5'
