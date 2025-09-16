@@ -504,19 +504,11 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const board = { x: 32, y: 34, width: 336, height: 132 };
   const weightBlock = { x: 112, width: 26, height: 18 };
   const sumNode = { x: 224, y: 100, radius: 20 };
-  const chip = { x: 284, y: 74, width: 66, height: 52 };
+  const outputNodeX = sumNode.x + 90; // Position output node relative to summation
   const moduleEntryX = weightBlock.x - 10;
   const moduleExitX = weightBlock.x + weightBlock.width + 4;
   const inputLeadInX = 64;
   const middleTraceCrest = 12;
-
-  const activationStart = { x: sumNode.x + sumNode.radius, y: sumNode.y };
-  const activationConnectorSegment = `C ${sumNode.x + 38},${sumNode.y - 12} ${chip.x - 12},${sumNode.y - 8} ${chip.x - 6},${sumNode.y} S ${chip.x + 8},${sumNode.y + 12} ${chip.x + 12},${sumNode.y}`;
-  const activationConnector = `M ${activationStart.x},${activationStart.y} ${activationConnectorSegment}`;
-  const outputStart = { x: chip.x + chip.width, y: sumNode.y };
-  const outputEndX = chip.x + chip.width + 44; // Position of output node
-  const outputConnectorSegment = `C ${outputStart.x + 18},${sumNode.y} ${outputStart.x + 32},${sumNode.y} ${outputEndX},${sumNode.y}`;
-  const outputConnector = `M ${outputStart.x},${sumNode.y} ${outputConnectorSegment}`;
   const traceMaskId = 'circuit-trace-mask';
   const traceMaskUrl = `url(#${traceMaskId})`;
 
