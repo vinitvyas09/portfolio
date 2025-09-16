@@ -514,7 +514,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const activationConnectorSegment = `C ${sumNode.x + 38},${sumNode.y - 12} ${chip.x - 12},${sumNode.y - 8} ${chip.x - 6},${sumNode.y} S ${chip.x + 8},${sumNode.y + 12} ${chip.x + 12},${sumNode.y}`;
   const activationConnector = `M ${activationStart.x},${activationStart.y} ${activationConnectorSegment}`;
   const outputStart = { x: chip.x + chip.width, y: sumNode.y };
-  const outputConnectorSegment = `C ${outputStart.x + 18},${sumNode.y} ${outputStart.x + 32},${sumNode.y} ${outputStart.x + 40},${sumNode.y}`;
+  const outputEndX = chip.x + chip.width + 44; // Position of output node
+  const outputConnectorSegment = `C ${outputStart.x + 18},${sumNode.y} ${outputStart.x + 32},${sumNode.y} ${outputEndX},${sumNode.y}`;
   const outputConnector = `M ${outputStart.x},${sumNode.y} ${outputConnectorSegment}`;
   const traceMaskId = 'circuit-trace-mask';
   const traceMaskUrl = `url(#${traceMaskId})`;
@@ -564,7 +565,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
       `L ${outputStart.x},${sumNode.y}`,
       outputConnectorSegment,
     ].join(' ');
-  }, [activationConnectorSegment, activationStart.x, activationStart.y, inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, outputConnectorSegment, outputStart.x, sumNode.x, sumNode.y]);
+  }, [activationConnectorSegment, activationStart.x, activationStart.y, inputLeadInX, middleTraceCrest, moduleEntryX, moduleExitX, outputConnectorSegment, outputStart.x, sumNode.x, sumNode.y, outputEndX]);
 
   const signalPathRef = useRef<SVGPathElement | null>(null);
   const [pulseTrajectory, setPulseTrajectory] = useState<{
@@ -759,8 +760,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius} fill={`${colors.circuitSecondary}18`} stroke={colors.circuitSecondary} strokeWidth={2} filter="url(#circuit-shadow)" />
           <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 6} fill={`${colors.circuitSecondary}12`} />
           <text x={sumNode.x} y={sumNode.y + 6.5} textAnchor="middle" fontSize={22} fill={colors.circuitSecondary} fontWeight="bold">Σ</text>
-          <text x={sumNode.x + sumNode.radius + 12} y={sumNode.y - 10} fontSize={9} fill={colors.textMuted}>
-            Σ w_ix_i + b
+          <text x={sumNode.x} y={sumNode.y - sumNode.radius - 8} fontSize={9} fill={colors.textMuted} textAnchor="middle">
+            weighted sum
           </text>
         </motion.g>
 
@@ -782,7 +783,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         </motion.g>
 
-        {/* Summation to activation */}
+        {/* Summation to activation - with flow arrow */}
         <motion.path
           d={activationConnector}
           stroke="url(#circuit-signal)"
@@ -794,6 +795,19 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.05, duration: 0.7, ease: 'easeInOut' }}
           filter="url(#circuit-shadow)"
+        />
+        
+        {/* Arrow indicator showing flow direction */}
+        <motion.path
+          d={`M ${sumNode.x + sumNode.radius + 10},${sumNode.y - 3} L ${sumNode.x + sumNode.radius + 15},${sumNode.y} L ${sumNode.x + sumNode.radius + 10},${sumNode.y + 3}`}
+          stroke={colors.circuitSecondary}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.8 }}
+          transition={{ delay: 1.2, duration: 0.5 }}
         />
 
         {/* Activation chip */}
@@ -813,15 +827,15 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             stroke={`${colors.mathPrimary}40`}
             strokeWidth={0.6}
           />
-          <text x={chip.x - 10} y={sumNode.y - 8} fontSize={8} fill={colors.textMuted} textAnchor="end">
-            net input
+          <text x={chip.x + chip.width / 2} y={chip.y - 8} fontSize={9} fill={colors.textMuted} textAnchor="middle">
+            activation
           </text>
-          <text x={chip.x + chip.width + 14} y={sumNode.y - 10} fontSize={8} fill={colors.textMuted}>
-            y = f(net)
+          <text x={chip.x + chip.width / 2} y={chip.y + chip.height + 16} fontSize={8} fill={colors.textMuted} textAnchor="middle">
+            f(sum)
           </text>
         </motion.g>
 
-        {/* Activation to output */}
+        {/* Activation to output - with flow arrow */}
         <motion.path
           d={outputConnector}
           stroke={`${colors.mathPrimary}cc`}
@@ -834,13 +848,26 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           transition={{ delay: 1.55, duration: 0.5, ease: 'easeOut' }}
           filter="url(#circuit-shadow)"
         />
+        
+        {/* Arrow indicator for output flow */}
+        <motion.path
+          d={`M ${chip.x + chip.width + 18},${sumNode.y - 3} L ${chip.x + chip.width + 23},${sumNode.y} L ${chip.x + chip.width + 18},${sumNode.y + 3}`}
+          stroke={colors.mathPrimary}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.8 }}
+          transition={{ delay: 1.7, duration: 0.5 }}
+        />
 
         {/* Output node */}
         <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.7, type: 'spring', stiffness: 180, damping: 12 }}>
           <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
           <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
           <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
-          <text x={chip.x + chip.width + 44} y={sumNode.y + 18} fontSize={8} fill={colors.textMuted} textAnchor="middle">y</text>
+          <text x={chip.x + chip.width + 44} y={sumNode.y + 18} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
         </motion.g>
 
         {/* Glide highlight along the main bus */}
