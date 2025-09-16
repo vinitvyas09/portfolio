@@ -2,9 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 
-const pseudoRandom = (seed: number) => {
+const pseudoRandom = (seed: number): number => {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
+};
+
+// Helper function to ensure consistent floating point precision
+const roundCoord = (num: number): number => {
+  return Math.round(num * 1000) / 1000;
 };
 
 interface NeuronAnimationProps {
@@ -68,7 +73,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       const signalValues: number[] = [];
       weights.forEach((weight, index) => {
         setTimeout(() => {
-          const signalStrength = Math.random() > 0.3 ? weight : 0;
+          const signalStrength = pseudoRandom(animationCycle * 1000 + index) > 0.3 ? weight : 0;
           signalValues[index] = signalStrength;
           
           setSignals([...signalValues]);
@@ -156,12 +161,12 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             const angle = baseAngle + angleVariation;
             
             // Start from soma edge, not center
-            const startX = somaX + Math.cos(angle * Math.PI / 180) * somaRadius;
-            const startY = somaY + Math.sin(angle * Math.PI / 180) * somaRadius;
+            const startX = roundCoord(somaX + Math.cos(angle * Math.PI / 180) * somaRadius);
+            const startY = roundCoord(somaY + Math.sin(angle * Math.PI / 180) * somaRadius);
             
             const length = 90 + Math.sin(i * 1.3) * 25; // DOUBLED the lengths for bigger dendrites
-            const endX = somaX + Math.cos(angle * Math.PI / 180) * (length + somaRadius);
-            const endY = somaY + Math.sin(angle * Math.PI / 180) * (length + somaRadius);
+            const endX = roundCoord(somaX + Math.cos(angle * Math.PI / 180) * (length + somaRadius));
+            const endY = roundCoord(somaY + Math.sin(angle * Math.PI / 180) * (length + somaRadius));
             
             mainBranches.push({
               startX,
@@ -193,8 +198,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                   branchInputs.reduce((sum, inp) => sum + inp.weight, 0) / branchInputs.length : 0.5;
                 
                 // Calculate control points for natural curve
-                const ctrl1X = branch.startX + (branch.endX - branch.startX) * 0.3 + Math.sin(branch.angle * 0.02) * 5;
-                const ctrl1Y = branch.startY + (branch.endY - branch.startY) * 0.3 + Math.cos(branch.angle * 0.02) * 5;
+                const ctrl1X = roundCoord(branch.startX + (branch.endX - branch.startX) * 0.3 + Math.sin(branch.angle * 0.02) * 5);
+                const ctrl1Y = roundCoord(branch.startY + (branch.endY - branch.startY) * 0.3 + Math.cos(branch.angle * 0.02) * 5);
                 
                 return (
                   <g key={`dendrite-tree-${branchIdx}`}>
@@ -215,15 +220,15 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                     
                     {/* Create secondary branches along the main trunk */}
                     {[0.4, 0.6, 0.8].map((progress, pIdx) => {
-                      const trunkX = branch.startX + (branch.endX - branch.startX) * progress;
-                      const trunkY = branch.startY + (branch.endY - branch.startY) * progress;
+                      const trunkX = roundCoord(branch.startX + (branch.endX - branch.startX) * progress);
+                      const trunkY = roundCoord(branch.startY + (branch.endY - branch.startY) * progress);
                       
                       // Create 2-3 sub-branches at each point
                       return [-30, 0, 30].map((angleOffset, sIdx) => {
                         const subAngle = branch.angle + angleOffset + Math.sin((pIdx + sIdx) * 2.1) * 10;
                         const subLength = 40 + Math.sin((pIdx + sIdx) * 1.7) * 15; // Doubled sub-branch lengths
-                        const subEndX = trunkX + Math.cos(subAngle * Math.PI / 180) * subLength;
-                        const subEndY = trunkY + Math.sin(subAngle * Math.PI / 180) * subLength;
+                        const subEndX = roundCoord(trunkX + Math.cos(subAngle * Math.PI / 180) * subLength);
+                        const subEndY = roundCoord(trunkY + Math.sin(subAngle * Math.PI / 180) * subLength);
                         
                         const inputIdx = pIdx * 3 + sIdx;
                         const input = branchInputs[inputIdx % branchInputs.length];
@@ -251,8 +256,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             {[-20, 20].map((tAngle, tIdx) => {
                               const spikeAngle = subAngle + tAngle;
                               const spikeLength = 15 + Math.sin((tIdx + sIdx) * 3.1) * 5; // Doubled spike lengths
-                              const spikeEndX = subEndX + Math.cos(spikeAngle * Math.PI / 180) * spikeLength;
-                              const spikeEndY = subEndY + Math.sin(spikeAngle * Math.PI / 180) * spikeLength;
+                              const spikeEndX = roundCoord(subEndX + Math.cos(spikeAngle * Math.PI / 180) * spikeLength);
+                              const spikeEndY = roundCoord(subEndY + Math.sin(spikeAngle * Math.PI / 180) * spikeLength);
                               
                               return (
                                 <path
@@ -308,8 +313,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                     {[-25, 0, 25].map((angleOffset, tIdx) => {
                       const termAngle = branch.angle + angleOffset;
                       const termLength = 24; // Doubled terminal lengths
-                      const termEndX = branch.endX + Math.cos(termAngle * Math.PI / 180) * termLength;
-                      const termEndY = branch.endY + Math.sin(termAngle * Math.PI / 180) * termLength;
+                      const termEndX = roundCoord(branch.endX + Math.cos(termAngle * Math.PI / 180) * termLength);
+                      const termEndY = roundCoord(branch.endY + Math.sin(termAngle * Math.PI / 180) * termLength);
                       
                       return (
                         <path
@@ -329,10 +334,10 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               {/* Additional fine dendrites for extra density */}
               {[45, 135, 180, 225, 315].map((angle, idx) => {
                 const length = 50 + Math.sin(idx * 2.3) * 20; // Doubled fine dendrite lengths
-                const startX = somaX + Math.cos(angle * Math.PI / 180) * somaRadius;
-                const startY = somaY + Math.sin(angle * Math.PI / 180) * somaRadius;
-                const endX = somaX + Math.cos(angle * Math.PI / 180) * (length + somaRadius);
-                const endY = somaY + Math.sin(angle * Math.PI / 180) * (length + somaRadius);
+                const startX = roundCoord(somaX + Math.cos(angle * Math.PI / 180) * somaRadius);
+                const startY = roundCoord(somaY + Math.sin(angle * Math.PI / 180) * somaRadius);
+                const endX = roundCoord(somaX + Math.cos(angle * Math.PI / 180) * (length + somaRadius));
+                const endY = roundCoord(somaY + Math.sin(angle * Math.PI / 180) * (length + somaRadius));
                 const isActive = signals[idx % signals.length] > 0;
                 
                 return (
@@ -349,8 +354,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                       <path
                         key={i}
                         d={`M ${endX},${endY} 
-                            L ${endX + Math.cos((angle + offset) * Math.PI / 180) * 16},
-                              ${endY + Math.sin((angle + offset) * Math.PI / 180) * 16}`}
+                            L ${roundCoord(endX + Math.cos((angle + offset) * Math.PI / 180) * 16)},
+                              ${roundCoord(endY + Math.sin((angle + offset) * Math.PI / 180) * 16)}`}
                         stroke={isActive ? '#60a5fa' : '#475569'}
                         strokeWidth="0.6"
                         opacity={isActive ? 0.3 : 0.08}
