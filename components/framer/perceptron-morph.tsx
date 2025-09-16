@@ -433,11 +433,11 @@ const PerceptronContinuum = () => {
       textMuted: "#94a3b8",
       
       // UI elements
-      cardBg: "rgba(15, 23, 42, 0.9)",
-      cardBorder: "rgba(51, 65, 85, 0.8)",
-      timelineBg: "rgba(15, 23, 42, 0.9)",
-      timelineTrack: "rgba(51, 65, 85, 0.7)",
-      timelineDot: "rgba(100, 116, 139, 0.8)",
+      cardBg: "rgba(23, 23, 23, 0.9)",
+      cardBorder: "rgba(64, 64, 64, 0.8)",
+      timelineBg: "rgba(23, 23, 23, 0.9)",
+      timelineTrack: "rgba(64, 64, 64, 0.7)",
+      timelineDot: "rgba(115, 115, 115, 0.8)",
     } : {
       // Light mode - clean whites and subtle colors
       containerBg: "rgba(255, 255, 255, 0.95)",
