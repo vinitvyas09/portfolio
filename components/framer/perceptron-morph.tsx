@@ -785,76 +785,23 @@ const CircuitScene = ({ colors }: { colors: any }) => {
 
         {/* Direct connection from summation to output */}
         <motion.path
-          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${chip.x + chip.width + 44},${sumNode.y}`}
+          d={`M ${sumNode.x + sumNode.radius},${sumNode.y} L ${sumNode.x + 80},${sumNode.y}`}
           stroke="url(#circuit-signal)"
           strokeWidth={3.2}
           strokeLinecap="round"
           fill="none"
-          mask={traceMaskUrl}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ delay: 1.05, duration: 0.7, ease: 'easeInOut' }}
           filter="url(#circuit-shadow)"
         />
 
-        {/* Activation chip */}
-        <motion.g initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.2, type: 'spring', stiffness: 120, damping: 11 }}>
-          <rect x={chip.x} y={chip.y} width={chip.width} height={chip.height} rx={8} fill={`${colors.mathPrimary}18`} stroke={colors.mathPrimary} strokeWidth={2} filter="url(#circuit-shadow)" />
-          {[0, 1, 2, 3].map((i) => (
-            <rect key={`pin-top-${i}`} x={chip.x + 10 + i * 14} y={chip.y - 6} width={3} height={6} rx={1} fill={`${colors.mathPrimary}cc`} />
-          ))}
-          {[0, 1, 2, 3].map((i) => (
-            <rect key={`pin-bottom-${i}`} x={chip.x + 10 + i * 14} y={chip.y + chip.height} width={3} height={6} rx={1} fill={`${colors.mathPrimary}b0`} />
-          ))}
-          <text x={chip.x + chip.width / 2} y={chip.y + chip.height / 2 + 5} textAnchor="middle" fontSize={15} fill={colors.mathPrimary} fontWeight={600}>
-            f(·)
-          </text>
-          <path
-            d={`M ${chip.x + 8},${chip.y + 14} L ${chip.x + chip.width - 8},${chip.y + 14} M ${chip.x + 8},${chip.y + chip.height - 14} L ${chip.x + chip.width - 8},${chip.y + chip.height - 14}`}
-            stroke={`${colors.mathPrimary}40`}
-            strokeWidth={0.6}
-          />
-          <text x={chip.x + chip.width / 2} y={chip.y - 8} fontSize={9} fill={colors.textMuted} textAnchor="middle">
-            activation
-          </text>
-          <text x={chip.x + chip.width / 2} y={chip.y + chip.height + 16} fontSize={8} fill={colors.textMuted} textAnchor="middle">
-            f(sum)
-          </text>
-        </motion.g>
-
-        {/* Activation to output - with flow arrow */}
-        <motion.path
-          d={outputConnector}
-          stroke={`${colors.mathPrimary}cc`}
-          strokeWidth={3}
-          strokeLinecap="round"
-          fill="none"
-          mask={traceMaskUrl}
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 1.55, duration: 0.5, ease: 'easeOut' }}
-          filter="url(#circuit-shadow)"
-        />
-        
-        {/* Arrow indicator for output flow */}
-        <motion.path
-          d={`M ${chip.x + chip.width + 18},${sumNode.y - 3} L ${chip.x + chip.width + 23},${sumNode.y} L ${chip.x + chip.width + 18},${sumNode.y + 3}`}
-          stroke={colors.mathPrimary}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          transition={{ delay: 1.7, duration: 0.5 }}
-        />
-
-        {/* Output node */}
-        <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.7, type: 'spring', stiffness: 180, damping: 12 }}>
-          <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
-          <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
-          <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
-          <text x={chip.x + chip.width + 44} y={sumNode.y + 18} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
+        {/* Output node - positioned closer to summation */}
+        <motion.g initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.4, type: 'spring', stiffness: 180, damping: 12 }}>
+          <circle cx={sumNode.x + 90} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
+          <circle cx={sumNode.x + 90} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
+          <circle cx={sumNode.x + 90} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
+          <text x={sumNode.x + 90} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
         </motion.g>
 
         {/* Glide highlight along the main bus */}
