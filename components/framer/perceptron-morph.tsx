@@ -74,7 +74,7 @@ const CODE_LINES = [
 const NeuronScene = ({ colors }: { colors: any }) => {
   const somaX = 170;
   const somaY = 160;
-  const somaRadius = 38;
+  const somaRadius = 35;
 
   const withAlpha = (hex: string, alpha: string) => {
     if (typeof hex !== 'string' || !hex.startsWith('#') || (hex.length !== 7 && hex.length !== 9)) {
@@ -82,6 +82,29 @@ const NeuronScene = ({ colors }: { colors: any }) => {
     }
     return hex.length === 7 ? `${hex}${alpha}` : hex;
   };
+
+  const roundCoord = (value: number) => Math.round(value * 1000) / 1000;
+
+  const palette = useMemo(() => ({
+    somaGradientId: 'neuron-soma-detailed',
+    somaOuter: withAlpha(colors.neuronPrimary, 'dd'),
+    somaMid: withAlpha(colors.neuronPrimary, 'bb'),
+    somaInner: withAlpha(colors.neuronPrimary, '55'),
+    membrane: withAlpha(colors.neuronPrimary, 'ee'),
+    dendriteMain: withAlpha(colors.neuronPrimary, 'cc'),
+    dendriteSecondary: withAlpha(colors.neuronPrimary, '88'),
+    dendriteFine: withAlpha(colors.neuronPrimary, '5a'),
+    dendriteSpine: withAlpha(colors.neuronPrimary, '9d'),
+    axonHillock: withAlpha(colors.neuronPrimary, '66'),
+    axonCore: withAlpha(colors.neuronPrimary, 'bb'),
+    myelinFill: withAlpha(colors.neuronPrimary, '1c'),
+    myelinStroke: withAlpha(colors.neuronPrimary, '88'),
+    terminal: withAlpha(colors.neuronPrimary, 'cc'),
+    terminalSoft: withAlpha(colors.neuronPrimary, '88'),
+    vesicle: withAlpha(colors.neuronPrimary, 'aa'),
+    nucleus: withAlpha(colors.neuronPrimary, 'f0'),
+    nucleolus: withAlpha(colors.neuronPrimary, 'ff'),
+  }), [colors.neuronPrimary]);
 
   const numMainBranches = 8;
 
@@ -92,43 +115,71 @@ const NeuronScene = ({ colors }: { colors: any }) => {
       const angleDeg = baseAngle + angleVariation;
       const angleRad = (angleDeg * Math.PI) / 180;
       const length = 90 + Math.sin(i * 1.3) * 25;
-      const startX = somaX + Math.cos(angleRad) * somaRadius;
-      const startY = somaY + Math.sin(angleRad) * somaRadius;
-      const endX = somaX + Math.cos(angleRad) * (length + somaRadius);
-      const endY = somaY + Math.sin(angleRad) * (length + somaRadius);
-      return { startX, startY, endX, endY, angleDeg, angleRad, index: i };
+      const startX = roundCoord(somaX + Math.cos(angleRad) * somaRadius);
+      const startY = roundCoord(somaY + Math.sin(angleRad) * somaRadius);
+      const endX = roundCoord(somaX + Math.cos(angleRad) * (length + somaRadius));
+      const endY = roundCoord(somaY + Math.sin(angleRad) * (length + somaRadius));
+      return { startX, startY, endX, endY, angleDeg, index: i };
     });
   }, [numMainBranches, somaRadius, somaX, somaY]);
 
-  const somaOutlinePath = useMemo(() => {
-    const segments = 16;
-    const points = Array.from({ length: segments }, (_, i) => {
-      const angle = (i / segments) * Math.PI * 2;
-      const radius = somaRadius + 8 + Math.sin(i * 1.3) * 4;
-      return {
+  const fineDendrites = useMemo(() => {
+    return [45, 135, 180, 225, 315].map((angle, idx) => {
+      const angleRad = (angle * Math.PI) / 180;
+      const length = 50 + Math.sin(idx * 2.3) * 20;
+      const startX = roundCoord(somaX + Math.cos(angleRad) * somaRadius);
+      const startY = roundCoord(somaY + Math.sin(angleRad) * somaRadius);
+      const endX = roundCoord(somaX + Math.cos(angleRad) * (length + somaRadius));
+      const endY = roundCoord(somaY + Math.sin(angleRad) * (length + somaRadius));
+      return { startX, startY, endX, endY, angle };
+    });
+  }, [somaRadius, somaX, somaY]);
+
+  const somaPaths = useMemo(() => {
+    const points: Array<{ x: number; y: number; angle: number }> = [];
+    const numPoints = 24;
+
+    for (let i = 0; i < numPoints; i++) {
+      const angle = (i / numPoints) * Math.PI * 2;
+      const baseRadius = 32;
+      const angleDeg = (angle * 180) / Math.PI;
+      let radius = baseRadius;
+
+      if (angleDeg > 90 && angleDeg < 270) {
+        radius += Math.sin(angle * 4) * 5 + Math.cos(angle * 3) * 3;
+      } else {
+        radius += Math.sin(angle * 2) * 2;
+      }
+
+      points.push({
         x: somaX + Math.cos(angle) * radius,
         y: somaY + Math.sin(angle) * radius,
         angle,
-      };
-    });
-
-    if (!points.length) {
-      return '';
+      });
     }
 
-    let path = `M ${points[0].x},${points[0].y}`;
-    for (let i = 1; i < points.length; i++) {
-      const current = points[i];
-      const prev = points[i - 1];
-      const cp1x = prev.x + Math.cos(prev.angle + Math.PI / 2) * 12;
-      const cp1y = prev.y + Math.sin(prev.angle + Math.PI / 2) * 12;
-      const cp2x = current.x + Math.cos(current.angle - Math.PI / 2) * 12;
-      const cp2y = current.y + Math.sin(current.angle - Math.PI / 2) * 12;
-      path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${current.x},${current.y}`;
-    }
-    path += ' Z';
-    return path;
-  }, [somaRadius, somaX, somaY]);
+    const buildPath = () => {
+      if (!points.length) {
+        return '';
+      }
+      let path = `M ${points[0].x},${points[0].y}`;
+      for (let i = 0; i < points.length; i++) {
+        const current = points[i];
+        const next = points[(i + 1) % points.length];
+        const cp1x = current.x + Math.cos(current.angle + Math.PI / 2) * 8;
+        const cp1y = current.y + Math.sin(current.angle + Math.PI / 2) * 8;
+        const cp2x = next.x + Math.cos(next.angle - Math.PI / 2) * 8;
+        const cp2y = next.y + Math.sin(next.angle - Math.PI / 2) * 8;
+        path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${next.x},${next.y}`;
+      }
+      return `${path} Z`;
+    };
+
+    return {
+      fill: buildPath(),
+      outline: buildPath(),
+    };
+  }, [somaX, somaY]);
 
   const axonSegmentCount = 4;
   const axonSegmentSpacing = 82;
@@ -143,357 +194,372 @@ const NeuronScene = ({ colors }: { colors: any }) => {
   const axonTerminalX = 570;
   const terminalBaseY = axonBaselineY + Math.sin((axonSegmentCount + 1) * 0.9) * axonCurveAmplitude;
 
-  interface TerminalBranch {
-    id: string;
-    path: string;
-    boutonX: number;
-    boutonY: number;
-  }
-
-  const terminalBranches = useMemo<TerminalBranch[]>(() => {
-    const branches: TerminalBranch[] = [];
+  const terminalData = useMemo(() => {
     const primaryX = axonTerminalX;
     const primaryY = terminalBaseY;
     const mainAngles = [-25, 0, 25];
 
+    const mainCurves = mainAngles.map((angle, idx) => {
+      const length = 25 + Math.sin(idx * 1.7) * 5;
+      const endX = primaryX + length;
+      const endY = primaryY + Math.sin((angle * Math.PI) / 180) * length;
+      return { angle, endX, endY };
+    });
+
+    const branches: Array<{
+      id: string;
+      secondaryStartX: number;
+      secondaryStartY: number;
+      secondaryEndX: number;
+      secondaryEndY: number;
+      terminalStartX: number;
+      terminalStartY: number;
+      terminalEndX: number;
+      terminalEndY: number;
+      boutonX: number;
+      boutonY: number;
+    }> = [];
+
     mainAngles.forEach((angle, mainIdx) => {
-      const mainLength = 28 + Math.sin(mainIdx * 1.7) * 6;
+      const mainLength = 25 + Math.sin(mainIdx * 1.7) * 5;
       const mainEndX = primaryX + mainLength;
       const mainEndY = primaryY + Math.sin((angle * Math.PI) / 180) * mainLength;
       const numSecondary = mainIdx === 1 ? 3 : 2;
 
       for (let secIdx = 0; secIdx < numSecondary; secIdx++) {
-        const secAngle = angle + (secIdx - (numSecondary - 1) / 2) * 18;
-        const secLength = 22 + Math.sin((mainIdx + secIdx) * 2.1) * 6;
+        const secAngle = angle + (secIdx - (numSecondary - 1) / 2) * 15;
+        const secLength = 20 + Math.sin((mainIdx + secIdx) * 2.1) * 5;
         const secEndX = mainEndX + Math.cos((secAngle * Math.PI) / 180) * secLength;
-        const secEndY = mainEndY + Math.sin((secAngle * Math.PI) / 180) * secLength * 1.15;
+        const secEndY = mainEndY + Math.sin((secAngle * Math.PI) / 180) * secLength * 1.2;
         const numBoutons = secIdx % 2 === 0 ? 2 : 1;
 
         for (let boutIdx = 0; boutIdx < numBoutons; boutIdx++) {
-          const boutAngle = secAngle + (boutIdx - (numBoutons - 1) / 2) * 22;
-          const boutLength = 14 + Math.sin((secIdx + boutIdx) * 3.1) * 3;
-          const boutEndX = secEndX + Math.cos((boutAngle * Math.PI) / 180) * boutLength;
-          const boutEndY = secEndY + Math.sin((boutAngle * Math.PI) / 180) * boutLength;
-          const control1X = primaryX + (mainEndX - primaryX) * 0.6;
-          const control1Y = primaryY + (mainEndY - primaryY) * 0.6 + Math.sin(mainIdx * 1.2) * 4;
-          const control2X = mainEndX + (secEndX - mainEndX) * 0.5;
-          const control2Y = mainEndY + (secEndY - mainEndY) * 0.5 + Math.sin(secIdx * 1.5) * 4;
-          const control3X = secEndX + (boutEndX - secEndX) * 0.6;
-          const control3Y = secEndY + (boutEndY - secEndY) * 0.6;
-          const path = [
-            `M ${primaryX},${primaryY}`,
-            `Q ${control1X},${control1Y} ${mainEndX},${mainEndY}`,
-            `Q ${control2X},${control2Y} ${secEndX},${secEndY}`,
-            `Q ${control3X},${control3Y} ${boutEndX},${boutEndY}`,
-          ].join(' ');
+          const boutAngle = secAngle + (boutIdx - (numBoutons - 1) / 2) * 20;
+          const boutLength = 12 + Math.sin((secIdx + boutIdx) * 3.1) * 3;
+          const boutonX = secEndX + Math.cos((boutAngle * Math.PI) / 180) * boutLength;
+          const boutonY = secEndY + Math.sin((boutAngle * Math.PI) / 180) * boutLength;
 
           branches.push({
-            id: `terminal-${mainIdx}-${secIdx}-${boutIdx}`,
-            path,
-            boutonX: boutEndX,
-            boutonY: boutEndY,
+            id: `${mainIdx}-${secIdx}-${boutIdx}`,
+            secondaryStartX: mainEndX,
+            secondaryStartY: mainEndY,
+            secondaryEndX: secEndX,
+            secondaryEndY: secEndY,
+            terminalStartX: secEndX,
+            terminalStartY: secEndY,
+            terminalEndX: boutonX,
+            terminalEndY: boutonY,
+            boutonX,
+            boutonY,
           });
         }
       }
     });
 
-    return branches;
-  }, [axonTerminalX, terminalBaseY]);
-
-  const extraTerminals = useMemo(() => {
-    return [-18, 18].map((angle, idx) => {
-      const startX = axonTerminalX;
-      const startY = terminalBaseY;
+    const extra = [-18, 18].map((angle, idx) => {
+      const startX = primaryX;
+      const startY = primaryY;
       const controlX = startX + 24;
       const controlY = startY + angle * 1.3;
       const endX = controlX + 32;
       const endY = controlY + angle * 0.9;
-
-      return {
-        id: `extra-terminal-${idx}`,
-        path: `M ${startX},${startY} Q ${controlX},${controlY} ${endX},${endY}`,
-        boutonX: endX,
-        boutonY: endY,
-      };
+      return { id: `extra-${idx}`, path: `M ${startX},${startY} Q ${controlX},${controlY} ${endX},${endY}`, endX, endY };
     });
+
+    return { primaryX, primaryY, mainAngles, mainCurves, branches, extra };
   }, [axonTerminalX, terminalBaseY]);
 
   return (
-    <div 
+    <div
       className="relative flex h-full w-full items-center justify-center overflow-hidden"
       style={{ backgroundColor: colors.sceneBg }}
     >
-      <motion.svg viewBox="0 0 700 320" className="h-full w-full" preserveAspectRatio="xMidYMid meet" fill="none">
+      <motion.svg
+        viewBox="0 0 700 320"
+        className="h-full w-full"
+        preserveAspectRatio="xMidYMid meet"
+        fill="none"
+      >
         <defs>
-          <radialGradient id="neuron-soma-morph" cx="50%" cy="50%" r="70%">
-            <stop offset="0%" stopColor={withAlpha(colors.neuronSecondary, 'dd')} />
-            <stop offset="60%" stopColor={withAlpha(colors.neuronPrimary, 'cc')} />
-            <stop offset="100%" stopColor={withAlpha(colors.neuronPrimary, '99')} />
+          <radialGradient id={palette.somaGradientId} cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stopColor={palette.somaOuter} />
+            <stop offset="65%" stopColor={palette.somaMid} />
+            <stop offset="100%" stopColor={palette.somaInner} />
           </radialGradient>
-          <linearGradient id="neuron-axon-morph" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={withAlpha(colors.neuronPrimary, 'cc')} />
-            <stop offset="100%" stopColor={withAlpha(colors.neuronSecondary, 'cc')} />
-          </linearGradient>
         </defs>
 
-        <g>
+        <motion.g initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
+          {/* Dendritic canopy */}
           {mainBranches.map((branch) => {
-            const ctrl1X =
-              branch.startX +
-              (branch.endX - branch.startX) * 0.35 +
-              Math.sin(branch.index * 0.8) * 10;
-            const ctrl1Y =
-              branch.startY +
-              (branch.endY - branch.startY) * 0.35 +
-              Math.cos(branch.index * 0.8) * 12;
-            const ctrl2X =
-              branch.startX +
-              (branch.endX - branch.startX) * 0.75 +
-              Math.cos(branch.index * 0.9) * 12;
-            const ctrl2Y =
-              branch.startY +
-              (branch.endY - branch.startY) * 0.75 +
-              Math.sin(branch.index * 0.9) * 14;
-            const trunkThickness = 2.6 + (Math.sin(branch.index * 1.4) + 1) * 1.2;
-            const trunkOpacity = 0.35 + (Math.cos(branch.index * 1.2) + 1) * 0.2;
+            const ctrl1X = roundCoord(branch.startX + (branch.endX - branch.startX) * 0.3 + Math.sin(branch.index * 0.4) * 6);
+            const ctrl1Y = roundCoord(branch.startY + (branch.endY - branch.startY) * 0.3 + Math.cos(branch.index * 0.4) * 6);
+            const trunkThickness = 3 + Math.sin(branch.index * 0.5) * 0.8;
 
             return (
               <g key={`dendrite-${branch.index}`}>
                 <path
-                  d={`M ${branch.startX},${branch.startY} C ${ctrl1X},${ctrl1Y} ${ctrl2X},${ctrl2Y} ${branch.endX},${branch.endY}`}
-                  stroke={colors.neuronPrimary}
+                  d={`M ${branch.startX},${branch.startY} Q ${ctrl1X},${ctrl1Y} ${branch.endX},${branch.endY}`}
+                  stroke={palette.dendriteMain}
                   strokeWidth={trunkThickness}
-                  opacity={trunkOpacity}
+                  opacity={0.35}
                   strokeLinecap="round"
                   fill="none"
                 />
-                {[0.45, 0.65, 0.85].map((progress, pIdx) => {
-                  const trunkX =
-                    branch.startX + (branch.endX - branch.startX) * progress;
-                  const trunkY =
-                    branch.startY + (branch.endY - branch.startY) * progress;
-                  return [-35, 0, 32].map((angleOffset, sIdx) => {
-                    const subAngleDeg =
-                      branch.angleDeg +
-                      angleOffset +
-                      Math.sin((branch.index + pIdx + sIdx) * 2.1) * 8;
-                    const subAngle = (subAngleDeg * Math.PI) / 180;
-                    const subLength =
-                      46 + Math.sin((branch.index + pIdx + sIdx) * 1.9) * 12;
-                    const subEndX = trunkX + Math.cos(subAngle) * subLength;
-                    const subEndY = trunkY + Math.sin(subAngle) * subLength;
-                    const subThickness =
-                      1 + (Math.sin((pIdx + sIdx) * 1.5) + 1) * 0.6;
-                    const subOpacity =
-                      0.22 + (Math.cos((branch.index + sIdx) * 1.1) + 1) * 0.12;
+
+                {[0.4, 0.6, 0.8].map((progress, pIdx) => {
+                  const trunkX = roundCoord(branch.startX + (branch.endX - branch.startX) * progress);
+                  const trunkY = roundCoord(branch.startY + (branch.endY - branch.startY) * progress);
+
+                  return [-30, 0, 30].map((angleOffset, sIdx) => {
+                    const subAngle = branch.angleDeg + angleOffset + Math.sin((pIdx + sIdx) * 2.1) * 10;
+                    const subLength = 40 + Math.sin((pIdx + sIdx) * 1.7) * 15;
+                    const subEndX = roundCoord(trunkX + Math.cos((subAngle * Math.PI) / 180) * subLength);
+                    const subEndY = roundCoord(trunkY + Math.sin((subAngle * Math.PI) / 180) * subLength);
 
                     return (
                       <g key={`sub-${branch.index}-${pIdx}-${sIdx}`}>
                         <path
-                          d={`M ${trunkX},${trunkY} Q ${trunkX + Math.cos(subAngle) * 8},${trunkY + Math.sin(subAngle) * 8} ${subEndX},${subEndY}`}
-                          stroke={colors.neuronPrimary}
-                          strokeWidth={subThickness}
-                          opacity={subOpacity}
+                          d={`M ${trunkX},${trunkY} C ${trunkX + 5},${trunkY + Math.sin(angleOffset) * 2} ${(trunkX + subEndX) / 2},${(trunkY + subEndY) / 2} ${subEndX},${subEndY}`}
+                          stroke={palette.dendriteSecondary}
+                          strokeWidth={1.6}
+                          opacity={0.3}
                           strokeLinecap="round"
                           fill="none"
                         />
-                        {[-18, 18].map((tAngle, tIdx) => {
-                          const spikeAngle = ((subAngleDeg + tAngle) * Math.PI) / 180;
-                          const spikeLength =
-                            16 + Math.sin((branch.index + sIdx + tIdx) * 3.1) * 4;
-                          const spikeEndX =
-                            subEndX + Math.cos(spikeAngle) * spikeLength;
-                          const spikeEndY =
-                            subEndY + Math.sin(spikeAngle) * spikeLength;
+
+                        {[-20, 20].map((tAngle, tIdx) => {
+                          const spikeAngle = subAngle + tAngle;
+                          const spikeLength = 15 + Math.sin((tIdx + sIdx) * 3.1) * 5;
+                          const spikeEndX = roundCoord(subEndX + Math.cos((spikeAngle * Math.PI) / 180) * spikeLength);
+                          const spikeEndY = roundCoord(subEndY + Math.sin((spikeAngle * Math.PI) / 180) * spikeLength);
+
                           return (
-                            <line
-                              key={`spike-${branch.index}-${pIdx}-${sIdx}-${tIdx}`}
-                              x1={subEndX}
-                              y1={subEndY}
-                              x2={spikeEndX}
-                              y2={spikeEndY}
-                              stroke={colors.neuronPrimary}
+                            <path
+                              key={`spike-${tIdx}`}
+                              d={`M ${subEndX},${subEndY} L ${spikeEndX},${spikeEndY}`}
+                              stroke={palette.dendriteFine}
                               strokeWidth={0.8}
-                              opacity={0.18}
+                              opacity={0.2}
                               strokeLinecap="round"
                             />
                           );
                         })}
-                        <circle
-                          cx={subEndX}
-                          cy={subEndY}
-                          r={1.6}
-                          fill={withAlpha(colors.neuronSecondary, '88')}
-                          opacity={0.4}
-                        />
+
+                        <circle cx={subEndX} cy={subEndY} r={1.2} fill={palette.dendriteSpine} opacity={0.25} />
                       </g>
                     );
                   });
                 })}
+
+                {[-25, 0, 25].map((angleOffset, tIdx) => {
+                  const termAngle = branch.angleDeg + angleOffset;
+                  const termLength = 24;
+                  const termEndX = roundCoord(branch.endX + Math.cos((termAngle * Math.PI) / 180) * termLength);
+                  const termEndY = roundCoord(branch.endY + Math.sin((termAngle * Math.PI) / 180) * termLength);
+
+                  return (
+                    <path
+                      key={`terminal-${tIdx}`}
+                      d={`M ${branch.endX},${branch.endY} L ${termEndX},${termEndY}`}
+                      stroke={palette.dendriteFine}
+                      strokeWidth={1}
+                      opacity={0.18}
+                      strokeLinecap="round"
+                    />
+                  );
+                })}
               </g>
             );
           })}
-        </g>
 
-        <path
-          d={somaOutlinePath}
-          fill="url(#neuron-soma-morph)"
-          stroke={withAlpha(colors.neuronPrimary, 'aa')}
-          strokeWidth={2}
-          opacity={0.9}
-        />
-        <ellipse
-          cx={somaX}
-          cy={somaY}
-          rx={somaRadius - 6}
-          ry={somaRadius - 8}
-          fill={withAlpha(colors.neuronPrimary, '40')}
-          transform="rotate(-8 170 160)"
-        />
-
-        <ellipse
-          cx={168}
-          cy={158}
-          rx={14}
-          ry={12}
-          fill={withAlpha(colors.neuronSecondary, 'cc')}
-          opacity={0.9}
-          transform="rotate(10 168 158)"
-        />
-        <circle
-          cx={170}
-          cy={157}
-          r={4}
-          fill={withAlpha(colors.neuronSecondary, 'ee')}
-          opacity={0.9}
-        />
-
-        <g>
-          <path
-            d={`M 203,153 C 210,151 218,151 225,152 C 232,153 237,155 ${axonStartX},${firstSegmentY - 2} L ${axonStartX},${firstSegmentY + 2} C 237,165 232,167 225,168 C 218,169 210,169 203,167 C 201,164 201,156 203,153 Z`}
-            fill={withAlpha(colors.neuronPrimary, '55')}
-          />
-          <path
-            d={`M 206,156 Q 215,155 225,${155 + Math.sin(0.5) * 2} T ${axonStartX - 5},${firstSegmentY - 1}`}
-            stroke={withAlpha(colors.neuronPrimary, 'aa')}
-            strokeWidth={6}
-            strokeLinecap="round"
-            fill="none"
-            opacity={0.7}
-          />
-          <path
-            d={`M 206,164 Q 215,165 225,${165 + Math.sin(0.5) * 2} T ${axonStartX - 5},${firstSegmentY + 1}`}
-            stroke={withAlpha(colors.neuronPrimary, 'aa')}
-            strokeWidth={6}
-            strokeLinecap="round"
-            fill="none"
-            opacity={0.7}
-          />
-          <path
-            d={`M 208,160 C 218,160 228,${160 + Math.sin(0.8) * 3} ${axonStartX},${firstSegmentY}`}
-            stroke="url(#neuron-axon-morph)"
-            strokeWidth={4}
-            strokeLinecap="round"
-            fill="none"
-            opacity={0.9}
-          />
-        </g>
-
-        {Array.from({ length: axonSegmentCount }).map((_, i) => {
-          const x = axonStartX + i * axonSegmentSpacing;
-          const wave = Math.sin((i + 1) * 0.9) * axonCurveAmplitude;
-          const segmentY = axonBaselineY + wave;
-          const prevWave = Math.sin(i * 0.9) * axonCurveAmplitude;
-          const prevSegmentY = axonBaselineY + prevWave;
-          const prevSegmentX = axonStartX + (i - 1) * axonSegmentSpacing;
-          const prevSegmentRight = prevSegmentX + axonSegmentWidth;
-          const gap = x - prevSegmentRight;
-          const connectorMidY = (prevSegmentY + segmentY) / 2 + Math.sin(i * 1.2) * 3;
-          const connectorControlX = prevSegmentRight + gap / 2;
-
-          return (
-            <g key={`axon-segment-${i}`}>
-              {i > 0 && (
-                <path
-                  d={`M ${prevSegmentRight},${prevSegmentY} Q ${connectorControlX},${connectorMidY} ${x},${segmentY}`}
-                  stroke="url(#neuron-axon-morph)"
-                  strokeWidth={3}
-                  fill="none"
-                  strokeLinecap="round"
-                  opacity={0.7}
-                />
-              )}
-              <rect
-                x={x}
-                y={segmentY - axonSegmentHeight / 2}
-                width={axonSegmentWidth}
-                height={axonSegmentHeight}
-                rx={10}
-                fill={withAlpha(colors.neuronSecondary, '1f')}
-                stroke={withAlpha(colors.neuronSecondary, '88')}
-                strokeWidth={1.5}
-                opacity={0.9}
-                transform={`rotate(${Math.sin((i + 1) * 0.6) * 2} ${x + axonSegmentWidth / 2} ${segmentY})`}
-              />
+          {fineDendrites.map((branch, idx) => (
+            <g key={`fine-${idx}`}>
               <path
-                d={`M ${x + 3},${segmentY} Q ${x + axonSegmentWidth / 2},${segmentY + Math.sin((i + 1) * 1.1)} ${x + axonSegmentWidth - 3},${segmentY}`}
-                stroke={withAlpha(colors.neuronPrimary, 'aa')}
-                strokeWidth={2}
-                opacity={0.35}
-                fill="none"
+                d={`M ${branch.startX},${branch.startY} L ${branch.endX},${branch.endY}`}
+                stroke={palette.dendriteSecondary}
+                strokeWidth={1.4}
+                opacity={0.18}
+                strokeLinecap="round"
               />
+              {[-15, 15].map((offset, i) => {
+                const offsetAngle = (branch.angle + offset) * (Math.PI / 180);
+                const budX = roundCoord(branch.endX + Math.cos(offsetAngle) * 16);
+                const budY = roundCoord(branch.endY + Math.sin(offsetAngle) * 16);
+                return (
+                  <path
+                    key={`${idx}-${i}`}
+                    d={`M ${branch.endX},${branch.endY} L ${budX},${budY}`}
+                    stroke={palette.dendriteFine}
+                    strokeWidth={0.6}
+                    opacity={0.12}
+                    strokeLinecap="round"
+                  />
+                );
+              })}
             </g>
-          );
-        })}
+          ))}
 
-        <path
-          d={`M ${axonEndX},${axonEndY} Q ${(axonEndX + axonTerminalX) / 2},${(axonEndY + terminalBaseY) / 2 + Math.sin(axonSegmentCount * 1.3) * 3} ${axonTerminalX},${terminalBaseY}`}
-          stroke="url(#neuron-axon-morph)"
-          strokeWidth={3}
-          fill="none"
-          strokeLinecap="round"
-          opacity={0.75}
-        />
+          {/* Soma */}
+          <path d={somaPaths.fill} fill={`url(#${palette.somaGradientId})`} opacity={0.85} />
+          <ellipse cx="168" cy="160" rx="26" ry="24" fill={palette.somaInner} opacity={0.3} transform="rotate(15 168 160)" />
+          <ellipse cx="172" cy="158" rx="22" ry="20" fill={palette.somaInner} opacity={0.25} transform="rotate(-25 172 158)" />
+          <path d={somaPaths.outline} fill="none" stroke={palette.membrane} strokeWidth={1.1} opacity={0.9} />
 
-        {terminalBranches.map((branch) => (
-          <g key={branch.id}>
+          {/* Nucleus */}
+          <ellipse cx="168" cy="158" rx="14" ry="12" fill={palette.nucleus} opacity={0.85} transform="rotate(10 168 158)" />
+          <circle cx="170" cy="157" r="4" fill={palette.nucleolus} opacity={0.9} />
+
+          {/* Axon hillock */}
+          <g>
             <path
-              d={branch.path}
-              stroke={withAlpha(colors.neuronSecondary, 'cc')}
-              strokeWidth={1.5}
-              fill="none"
-              strokeLinecap="round"
-              opacity={0.7}
-            />
-            <circle
-              cx={branch.boutonX}
-              cy={branch.boutonY}
-              r={4}
-              fill={withAlpha(colors.neuronSecondary, 'bb')}
-              opacity={0.85}
-            />
-          </g>
-        ))}
-
-        {extraTerminals.map((branch) => (
-          <g key={branch.id}>
-            <path
-              d={branch.path}
-              stroke={withAlpha(colors.neuronSecondary, '88')}
-              strokeWidth={1}
-              fill="none"
-              strokeLinecap="round"
+              d={`M 203,153 C 210,151 218,151 225,152 C 232,153 237,155 ${axonStartX},${firstSegmentY - 2} L ${axonStartX},${firstSegmentY + 2} C 237,165 232,167 225,168 C 218,169 210,169 203,167 C 201,164 201,156 203,153 Z`}
+              fill={palette.axonHillock}
               opacity={0.5}
             />
-            <circle
-              cx={branch.boutonX}
-              cy={branch.boutonY}
-              r={3.2}
-              fill={withAlpha(colors.neuronSecondary, 'aa')}
-              opacity={0.6}
+            <path
+              d={`M 206,156 Q 215,155 225,${155 + Math.sin(0.5) * 2} T ${axonStartX - 5},${firstSegmentY - 1}`}
+              stroke={palette.axonHillock}
+              strokeWidth={6}
+              strokeLinecap="round"
+              fill="none"
+              opacity={0.7}
+            />
+            <path
+              d={`M 206,164 Q 215,165 225,${165 + Math.sin(0.5) * 2} T ${axonStartX - 5},${firstSegmentY + 1}`}
+              stroke={palette.axonHillock}
+              strokeWidth={6}
+              strokeLinecap="round"
+              fill="none"
+              opacity={0.7}
+            />
+            <path
+              d={`M 208,160 C 218,160 228,${160 + Math.sin(0.8) * 3} ${axonStartX},${firstSegmentY}`}
+              stroke={palette.axonCore}
+              strokeWidth={4}
+              strokeLinecap="round"
+              fill="none"
+              opacity={0.9}
             />
           </g>
-        ))}
+
+          {/* Axon */}
+          {Array.from({ length: axonSegmentCount }).map((_, i) => {
+            const x = axonStartX + i * axonSegmentSpacing;
+            const wave = Math.sin((i + 1) * 0.9) * axonCurveAmplitude;
+            const segmentY = axonBaselineY + wave;
+            const prevWave = Math.sin(i * 0.9) * axonCurveAmplitude;
+            const prevSegmentY = axonBaselineY + prevWave;
+            const prevSegmentX = axonStartX + (i - 1) * axonSegmentSpacing;
+            const prevSegmentRight = prevSegmentX + axonSegmentWidth;
+            const gap = x - prevSegmentRight;
+            const connectorMidY = (prevSegmentY + segmentY) / 2 + Math.sin(i * 1.2) * 3;
+            const connectorControlX = prevSegmentRight + gap / 2;
+
+            return (
+              <g key={`axon-segment-${i}`}>
+                {i > 0 && (
+                  <path
+                    d={`M ${prevSegmentRight},${prevSegmentY} Q ${connectorControlX},${connectorMidY} ${x},${segmentY}`}
+                    stroke={palette.axonCore}
+                    strokeWidth={3}
+                    fill="none"
+                    strokeLinecap="round"
+                    opacity={0.7}
+                  />
+                )}
+                <rect
+                  x={x}
+                  y={segmentY - axonSegmentHeight / 2}
+                  width={axonSegmentWidth}
+                  height={axonSegmentHeight}
+                  rx={10}
+                  fill={palette.myelinFill}
+                  stroke={palette.myelinStroke}
+                  strokeWidth={1.5}
+                  opacity={0.9}
+                  transform={`rotate(${Math.sin((i + 1) * 0.6) * 2} ${x + axonSegmentWidth / 2} ${segmentY})`}
+                />
+                <path
+                  d={`M ${x + 3},${segmentY} Q ${x + axonSegmentWidth / 2},${segmentY + Math.sin((i + 1) * 1.1)} ${x + axonSegmentWidth - 3},${segmentY}`}
+                  stroke={palette.axonCore}
+                  strokeWidth={2}
+                  opacity={0.35}
+                  fill="none"
+                />
+              </g>
+            );
+          })}
+
+          <path
+            d={`M ${axonEndX},${axonEndY} Q ${(axonEndX + axonTerminalX) / 2},${(axonEndY + terminalBaseY) / 2 + Math.sin(axonSegmentCount * 1.3) * 3} ${axonTerminalX},${terminalBaseY}`}
+            stroke={palette.axonCore}
+            strokeWidth={3}
+            fill="none"
+            strokeLinecap="round"
+            opacity={0.75}
+          />
+
+          {/* Axon terminals */}
+          {terminalData.mainCurves.map((curve, idx) => (
+            <path
+              key={`terminal-main-${idx}`}
+              d={`M ${terminalData.primaryX},${terminalData.primaryY} Q ${terminalData.primaryX + 10},${terminalData.primaryY + Math.sin((curve.angle * Math.PI) / 180) * 5} ${curve.endX},${curve.endY}`}
+              stroke={palette.terminal}
+              strokeWidth={3}
+              fill="none"
+              opacity={0.6}
+              strokeLinecap="round"
+            />
+          ))}
+
+          {terminalData.branches.map((branch) => {
+            const boutonRadius = 6 + Math.sin(branch.boutonX * 0.1) * 1;
+            return (
+              <g key={branch.id}>
+                <path
+                  d={`M ${branch.secondaryStartX},${branch.secondaryStartY} C ${branch.secondaryStartX + 5},${branch.secondaryStartY + 2} ${(branch.secondaryStartX + branch.secondaryEndX) / 2},${(branch.secondaryStartY + branch.secondaryEndY) / 2} ${branch.secondaryEndX},${branch.secondaryEndY}`}
+                  stroke={palette.terminal}
+                  strokeWidth={2}
+                  fill="none"
+                  opacity={0.5}
+                  strokeLinecap="round"
+                />
+                <path
+                  d={`M ${branch.terminalStartX},${branch.terminalStartY} L ${branch.terminalEndX},${branch.terminalEndY}`}
+                  stroke={palette.terminalSoft}
+                  strokeWidth={1.5}
+                  fill="none"
+                  opacity={0.45}
+                  strokeLinecap="round"
+                />
+                <path
+                  d={`M ${branch.boutonX},${branch.boutonY} m -${boutonRadius},0 c 0,-${boutonRadius * 0.8} ${boutonRadius * 0.8},-${boutonRadius} ${boutonRadius},-${boutonRadius} c ${boutonRadius * 0.2},0 ${boutonRadius},${boutonRadius * 0.2} ${boutonRadius},${boutonRadius} c 0,${boutonRadius * 0.8} -${boutonRadius * 0.8},${boutonRadius} -${boutonRadius},${boutonRadius} c -${boutonRadius * 0.2},0 -${boutonRadius},-${boutonRadius * 0.2} -${boutonRadius},-${boutonRadius} Z`}
+                  fill={palette.terminal}
+                  opacity={0.7}
+                />
+                <ellipse
+                  cx={branch.boutonX + boutonRadius * 0.3}
+                  cy={branch.boutonY}
+                  rx={boutonRadius * 0.4}
+                  ry={boutonRadius * 0.5}
+                  fill={palette.terminalSoft}
+                  opacity={0.6}
+                />
+                <circle cx={branch.boutonX - 2} cy={branch.boutonY - 1} r={1.8} fill={palette.vesicle} opacity={0.4} />
+                <circle cx={branch.boutonX + 1} cy={branch.boutonY + 1} r={1.5} fill={palette.vesicle} opacity={0.35} />
+                <circle cx={branch.boutonX - 1} cy={branch.boutonY + 2} r={1.3} fill={palette.vesicle} opacity={0.3} />
+                <circle cx={branch.boutonX + 2} cy={branch.boutonY - 2} r={1.6} fill={palette.vesicle} opacity={0.35} />
+              </g>
+            );
+          })}
+
+          {terminalData.extra.map((extra) => (
+            <g key={extra.id}>
+              <path d={extra.path} stroke={palette.terminalSoft} strokeWidth={1} fill="none" opacity={0.35} strokeLinecap="round" />
+              <circle cx={extra.endX} cy={extra.endY} r={3.5} fill={palette.terminalSoft} opacity={0.4} />
+            </g>
+          ))}
+        </motion.g>
       </motion.svg>
     </div>
   );
