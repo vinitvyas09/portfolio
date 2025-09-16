@@ -819,8 +819,12 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={10} fill={`${colors.codePrimary}26`} filter="url(#circuit-glow)" />
           <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={7} fill={colors.codePrimary} filter="url(#circuit-shadow)" />
           <circle cx={chip.x + chip.width + 44} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
-          <text x={chip.x + chip.width + 44} y={sumNode.y + 18} fontSize={8} fill={colors.textMuted} textAnchor="middle">out</text>
+          <text x={chip.x + chip.width + 44} y={sumNode.y + 18} fontSize={8} fill={colors.textMuted} textAnchor="middle">y</text>
         </motion.g>
+
+        {/* Arrow indicators for flow */}
+        <path d={activationArrow} fill={`${colors.mathPrimary}aa`} opacity={0.85} />
+        <path d={outputArrow} fill={`${colors.codePrimary}aa`} opacity={0.85} />
 
         {/* Glide highlight along the main bus */}
         <motion.path
