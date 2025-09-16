@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTheme } from 'next-themes';
 
 const pseudoRandom = (seed: number): number => {
   const x = Math.sin(seed) * 10000;
@@ -31,6 +32,12 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
     description: "Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!"
   }
 }) => {
+  // Theme handling
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
+  
   const [signals, setSignals] = useState<number[]>([]);
   const [isFiring, setIsFiring] = useState(false);
   const [currentSum, setCurrentSum] = useState(0);
@@ -39,6 +46,137 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const [animationCycle, setAnimationCycle] = useState(0);
 
   const { inputs = 5, showWeights = true, fireThreshold = 0.4, animationMs = 3000, description } = config;
+  
+  // Sophisticated color palette
+  const colors = useMemo(() => {
+    // Default to light colors before mount to avoid hydration mismatch
+    if (!mounted) {
+      return {
+        // Background gradients
+        bgGradient1: "#fafafa",
+        bgGradient2: "#f3f4f6",
+        
+        // Neuron colors
+        neuronResting: "#6366f1",
+        neuronActive: "#10b981",
+        nucleusResting: "#4f46e5",
+        nucleusActive: "#059669",
+        
+        // Dendrite colors
+        dendriteActive: "#6366f1",
+        dendriteInactive: "#cbd5e1",
+        
+        // Axon colors
+        axonActive: "#10b981",
+        axonInactive: "#6366f1",
+        myelinActive: "#86efac",
+        myelinInactive: "#c7d2fe",
+        myelinStrokeActive: "#10b981",
+        myelinStrokeInactive: "#6366f1",
+        
+        // Terminal colors
+        terminalActive: "#10b981",
+        terminalInactive: "#6366f1",
+        vesicleActive: "#4ade80",
+        vesicleInactive: "#818cf8",
+        
+        // UI colors
+        textPrimary: "#1e293b",
+        textSecondary: "#64748b",
+        textMuted: "#94a3b8",
+        statusBarBg: "rgba(241, 245, 249, 0.95)",
+        statusActiveGradient1: "#059669",
+        statusActiveGradient2: "#10b981",
+        statusInactiveBg: "#e2e8f0",
+        progressBarBg: "rgba(148, 163, 184, 0.2)",
+        progressBarFill1: "#10b981",
+        progressBarFill2: "#4ade80"
+      };
+    }
+    
+    return isDark ? {
+      // Dark mode - sophisticated blacks and grays
+      bgGradient1: "#0a0a0a",
+      bgGradient2: "#171717",
+      
+      // Neuron colors - subtle purple to green shift
+      neuronResting: "#a78bfa",
+      neuronActive: "#34d399",
+      nucleusResting: "#8b5cf6",
+      nucleusActive: "#10b981",
+      
+      // Dendrite colors
+      dendriteActive: "#a78bfa",
+      dendriteInactive: "#404040",
+      
+      // Axon colors
+      axonActive: "#34d399",
+      axonInactive: "#a78bfa",
+      myelinActive: "#065f46",
+      myelinInactive: "#312e81",
+      myelinStrokeActive: "#34d399",
+      myelinStrokeInactive: "#a78bfa",
+      
+      // Terminal colors
+      terminalActive: "#34d399",
+      terminalInactive: "#a78bfa",
+      vesicleActive: "#4ade80",
+      vesicleInactive: "#c4b5fd",
+      
+      // UI colors
+      textPrimary: "#f3f4f6",
+      textSecondary: "#d1d5db",
+      textMuted: "#9ca3af",
+      statusBarBg: "rgba(23, 23, 23, 0.9)",
+      statusActiveGradient1: "#065f46",
+      statusActiveGradient2: "#34d399",
+      statusInactiveBg: "#262626",
+      progressBarBg: "rgba(64, 64, 64, 0.5)",
+      progressBarFill1: "#34d399",
+      progressBarFill2: "#4ade80"
+    } : {
+      // Light mode - classy whites and subtle colors
+      bgGradient1: "#ffffff",
+      bgGradient2: "#fafafa",
+      
+      // Neuron colors
+      neuronResting: "#6366f1",
+      neuronActive: "#10b981",
+      nucleusResting: "#4f46e5",
+      nucleusActive: "#059669",
+      
+      // Dendrite colors
+      dendriteActive: "#6366f1",
+      dendriteInactive: "#cbd5e1",
+      
+      // Axon colors
+      axonActive: "#10b981",
+      axonInactive: "#6366f1",
+      myelinActive: "#d1fae5",
+      myelinInactive: "#e0e7ff",
+      myelinStrokeActive: "#10b981",
+      myelinStrokeInactive: "#6366f1",
+      
+      // Terminal colors
+      terminalActive: "#10b981",
+      terminalInactive: "#6366f1",
+      vesicleActive: "#4ade80",
+      vesicleInactive: "#818cf8",
+      
+      // UI colors
+      textPrimary: "#1e293b",
+      textSecondary: "#64748b",
+      textMuted: "#94a3b8",
+      statusBarBg: "rgba(248, 250, 252, 0.95)",
+      statusActiveGradient1: "#059669",
+      statusActiveGradient2: "#10b981",
+      statusInactiveBg: "#e2e8f0",
+      progressBarBg: "rgba(148, 163, 184, 0.2)",
+      progressBarFill1: "#10b981",
+      progressBarFill2: "#4ade80"
+    };
+  }, [isDark, mounted]);
+  
   const axonSegmentCount = 4;
   const axonSegmentSpacing = 82;
   const axonSegmentWidth = 48;
@@ -110,13 +248,28 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
     runAnimation();
   }, []);
 
-  const neuronColor = isFiring ? '#4ade80' : '#60a5fa';
-  const nucleusColor = isFiring ? '#16a34a' : '#2563eb';
+  const neuronColor = isFiring ? colors.neuronActive : colors.neuronResting;
+  const nucleusColor = isFiring ? colors.nucleusActive : colors.nucleusResting;
+  
+  // Placeholder to avoid SSR/CSR theme mismatch flash
+  if (!mounted) {
+    return (
+      <div
+        style={{
+          padding: '2rem',
+          borderRadius: '12px',
+          margin: '2rem 0',
+          height: '400px',
+          background: 'transparent',
+        }}
+      />
+    );
+  }
 
   return (
     <div className="neuron-container" style={{
       padding: '2rem',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
       borderRadius: '12px',
       margin: '2rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -215,7 +368,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                       d={`M ${branch.startX},${branch.startY}
                           Q ${ctrl1X},${ctrl1Y}
                             ${branch.endX},${branch.endY}`}
-                      stroke={isBranchActive ? '#60a5fa' : '#475569'}
+                      stroke={isBranchActive ? colors.dendriteActive : colors.dendriteInactive}
                       strokeWidth={3 + avgWeight * 2}
                       fill="none"
                       opacity={isBranchActive ? 0.6 : 0.25}
@@ -249,7 +402,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                                   C ${trunkX + 5},${trunkY + Math.sin(angleOffset) * 2}
                                     ${(trunkX + subEndX) / 2},${(trunkY + subEndY) / 2}
                                     ${subEndX},${subEndY}`}
-                              stroke={isActive ? '#60a5fa' : '#475569'}
+                              stroke={isActive ? colors.dendriteActive : colors.dendriteInactive}
                               strokeWidth={1.5 + (input ? input.weight * 1.5 : 0.5)}
                               fill="none"
                               opacity={isActive ? 0.7 : 0.2}
@@ -270,7 +423,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                                 <path
                                   key={`spike-${tIdx}`}
                                   d={`M ${subEndX},${subEndY} L ${spikeEndX},${spikeEndY}`}
-                                  stroke={isActive ? '#60a5fa' : '#475569'}
+                                  stroke={isActive ? colors.dendriteActive : colors.dendriteInactive}
                                   strokeWidth="0.8"
                                   opacity={isActive ? 0.5 : 0.15}
                                   strokeLinecap="round"
@@ -283,7 +436,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                               cx={subEndX}
                               cy={subEndY}
                               r="1.2"
-                              fill={isActive ? '#60a5fa' : '#475569'}
+                              fill={isActive ? colors.dendriteActive : colors.dendriteInactive}
                               opacity={isActive ? 0.4 : 0.15}
                             />
                             
@@ -295,7 +448,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             })() && (
                               <circle
                                 r="2.5"
-                                fill="#60a5fa"
+                                fill={colors.dendriteActive}
                                 opacity="0"
                               >
                                 <animateMotion
@@ -327,7 +480,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                         <path
                           key={`term-${tIdx}`}
                           d={`M ${branch.endX},${branch.endY} L ${termEndX},${termEndY}`}
-                          stroke={isBranchActive ? '#60a5fa' : '#475569'}
+                          stroke={isBranchActive ? colors.dendriteActive : colors.dendriteInactive}
                           strokeWidth="1"
                           opacity={isBranchActive ? 0.4 : 0.12}
                           strokeLinecap="round"
@@ -351,7 +504,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                   <g key={`extra-dendrite-${idx}`}>
                     <path
                       d={`M ${startX},${startY} L ${endX},${endY}`}
-                      stroke={isActive ? '#60a5fa' : '#475569'}
+                      stroke={isActive ? colors.dendriteActive : colors.dendriteInactive}
                       strokeWidth="1.5"
                       opacity={isActive ? 0.4 : 0.1}
                       strokeLinecap="round"
@@ -363,7 +516,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                         d={`M ${endX},${endY} 
                             L ${roundCoord(endX + Math.cos((angle + offset) * Math.PI / 180) * 16)},
                               ${roundCoord(endY + Math.sin((angle + offset) * Math.PI / 180) * 16)}`}
-                        stroke={isActive ? '#60a5fa' : '#475569'}
+                        stroke={isActive ? colors.dendriteActive : colors.dendriteInactive}
                         strokeWidth="0.6"
                         opacity={isActive ? 0.3 : 0.08}
                         strokeLinecap="round"
@@ -499,7 +652,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               return path;
             })()}
             fill="none"
-            stroke={isFiring ? '#22c55e' : '#3b82f6'}
+            stroke={isFiring ? colors.axonActive : colors.axonInactive}
             strokeWidth="2.5"
             opacity="0.9"
           />
@@ -522,7 +675,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             cx="170"
             cy="157"
             r="4"
-            fill="#1e40af"
+            fill={colors.nucleusResting}
             opacity="0.9"
           />
         </g>
@@ -617,7 +770,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               {i > 0 && (
                 <path
                   d={`M ${prevSegmentRight},${prevSegmentY} Q ${connectorControlX},${connectorMidY} ${x},${segmentY}`}
-                  stroke={isFiring ? '#22c55e' : '#60a5fa'}
+                  stroke={isFiring ? colors.axonActive : colors.axonInactive}
                   strokeWidth="3"
                   fill="none"
                   strokeLinecap="round"
@@ -631,7 +784,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                 width={axonSegmentWidth}
                 height={axonSegmentHeight}
                 rx="10"
-                fill={isFiring ? '#bbf7d0' : '#dbeafe'}
+                fill={isFiring ? colors.myelinActive : colors.myelinInactive}
                 stroke={isFiring ? '#22c55e' : '#3b82f6'}
                 strokeWidth="1.5"
                 opacity="0.9"
@@ -641,7 +794,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               {/* Inner axon line visible through myelin */}
               <path
                 d={`M ${x + 3},${segmentY} Q ${x + axonSegmentWidth / 2},${segmentY + Math.sin((i + 1) * 1.1)} ${x + axonSegmentWidth - 3},${segmentY}`}
-                stroke={isFiring ? '#16a34a' : '#2563eb'}
+                stroke={isFiring ? colors.nucleusActive : colors.nucleusResting}
                 strokeWidth="2"
                 opacity="0.4"
                 fill="none"
@@ -653,7 +806,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         {/* Link final myelin segment into terminal branches */}
         <path
           d={`M ${axonEndX},${axonEndY} Q ${(axonEndX + axonTerminalX) / 2},${(axonEndY + terminalBaseY) / 2 + Math.sin(axonSegmentCount * 1.3) * 3} ${axonTerminalX},${terminalBaseY}`}
-          stroke={isFiring ? '#22c55e' : '#60a5fa'}
+          stroke={isFiring ? colors.axonActive : colors.axonInactive}
           strokeWidth="3"
           fill="none"
           opacity={0.85}
@@ -664,7 +817,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         {isFiring && (
           <circle
             r="8"
-            fill="#22c55e"
+            fill={colors.axonActive}
             opacity="0"
           >
             <animateMotion
@@ -775,7 +928,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                     d={`M ${primaryBranchX},${primaryBranchY}
                         Q ${primaryBranchX + 10},${primaryBranchY + Math.sin(angle * Math.PI / 180) * 5}
                           ${mainEndX},${mainEndY}`}
-                    stroke={isLit ? '#22c55e' : '#60a5fa'}
+                    stroke={isLit ? colors.terminalActive : colors.terminalInactive}
                     strokeWidth="3"
                     fill="none"
                     opacity={isLit ? 0.9 : 0.6}
@@ -800,7 +953,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             ${(branch.secondaryBranch.startX + branch.secondaryBranch.endX) / 2},
                             ${(branch.secondaryBranch.startY + branch.secondaryBranch.endY) / 2}
                             ${branch.secondaryBranch.endX},${branch.secondaryBranch.endY}`}
-                      stroke={isLit ? '#22c55e' : '#60a5fa'}
+                      stroke={isLit ? colors.terminalActive : colors.terminalInactive}
                       strokeWidth="2"
                       fill="none"
                       opacity={isLit ? 0.85 : 0.5}
@@ -814,7 +967,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                     <path
                       d={`M ${branch.terminalBranch.startX},${branch.terminalBranch.startY}
                           L ${branch.terminalBranch.endX},${branch.terminalBranch.endY}`}
-                      stroke={isLit ? '#22c55e' : '#60a5fa'}
+                      stroke={isLit ? colors.terminalActive : colors.terminalInactive}
                       strokeWidth="1.5"
                       fill="none"
                       opacity={isLit ? 0.8 : 0.45}
@@ -835,7 +988,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             c 0,${boutonRadius * 0.8} -${boutonRadius * 0.8},${boutonRadius} -${boutonRadius},${boutonRadius}
                             c -${boutonRadius * 0.2},0 -${boutonRadius},-${boutonRadius * 0.2} -${boutonRadius},-${boutonRadius}
                             Z`}
-                        fill={isLit ? '#22c55e' : '#60a5fa'}
+                        fill={isLit ? colors.terminalActive : colors.terminalInactive}
                         opacity={isLit ? 0.95 : 0.7}
                         style={{
                           transition: 'all 0.3s ease',
@@ -848,7 +1001,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                         cy={branch.boutonY}
                         rx={boutonRadius * 0.4}
                         ry={boutonRadius * 0.5}
-                        fill={isLit ? '#16a34a' : '#3b82f6'}
+                        fill={isLit ? colors.nucleusActive : colors.nucleusResting}
                         opacity={isLit ? 0.8 : 0.5}
                       />
                     </g>
@@ -860,28 +1013,28 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                         cx={branch.boutonX - 2}
                         cy={branch.boutonY - 1}
                         r="1.8"
-                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        fill={isLit ? colors.vesicleActive : colors.vesicleInactive}
                         opacity={isLit ? 0.9 : 0.4}
                       />
                       <circle
                         cx={branch.boutonX + 1}
                         cy={branch.boutonY + 1}
                         r="1.5"
-                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        fill={isLit ? colors.vesicleActive : colors.vesicleInactive}
                         opacity={isLit ? 0.85 : 0.35}
                       />
                       <circle
                         cx={branch.boutonX - 1}
                         cy={branch.boutonY + 2}
                         r="1.3"
-                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        fill={isLit ? colors.vesicleActive : colors.vesicleInactive}
                         opacity={isLit ? 0.8 : 0.3}
                       />
                       <circle
                         cx={branch.boutonX + 2}
                         cy={branch.boutonY - 2}
                         r="1.6"
-                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        fill={isLit ? colors.vesicleActive : colors.vesicleInactive}
                         opacity={isLit ? 0.85 : 0.35}
                       />
                     </g>
@@ -896,7 +1049,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             cx={branch.boutonX + boutonRadius}
                             cy={branch.boutonY + (idx - 1) * 2}
                             r="1.5"
-                            fill="#22c55e"
+                            fill={colors.axonActive}
                             opacity="0"
                           >
                             <animate
@@ -939,7 +1092,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                       d={`M ${primaryBranchX},${primaryBranchY}
                           Q ${extraX},${extraY}
                             ${extraEndX},${extraEndY}`}
-                      stroke={isLit ? '#22c55e' : '#60a5fa'}
+                      stroke={isLit ? colors.terminalActive : colors.terminalInactive}
                       strokeWidth="1"
                       fill="none"
                       opacity={isLit ? 0.5 : 0.25}
@@ -950,7 +1103,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                       cx={extraEndX}
                       cy={extraEndY}
                       r="3.5"
-                      fill={isLit ? '#22c55e' : '#60a5fa'}
+                      fill={isLit ? colors.terminalActive : colors.terminalInactive}
                       opacity={isLit ? 0.7 : 0.4}
                     />
                   </g>
@@ -961,16 +1114,16 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         })()}
         
         {/* Labels */}
-        <text x="50" y="50" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="50" y="50" fill={colors.textPrimary} fontSize="11" fontWeight="500">
           Dendrites
         </text>
-        <text x="170" y="120" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="170" y="120" fill={colors.textPrimary} fontSize="11" fontWeight="500">
           Cell Body
         </text>
-        <text x="400" y="135" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="400" y="135" fill={colors.textPrimary} fontSize="11" fontWeight="500">
           Axon
         </text>
-        <text x="600" y="110" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="600" y="110" fill={colors.textPrimary} fontSize="11" fontWeight="500">
           Terminals
         </text>
       </svg>
@@ -979,10 +1132,10 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         <div style={{
           marginTop: '1.5rem',
           padding: '1rem',
-          background: 'rgba(30, 41, 59, 0.5)',
+          background: colors.statusBarBg,
           borderRadius: '8px',
           fontSize: '14px',
-          color: '#e2e8f0'
+          color: colors.textPrimary
         }}>
           {/* Top row - Threshold explanation */}
           <div style={{
