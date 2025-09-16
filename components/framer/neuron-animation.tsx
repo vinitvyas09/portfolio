@@ -978,34 +978,70 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         {/* Status bar */}
         <div style={{
           marginTop: '1.5rem',
-          padding: '0.75rem',
+          padding: '1rem',
           background: 'rgba(30, 41, 59, 0.5)',
           borderRadius: '8px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
           fontSize: '14px',
           color: '#e2e8f0'
         }}>
-          <div>
-            <span style={{ color: '#94a3b8' }}>Signal Strength: </span>
+          {/* Top row - Threshold explanation */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '0.75rem'
+          }}>
+            <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+              <span>Firing threshold: </span>
+              <span style={{ color: '#e2e8f0', fontWeight: '500' }}>
+                {(fireThreshold * 100).toFixed(0)}%
+              </span>
+            </div>
+            <div style={{
+              padding: '0.25rem 0.75rem',
+              background: isFiring ? 'linear-gradient(135deg, #16a34a, #22c55e)' : '#374151',
+              borderRadius: '4px',
+              fontWeight: '500',
+              fontSize: '13px',
+              transition: 'all 0.3s ease',
+              boxShadow: isFiring ? '0 0 20px rgba(34, 197, 94, 0.5)' : 'none'
+            }}>
+              {isFiring ? '⚡ FIRING!' : '💤 Inactive'}
+            </div>
+          </div>
+          
+          {/* Bottom row - Current signal strength */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <span style={{ color: '#94a3b8', fontSize: '13px' }}>Current signal:</span>
+            <div style={{
+              flex: 1,
+              height: '6px',
+              background: 'rgba(100, 116, 139, 0.3)',
+              borderRadius: '3px',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${Math.min(currentSum / fireThreshold * 100, 100)}%`,
+                background: currentSum >= fireThreshold 
+                  ? 'linear-gradient(90deg, #22c55e, #4ade80)' 
+                  : 'linear-gradient(90deg, #f59e0b, #fbbf24)',
+                borderRadius: '3px',
+                transition: 'all 0.3s ease'
+              }} />
+            </div>
             <span style={{ 
               fontWeight: 'bold',
-              color: currentSum >= fireThreshold ? '#22c55e' : '#f59e0b'
+              color: currentSum >= fireThreshold ? '#22c55e' : '#f59e0b',
+              minWidth: '45px',
+              textAlign: 'right'
             }}>
               {(currentSum * 100).toFixed(1)}%
             </span>
-            <span style={{ color: '#64748b' }}> / {(fireThreshold * 100).toFixed(0)}%</span>
-          </div>
-          <div style={{
-            padding: '0.25rem 0.75rem',
-            background: isFiring ? 'linear-gradient(135deg, #16a34a, #22c55e)' : '#374151',
-            borderRadius: '4px',
-            fontWeight: '500',
-            transition: 'all 0.3s ease',
-            boxShadow: isFiring ? '0 0 20px rgba(34, 197, 94, 0.5)' : 'none'
-          }}>
-            {isFiring ? 'Action Potential!' : '💤 Below Threshold'}
           </div>
         </div>
       
