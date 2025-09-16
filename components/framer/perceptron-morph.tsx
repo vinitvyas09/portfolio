@@ -646,10 +646,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               />
             ))}
             <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-            <path 
-              d={`M ${sumNode.x + 60},${sumNode.y - 10} L ${sumNode.x + 70},${sumNode.y} L ${sumNode.x + 60},${sumNode.y + 10} L ${sumNode.x + 50},${sumNode.y} Z`}
-              fill="black"
-            />
+            <circle cx={sumNode.x + 60} cy={sumNode.y} r={14} fill="black" />
             <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
           </mask>
         </defs>
@@ -793,23 +790,28 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           filter="url(#circuit-shadow)"
         />
 
-        {/* Minimal threshold/step function indicator */}
+        {/* Threshold comparison indicator */}
         <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.2, type: 'spring', stiffness: 180, damping: 12 }}>
-          {/* Small diamond shape to represent threshold decision */}
-          <path
-            d={`M ${sumNode.x + 60},${sumNode.y - 8} L ${sumNode.x + 68},${sumNode.y} L ${sumNode.x + 60},${sumNode.y + 8} L ${sumNode.x + 52},${sumNode.y} Z`}
-            fill={`${colors.mathPrimary}22`}
-            stroke={colors.mathPrimary}
-            strokeWidth={1.5}
+          {/* Simple circle background for the > symbol */}
+          <circle
+            cx={sumNode.x + 60}
+            cy={sumNode.y}
+            r={12}
+            fill={`${colors.mathPrimary}15`}
+            stroke={`${colors.mathPrimary}60`}
+            strokeWidth={1}
           />
-          <text x={sumNode.x + 60} y={sumNode.y - 12} fontSize={7} fill={colors.textMuted} textAnchor="middle">
-            step
+          <text x={sumNode.x + 60} y={sumNode.y + 3} fontSize={16} fill={colors.mathPrimary} textAnchor="middle" fontWeight="bold">
+            &gt;
+          </text>
+          <text x={sumNode.x + 60} y={sumNode.y - 18} fontSize={7} fill={colors.textMuted} textAnchor="middle">
+            threshold
           </text>
         </motion.g>
 
         {/* Connection from threshold to output */}
         <motion.path
-          d={`M ${sumNode.x + 68},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
+          d={`M ${sumNode.x + 72},${sumNode.y} L ${outputNodeX - 10},${sumNode.y}`}
           stroke={`${colors.mathPrimary}cc`}
           strokeWidth={3}
           strokeLinecap="round"
