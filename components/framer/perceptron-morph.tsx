@@ -938,7 +938,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <text x={100} y={47} fontSize={10} fill={colors.sceneBg} textAnchor="middle" fontWeight="bold">+1</text>
           <text x={100} y={28} fontSize={7} fill={colors.textMuted} textAnchor="middle">bias</text>
           <motion.path
-            d={`M 108,44 Q ${sumNode.x - 40},64 ${sumNode.x - 12},${sumNode.y - 10}`}
+            d={`M 108,44 L ${sumNode.x - 12},${sumNode.y - 10}`}
             stroke={`${colors.circuitSecondary}aa`}
             strokeWidth={2}
             strokeDasharray="6 3"
