@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
 
 type StageId = 'neuron' | 'circuit' | 'math' | 'code' | 'chat';
 
@@ -72,13 +73,16 @@ const CODE_LINES = [
 ] as const;
 
 
-const NeuronScene = () => (
-  <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-slate-900">
+const NeuronScene = ({ colors }: { colors: any }) => (
+  <div 
+    className="relative flex h-full w-full items-center justify-center overflow-hidden"
+    style={{ backgroundColor: colors.sceneBg }}
+  >
     <motion.svg viewBox="0 0 400 200" className="h-full w-full" fill="none">
       <defs>
         <linearGradient id="neuron-signal" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#34d399" stopOpacity="0.8" />
+          <stop offset="0%" stopColor={colors.neuronPrimary} stopOpacity="0.8" />
+          <stop offset="100%" stopColor={colors.neuronSecondary} stopOpacity="0.8" />
         </linearGradient>
       </defs>
       
@@ -116,8 +120,8 @@ const NeuronScene = () => (
         cx="150"
         cy="100"
         r="25"
-        fill="rgba(96, 165, 250, 0.3)"
-        stroke="#60a5fa"
+        fill={`${colors.neuronPrimary}30`}
+        stroke={colors.neuronPrimary}
         strokeWidth="2"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -140,7 +144,7 @@ const NeuronScene = () => (
         cx="320"
         cy="90"
         r="4"
-        fill="#34d399"
+        fill={colors.neuronSecondary}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3, delay: 1.5 }}
@@ -149,7 +153,7 @@ const NeuronScene = () => (
         cx="320"
         cy="100"
         r="4"
-        fill="#34d399"
+        fill={colors.neuronSecondary}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3, delay: 1.6 }}
@@ -158,7 +162,7 @@ const NeuronScene = () => (
         cx="320"
         cy="110"
         r="4"
-        fill="#34d399"
+        fill={colors.neuronSecondary}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3, delay: 1.7 }}
@@ -167,20 +171,23 @@ const NeuronScene = () => (
   </div>
 );
 
-const CircuitScene = () => (
-  <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-slate-900">
+const CircuitScene = ({ colors }: { colors: any }) => (
+  <div 
+    className="relative flex h-full w-full items-center justify-center overflow-hidden"
+    style={{ backgroundColor: colors.sceneBg }}
+  >
     <motion.svg viewBox="0 0 400 200" className="h-full w-full" fill="none">
       <defs>
         <linearGradient id="circuit-signal" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#34d399" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.8" />
+          <stop offset="0%" stopColor={colors.circuitPrimary} stopOpacity="0.8" />
+          <stop offset="100%" stopColor={colors.circuitSecondary} stopOpacity="0.8" />
         </linearGradient>
       </defs>
       
       {/* Input nodes */}
-      <motion.circle cx="50" cy="70" r="8" fill="#34d399" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} />
-      <motion.circle cx="50" cy="100" r="8" fill="#34d399" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }} />
-      <motion.circle cx="50" cy="130" r="8" fill="#34d399" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} />
+      <motion.circle cx="50" cy="70" r="8" fill={colors.circuitPrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} />
+      <motion.circle cx="50" cy="100" r="8" fill={colors.circuitPrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }} />
+      <motion.circle cx="50" cy="130" r="8" fill={colors.circuitPrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} />
       
       {/* Input lines */}
       <motion.line x1="58" y1="70" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.5 }} />
@@ -192,8 +199,8 @@ const CircuitScene = () => (
         cx="150"
         cy="100"
         r="20"
-        fill="rgba(34, 211, 238, 0.2)"
-        stroke="#22d3ee"
+        fill={`${colors.circuitSecondary}30`}
+        stroke={colors.circuitSecondary}
         strokeWidth="2"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -204,7 +211,7 @@ const CircuitScene = () => (
         y="108"
         textAnchor="middle"
         fontSize="24"
-        fill="#22d3ee"
+        fill={colors.circuitSecondary}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
@@ -222,8 +229,8 @@ const CircuitScene = () => (
         width="60"
         height="40"
         rx="8"
-        fill="rgba(250, 204, 21, 0.2)"
-        stroke="#facc15"
+        fill={`${colors.mathPrimary}30`}
+        stroke={colors.mathPrimary}
         strokeWidth="2"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -234,7 +241,7 @@ const CircuitScene = () => (
         y="105"
         textAnchor="middle"
         fontSize="16"
-        fill="#facc15"
+        fill={colors.mathPrimary}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6 }}
@@ -243,42 +250,58 @@ const CircuitScene = () => (
       </motion.text>
       
       {/* Output */}
-      <motion.circle cx="360" cy="100" r="6" fill="#f97316" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.8 }} />
+      <motion.circle cx="360" cy="100" r="6" fill={colors.codePrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.8 }} />
     </motion.svg>
   </div>
 );
 
-const MathScene = () => (
-  <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-slate-900 px-8 text-center">
+const MathScene = ({ colors }: { colors: any }) => (
+  <div 
+    className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-8 text-center"
+    style={{ backgroundColor: colors.sceneBg }}
+  >
     <motion.div
-      className="font-mono text-3xl text-slate-100 md:text-4xl"
+      className="font-mono text-3xl md:text-4xl"
+      style={{ color: colors.textPrimary }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      <span style={{ color: '#facc15' }}>y</span> = f<span className="text-slate-400">(</span>
-      <span style={{ color: '#22d3ee' }}>∑</span> 
-      <span style={{ color: '#34d399' }}>w</span><sub className="text-slate-400">i</sub>
-      <span style={{ color: '#60a5fa' }}>x</span><sub className="text-slate-400">i</sub> + 
-      <span style={{ color: '#f97316' }}>b</span>
-      <span className="text-slate-400">)</span>
+      <span style={{ color: colors.mathPrimary }}>y</span> = f<span style={{ color: colors.textMuted }}>(</span>
+      <span style={{ color: colors.circuitSecondary }}>∑</span> 
+      <span style={{ color: colors.circuitPrimary }}>w</span><sub style={{ color: colors.textMuted }}>i</sub>
+      <span style={{ color: colors.neuronPrimary }}>x</span><sub style={{ color: colors.textMuted }}>i</sub> + 
+      <span style={{ color: colors.codePrimary }}>b</span>
+      <span style={{ color: colors.textMuted }}>)</span>
     </motion.div>
   </div>
 );
 
-const CodeScene = () => (
-  <div className="relative flex h-full w-full flex-col justify-center overflow-hidden bg-slate-900 px-8 py-8">
+const CodeScene = ({ colors }: { colors: any }) => (
+  <div 
+    className="relative flex h-full w-full flex-col justify-center overflow-hidden px-8 py-8"
+    style={{ backgroundColor: colors.sceneBg }}
+  >
     <motion.div
-      className="rounded-lg border border-slate-700 bg-slate-950 p-6"
+      className="rounded-lg border p-6"
+      style={{
+        backgroundColor: colors.cardBg,
+        borderColor: colors.borderColor
+      }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="space-y-2 font-mono text-sm text-slate-200">
+      <div 
+        className="space-y-2 font-mono text-sm"
+        style={{ color: colors.textSecondary }}
+      >
         {CODE_LINES.map((line, index) => (
           <motion.div
             key={line.content}
-            className={'accent' in line && line.accent ? 'text-orange-300' : 'text-slate-300'}
+            style={{ 
+              color: 'accent' in line && line.accent ? colors.codePrimary : colors.textSecondary 
+            }}
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
@@ -291,21 +314,29 @@ const CodeScene = () => (
   </div>
 );
 
-const ChatScene = () => (
-  <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-slate-900 px-8">
+const ChatScene = ({ colors }: { colors: any }) => (
+  <div 
+    className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-8"
+    style={{ backgroundColor: colors.sceneBg }}
+  >
     <motion.div
-      className="max-w-sm rounded-2xl border border-slate-700 bg-slate-800 p-6"
+      className="max-w-sm rounded-2xl border p-6"
+      style={{
+        backgroundColor: colors.cardBg,
+        borderColor: colors.borderColor
+      }}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.8 }}
     >
       <div className="flex items-center gap-3 mb-4">
-        <div className="h-3 w-3 rounded-full bg-emerald-400"></div>
-        <span className="text-slate-400 text-sm">AI Chat</span>
+        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: colors.circuitPrimary }}></div>
+        <span className="text-sm" style={{ color: colors.textMuted }}>AI Chat</span>
       </div>
       <div className="space-y-3">
         <motion.div
-          className="bg-indigo-500 text-white p-3 rounded-lg rounded-br-sm text-sm"
+          className="p-3 rounded-lg rounded-br-sm text-sm"
+          style={{ backgroundColor: colors.chatPrimary, color: colors.sceneBg }}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
@@ -313,7 +344,8 @@ const ChatScene = () => (
           Hello AI!
         </motion.div>
         <motion.div
-          className="bg-slate-700 text-slate-200 p-3 rounded-lg rounded-bl-sm text-sm"
+          className="p-3 rounded-lg rounded-bl-sm text-sm"
+          style={{ backgroundColor: colors.timelineTrack, color: colors.textPrimary }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 1 }}
@@ -325,7 +357,7 @@ const ChatScene = () => (
   </div>
 );
 
-const STAGE_COMPONENTS: Record<StageId, () => React.JSX.Element> = {
+const STAGE_COMPONENTS: Record<StageId, (props: { colors: any }) => React.JSX.Element> = {
   neuron: NeuronScene,
   circuit: CircuitScene,
   math: MathScene,
@@ -334,8 +366,102 @@ const STAGE_COMPONENTS: Record<StageId, () => React.JSX.Element> = {
 };
 
 const PerceptronContinuum = () => {
+  // Theme handling
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
+  
   const [stageIndex, setStageIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  
+  // Sophisticated color palette
+  const colors = useMemo(() => {
+    // Default to light colors before mount to avoid hydration mismatch
+    if (!mounted) {
+      return {
+        // Background colors
+        containerBg: "rgba(248, 250, 252, 0.95)",
+        borderColor: "rgba(226, 232, 240, 0.8)",
+        sceneBg: "#ffffff",
+        
+        // Stage-specific colors
+        neuronPrimary: "#6366f1",
+        neuronSecondary: "#10b981",
+        circuitPrimary: "#10b981",
+        circuitSecondary: "#06b6d4",
+        mathPrimary: "#eab308",
+        codePrimary: "#f97316",
+        chatPrimary: "#a855f7",
+        
+        // Text colors
+        textPrimary: "#1e293b",
+        textSecondary: "#64748b",
+        textMuted: "#94a3b8",
+        
+        // UI elements
+        cardBg: "rgba(255, 255, 255, 0.9)",
+        cardBorder: "rgba(226, 232, 240, 0.8)",
+        timelineBg: "rgba(248, 250, 252, 0.9)",
+        timelineTrack: "rgba(148, 163, 184, 0.3)",
+        timelineDot: "rgba(100, 116, 139, 0.6)",
+      };
+    }
+    
+    return isDark ? {
+      // Dark mode - sophisticated blacks and grays
+      containerBg: "rgba(15, 23, 42, 0.95)",
+      borderColor: "rgba(51, 65, 85, 0.8)",
+      sceneBg: "#0f172a",
+      
+      // Stage-specific colors - more vibrant for dark mode
+      neuronPrimary: "#a78bfa",
+      neuronSecondary: "#34d399",
+      circuitPrimary: "#34d399",
+      circuitSecondary: "#22d3ee",
+      mathPrimary: "#fbbf24",
+      codePrimary: "#fb923c",
+      chatPrimary: "#c084fc",
+      
+      // Text colors
+      textPrimary: "#f8fafc",
+      textSecondary: "#cbd5e1",
+      textMuted: "#94a3b8",
+      
+      // UI elements
+      cardBg: "rgba(15, 23, 42, 0.9)",
+      cardBorder: "rgba(51, 65, 85, 0.8)",
+      timelineBg: "rgba(15, 23, 42, 0.9)",
+      timelineTrack: "rgba(51, 65, 85, 0.7)",
+      timelineDot: "rgba(100, 116, 139, 0.8)",
+    } : {
+      // Light mode - clean whites and subtle colors
+      containerBg: "rgba(255, 255, 255, 0.95)",
+      borderColor: "rgba(226, 232, 240, 0.8)",
+      sceneBg: "#ffffff",
+      
+      // Stage-specific colors
+      neuronPrimary: "#6366f1",
+      neuronSecondary: "#10b981",
+      circuitPrimary: "#10b981",
+      circuitSecondary: "#06b6d4",
+      mathPrimary: "#eab308",
+      codePrimary: "#f97316",
+      chatPrimary: "#a855f7",
+      
+      // Text colors
+      textPrimary: "#1e293b",
+      textSecondary: "#64748b",
+      textMuted: "#94a3b8",
+      
+      // UI elements
+      cardBg: "rgba(255, 255, 255, 0.9)",
+      cardBorder: "rgba(226, 232, 240, 0.8)",
+      timelineBg: "rgba(248, 250, 252, 0.9)",
+      timelineTrack: "rgba(148, 163, 184, 0.3)",
+      timelineDot: "rgba(100, 116, 139, 0.6)",
+    };
+  }, [isDark, mounted]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -348,10 +474,27 @@ const PerceptronContinuum = () => {
 
   const stage = STAGES[stageIndex];
   const StageVisual = STAGE_COMPONENTS[stage.id];
+  
+  // Placeholder to avoid SSR/CSR theme mismatch flash
+  if (!mounted) {
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="relative overflow-hidden rounded-2xl border bg-white shadow-2xl backdrop-blur" style={{ height: '32rem' }}>
+          {/* Empty placeholder */}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <div className="relative overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/60 shadow-2xl backdrop-blur">
+      <div 
+        className="relative overflow-hidden rounded-2xl border shadow-2xl backdrop-blur"
+        style={{
+          backgroundColor: colors.containerBg,
+          borderColor: colors.borderColor
+        }}
+      >
         {/* Step Number Indicator */}
         <motion.div
           key={`step-${stage.step}`}
@@ -376,15 +519,22 @@ const PerceptronContinuum = () => {
               exit="exit"
               transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
             >
-              <StageVisual />
+              <StageVisual colors={colors} />
             </motion.div>
           </AnimatePresence>
         </div>
         
-        <div className="border-t border-slate-800/80 bg-slate-950/70 px-6 py-6">
+        <div 
+          className="border-t px-6 py-6"
+          style={{
+            borderColor: colors.borderColor,
+            backgroundColor: colors.cardBg
+          }}
+        >
           <motion.h3
             key={`${stage.id}-title`}
-            className="text-xl font-semibold text-slate-100 md:text-2xl"
+            className="text-xl font-semibold md:text-2xl"
+            style={{ color: colors.textPrimary }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -396,6 +546,7 @@ const PerceptronContinuum = () => {
         <div className="px-6 pb-6">
           <Timeline
             stageIndex={stageIndex}
+            colors={colors}
             onSelectStage={(index) => {
               if (index === stageIndex) {
                 return;
@@ -412,16 +563,26 @@ const PerceptronContinuum = () => {
 
 interface TimelineProps {
   stageIndex: number;
+  colors: any;
   onSelectStage: (index: number) => void;
 }
 
-const Timeline = ({ stageIndex, onSelectStage }: TimelineProps) => {
+const Timeline = ({ stageIndex, colors, onSelectStage }: TimelineProps) => {
   const accent = STAGES[stageIndex].accent;
   const progress = (stageIndex / (STAGES.length - 1)) * 100;
 
   return (
-    <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 px-4 py-4">
-      <div className="relative h-1 w-full overflow-hidden rounded-full bg-slate-800/70">
+    <div 
+      className="rounded-xl border px-4 py-4"
+      style={{
+        backgroundColor: colors.timelineBg,
+        borderColor: colors.borderColor
+      }}
+    >
+      <div 
+        className="relative h-1 w-full overflow-hidden rounded-full"
+        style={{ backgroundColor: colors.timelineTrack }}
+      >
         <motion.div
           className="absolute left-0 top-0 h-full rounded-full"
           initial={false}
@@ -439,10 +600,17 @@ const Timeline = ({ stageIndex, onSelectStage }: TimelineProps) => {
                 key={stage.id}
                 type="button"
                 onClick={() => onSelectStage(index)}
-                className="group relative flex flex-col items-center gap-2 text-xs text-slate-500 transition-colors hover:text-slate-300"
+                className="group relative flex flex-col items-center gap-2 text-xs transition-colors"
+                style={{ 
+                  color: colors.textMuted,
+                  ['&:hover' as any]: { color: colors.textSecondary }
+                }}
               >
                 <span className="relative flex h-6 w-6 items-center justify-center">
-                  <span className="h-2 w-2 rounded-full bg-slate-600/80 transition-transform group-hover:scale-125" />
+                  <span 
+                    className="h-2 w-2 rounded-full transition-transform group-hover:scale-125"
+                    style={{ backgroundColor: colors.timelineDot }}
+                  />
                   {isActive && (
                     <motion.span
                       layoutId="timeline-dot"
