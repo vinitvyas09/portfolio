@@ -516,6 +516,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const outputStart = { x: chip.x + chip.width, y: sumNode.y };
   const outputConnectorSegment = `C ${outputStart.x + 18},${sumNode.y} ${outputStart.x + 32},${sumNode.y} ${outputStart.x + 40},${sumNode.y}`;
   const outputConnector = `M ${outputStart.x},${sumNode.y} ${outputConnectorSegment}`;
+  const activationArrow = `M ${chip.x - 8},${sumNode.y - 4} L ${chip.x + 4},${sumNode.y} L ${chip.x - 8},${sumNode.y + 4} Z`;
+  const outputArrow = `M ${chip.x + chip.width + 16},${sumNode.y - 4} L ${chip.x + chip.width + 30},${sumNode.y} L ${chip.x + chip.width + 16},${sumNode.y + 4} Z`;
 
   const createTracePath = (y: number, index: number) => {
     const controlX = (moduleExitX + sumNode.x) / 2;
@@ -736,6 +738,9 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius} fill={`${colors.circuitSecondary}18`} stroke={colors.circuitSecondary} strokeWidth={2} filter="url(#circuit-shadow)" />
           <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 6} fill={`${colors.circuitSecondary}12`} />
           <text x={sumNode.x} y={sumNode.y + 6.5} textAnchor="middle" fontSize={22} fill={colors.circuitSecondary} fontWeight="bold">Σ</text>
+          <text x={sumNode.x + sumNode.radius + 8} y={sumNode.y - 12} fontSize={9} fill={colors.textMuted}>
+            z
+          </text>
         </motion.g>
 
         {/* Bias input */}
@@ -779,13 +784,21 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             <rect key={`pin-bottom-${i}`} x={chip.x + 10 + i * 14} y={chip.y + chip.height} width={3} height={6} rx={1} fill={`${colors.mathPrimary}b0`} />
           ))}
           <text x={chip.x + chip.width / 2} y={chip.y + chip.height / 2 + 5} textAnchor="middle" fontSize={15} fill={colors.mathPrimary} fontWeight={600}>
-            f(x)
+            f(z)
           </text>
           <path
             d={`M ${chip.x + 8},${chip.y + 14} L ${chip.x + chip.width - 8},${chip.y + 14} M ${chip.x + 8},${chip.y + chip.height - 14} L ${chip.x + chip.width - 8},${chip.y + chip.height - 14}`}
             stroke={`${colors.mathPrimary}40`}
             strokeWidth={0.6}
           />
+          <circle cx={chip.x - 6} cy={sumNode.y} r={2.4} fill={`${colors.mathPrimary}aa`} />
+          <text x={chip.x - 10} y={sumNode.y - 8} fontSize={8} fill={colors.textMuted} textAnchor="end">
+            input z
+          </text>
+          <circle cx={chip.x + chip.width + 10} cy={sumNode.y} r={2.4} fill={`${colors.mathPrimary}aa`} />
+          <text x={chip.x + chip.width + 14} y={sumNode.y - 10} fontSize={8} fill={colors.textMuted}>
+            y = f(z)
+          </text>
         </motion.g>
 
         {/* Activation to output */}
