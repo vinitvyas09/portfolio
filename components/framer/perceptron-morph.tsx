@@ -394,11 +394,12 @@ const NeuronScene = ({ colors }: { colors: any }) => {
               <g key={`dendrite-${branch.index}`}>
                 <path
                   d={`M ${branch.startX},${branch.startY} Q ${ctrl1X},${ctrl1Y} ${branch.endX},${branch.endY}`}
-                  stroke={palette.dendriteMain}
+                  stroke="url(#dendrite-energy)"
                   strokeWidth={trunkThickness}
-                  opacity={0.35}
+                  opacity={0.6}
                   strokeLinecap="round"
                   fill="none"
+                  filter="url(#neuron-glow)"
                 />
 
                 {[0.4, 0.6, 0.8].map((progress, pIdx) => {
@@ -494,11 +495,13 @@ const NeuronScene = ({ colors }: { colors: any }) => {
             </g>
           ))}
 
-          {/* Soma */}
-          <path d={somaPaths.fill} fill={`url(#${palette.somaGradientId})`} opacity={0.85} />
-          <ellipse cx="168" cy="160" rx="26" ry="24" fill={palette.somaInner} opacity={0.3} transform="rotate(15 168 160)" />
-          <ellipse cx="172" cy="158" rx="22" ry="20" fill={palette.somaInner} opacity={0.25} transform="rotate(-25 172 158)" />
-          <path d={somaPaths.outline} fill="none" stroke={palette.membrane} strokeWidth={1.1} opacity={0.9} />
+          {/* Soma with enhanced gradients and glow */}
+          <circle cx={somaX} cy={somaY} r={somaRadius + 8} fill="url(#neuron-membrane-glow)" opacity={0.6} />
+          <path d={somaPaths.fill} fill={`url(#${palette.somaGradientId})`} opacity={0.92} filter="url(#neuron-glow)" />
+          <ellipse cx="168" cy="160" rx="26" ry="24" fill={palette.somaInner} opacity={0.4} transform="rotate(15 168 160)" />
+          <ellipse cx="172" cy="158" rx="22" ry="20" fill={withAlpha(colors.neuronSecondary, '35')} opacity={0.6} transform="rotate(-25 172 158)" />
+          <path d={somaPaths.outline} fill="none" stroke={palette.membrane} strokeWidth={1.3} opacity={0.95} />
+          <circle cx={somaX - 5} cy={somaY - 5} r={3} fill={withAlpha(lightenColor(colors.neuronPrimary, 0.4), 'aa')} opacity={0.8} />
 
           {/* Nucleus */}
           <ellipse cx="168" cy="158" rx="14" ry="12" fill={palette.nucleus} opacity={0.85} transform="rotate(10 168 158)" />
@@ -529,11 +532,12 @@ const NeuronScene = ({ colors }: { colors: any }) => {
             />
             <path
               d={`M 208,160 C 218,160 228,${160 + Math.sin(0.8) * 3} ${axonStartX},${firstSegmentY}`}
-              stroke={palette.axonCore}
+              stroke="url(#axon-pulse)"
               strokeWidth={4}
               strokeLinecap="round"
               fill="none"
-              opacity={0.9}
+              opacity={0.95}
+              filter="url(#neuron-glow)"
             />
           </g>
 
