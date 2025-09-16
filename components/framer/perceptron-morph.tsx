@@ -85,6 +85,8 @@ const NeuronScene = ({ colors }: { colors: any }) => {
 
   const roundCoord = (value: number) => Math.round(value * 1000) / 1000;
 
+  const revealClipId = useRef(`neuron-reveal-${Math.random().toString(36).slice(2)}`);
+
   const palette = useMemo(() => ({
     somaGradientId: 'neuron-soma-detailed',
     somaOuter: withAlpha(colors.neuronPrimary, 'dd'),
@@ -286,9 +288,24 @@ const NeuronScene = ({ colors }: { colors: any }) => {
             <stop offset="65%" stopColor={palette.somaMid} />
             <stop offset="100%" stopColor={palette.somaInner} />
           </radialGradient>
+          <clipPath id={revealClipId.current}>
+            <motion.rect
+              x="0"
+              y="0"
+              height="320"
+              initial={{ width: 0 }}
+              animate={{ width: 700 }}
+              transition={{ duration: 0.9, ease: 'easeInOut' }}
+            />
+          </clipPath>
         </defs>
 
-        <motion.g initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
+        <motion.g
+          clipPath={`url(#${revealClipId.current})`}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
           {/* Dendritic canopy */}
           {mainBranches.map((branch) => {
             const ctrl1X = roundCoord(branch.startX + (branch.endX - branch.startX) * 0.3 + Math.sin(branch.index * 0.4) * 6);
