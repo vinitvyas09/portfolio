@@ -683,91 +683,282 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           </circle>
         )}
         
-        {/* Axon Terminals */}
-        {[-35, -15, 0, 15, 35].map((offset, i) => {
-          const terminalY = terminalBaseY + offset;
+        {/* Axon Terminals - Realistic branching tree with synaptic boutons */}
+        {(() => {
+          // Create a natural branching pattern for axon terminals
+          interface TerminalBranch {
+            mainBranch: { startX: number; startY: number; endX: number; endY: number; angle: number };
+            secondaryBranch: { startX: number; startY: number; endX: number; endY: number };
+            terminalBranch: { startX: number; startY: number; endX: number; endY: number };
+            boutonX: number;
+            boutonY: number;
+            id: string;
+          }
+          const terminalBranches: TerminalBranch[] = [];
+          
+          // Primary branching point
+          const primaryBranchX = axonTerminalX;
+          const primaryBranchY = terminalBaseY;
+          
+          // Create 3 main branches that split further
+          const mainBranchAngles = [-25, 0, 25]; // Spread angles
+          
+          mainBranchAngles.forEach((angle, mainIdx) => {
+            // Main branch properties
+            const mainLength = 25 + Math.sin(mainIdx * 1.7) * 5;
+            const mainEndX = primaryBranchX + mainLength;
+            const mainEndY = primaryBranchY + Math.sin(angle * Math.PI / 180) * mainLength;
+            
+            // Each main branch splits into 2-3 secondary branches
+            const numSecondary = mainIdx === 1 ? 3 : 2; // Middle branch has 3
+            
+            for (let secIdx = 0; secIdx < numSecondary; secIdx++) {
+              const secAngle = angle + (secIdx - (numSecondary - 1) / 2) * 15;
+              const secLength = 20 + Math.sin((mainIdx + secIdx) * 2.1) * 5;
+              const secStartX = mainEndX;
+              const secStartY = mainEndY;
+              const secEndX = secStartX + secLength;
+              const secEndY = secStartY + Math.sin(secAngle * Math.PI / 180) * secLength * 1.2;
+              
+              // Each secondary branch ends in 1-2 terminal boutons
+              const numBoutons = secIdx % 2 === 0 ? 2 : 1;
+              
+              for (let boutIdx = 0; boutIdx < numBoutons; boutIdx++) {
+                const boutAngle = secAngle + (boutIdx - 0.5) * 20;
+                const boutLength = 12 + Math.sin((secIdx + boutIdx) * 3.1) * 3;
+                const boutStartX = secEndX;
+                const boutStartY = secEndY;
+                const boutEndX = boutStartX + boutLength;
+                const boutEndY = boutStartY + Math.sin(boutAngle * Math.PI / 180) * boutLength;
+                
+                terminalBranches.push({
+                  mainBranch: {
+                    startX: primaryBranchX,
+                    startY: primaryBranchY,
+                    endX: mainEndX,
+                    endY: mainEndY,
+                    angle: angle
+                  },
+                  secondaryBranch: {
+                    startX: secStartX,
+                    startY: secStartY,
+                    endX: secEndX,
+                    endY: secEndY
+                  },
+                  terminalBranch: {
+                    startX: boutStartX,
+                    startY: boutStartY,
+                    endX: boutEndX,
+                    endY: boutEndY
+                  },
+                  boutonX: boutEndX,
+                  boutonY: boutEndY,
+                  id: `${mainIdx}-${secIdx}-${boutIdx}`
+                });
+              }
+            }
+          });
+          
           const isLit = terminalLit;
           
           return (
-            <g key={`terminal-${i}`}>
-              {/* Branch to terminal */}
-              <path
-                d={`M ${axonTerminalX},${terminalBaseY} Q 600,${terminalBaseY + offset * 0.3} 618,${terminalY}`}
-                stroke={isLit ? '#22c55e' : '#60a5fa'}
-                strokeWidth="2.5"
-                fill="none"
-                opacity={isLit ? 1 : 0.6}
-                style={{
-                  transition: 'all 0.3s ease',
-                }}
-              />
+            <g>
+              {/* Main branching structure */}
+              {mainBranchAngles.map((angle, idx) => {
+                const mainLength = 25 + Math.sin(idx * 1.7) * 5;
+                const mainEndX = primaryBranchX + mainLength;
+                const mainEndY = primaryBranchY + Math.sin(angle * Math.PI / 180) * mainLength;
+                
+                return (
+                  <path
+                    key={`main-terminal-${idx}`}
+                    d={`M ${primaryBranchX},${primaryBranchY}
+                        Q ${primaryBranchX + 10},${primaryBranchY + Math.sin(angle * Math.PI / 180) * 5}
+                          ${mainEndX},${mainEndY}`}
+                    stroke={isLit ? '#22c55e' : '#60a5fa'}
+                    strokeWidth="3"
+                    fill="none"
+                    opacity={isLit ? 0.9 : 0.6}
+                    strokeLinecap="round"
+                    style={{
+                      transition: 'all 0.3s ease',
+                    }}
+                  />
+                );
+              })}
               
-              {/* Terminal button */}
-              <g filter={isLit ? "url(#terminalGlow)" : ""}>
-                <ellipse
-                  cx="625"
-                  cy={terminalY}
-                  rx="10"
-                  ry="8"
-                  fill={isLit ? '#22c55e' : '#60a5fa'}
-                  opacity={isLit ? 1 : 0.7}
-                  style={{
-                    transition: 'all 0.3s ease',
-                  }}
-                />
-              </g>
-              
-              {/* Synaptic vesicles */}
-              <circle
-                cx="623"
-                cy={terminalY - 2}
-                r="2.5"
-                fill={isLit ? '#16a34a' : '#2563eb'}
-                opacity={isLit ? 1 : 0.5}
-                style={{
-                  transition: 'all 0.3s ease',
-                }}
-              />
-              <circle
-                cx="627"
-                cy={terminalY + 2}
-                r="2.5"
-                fill={isLit ? '#16a34a' : '#2563eb'}
-                opacity={isLit ? 1 : 0.5}
-                style={{
-                  transition: 'all 0.3s ease',
-                }}
-              />
-              
-              {/* Neurotransmitter release animation */}
-              {isLit && (
-                <>
-                  <circle
-                    cx="635"
-                    cy={terminalY}
-                    r="2"
-                    fill="#22c55e"
-                    opacity="0"
-                  >
-                    <animate
-                      attributeName="cx"
-                      from="635"
-                      to="650"
-                      dur="0.5s"
-                      begin="0s"
+              {/* Secondary and terminal branches with boutons */}
+              {terminalBranches.map((branch) => {
+                const boutonRadius = 6 + Math.sin(branch.boutonX * 0.1) * 1;
+                
+                return (
+                  <g key={`terminal-${branch.id}`}>
+                    {/* Secondary branch */}
+                    <path
+                      d={`M ${branch.secondaryBranch.startX},${branch.secondaryBranch.startY}
+                          C ${branch.secondaryBranch.startX + 5},${branch.secondaryBranch.startY + 2}
+                            ${(branch.secondaryBranch.startX + branch.secondaryBranch.endX) / 2},
+                            ${(branch.secondaryBranch.startY + branch.secondaryBranch.endY) / 2}
+                            ${branch.secondaryBranch.endX},${branch.secondaryBranch.endY}`}
+                      stroke={isLit ? '#22c55e' : '#60a5fa'}
+                      strokeWidth="2"
+                      fill="none"
+                      opacity={isLit ? 0.85 : 0.5}
+                      strokeLinecap="round"
+                      style={{
+                        transition: 'all 0.3s ease',
+                      }}
                     />
-                    <animate
-                      attributeName="opacity"
-                      values="0;1;0"
-                      dur="0.5s"
-                      begin="0s"
+                    
+                    {/* Terminal stalk to bouton */}
+                    <path
+                      d={`M ${branch.terminalBranch.startX},${branch.terminalBranch.startY}
+                          L ${branch.terminalBranch.endX},${branch.terminalBranch.endY}`}
+                      stroke={isLit ? '#22c55e' : '#60a5fa'}
+                      strokeWidth="1.5"
+                      fill="none"
+                      opacity={isLit ? 0.8 : 0.45}
+                      strokeLinecap="round"
+                      style={{
+                        transition: 'all 0.3s ease',
+                      }}
                     />
-                  </circle>
-                </>
-              )}
+                    
+                    {/* Synaptic bouton (terminal knob) */}
+                    <g filter={isLit ? "url(#terminalGlow)" : ""}>
+                      {/* Bouton body - organic teardrop shape */}
+                      <path
+                        d={`M ${branch.boutonX},${branch.boutonY}
+                            m -${boutonRadius},0
+                            c 0,-${boutonRadius * 0.8} ${boutonRadius * 0.8},-${boutonRadius} ${boutonRadius},-${boutonRadius}
+                            c ${boutonRadius * 0.2},0 ${boutonRadius},${boutonRadius * 0.2} ${boutonRadius},${boutonRadius}
+                            c 0,${boutonRadius * 0.8} -${boutonRadius * 0.8},${boutonRadius} -${boutonRadius},${boutonRadius}
+                            c -${boutonRadius * 0.2},0 -${boutonRadius},-${boutonRadius * 0.2} -${boutonRadius},-${boutonRadius}
+                            Z`}
+                        fill={isLit ? '#22c55e' : '#60a5fa'}
+                        opacity={isLit ? 0.95 : 0.7}
+                        style={{
+                          transition: 'all 0.3s ease',
+                        }}
+                      />
+                      
+                      {/* Active zone (darker region where neurotransmitters release) */}
+                      <ellipse
+                        cx={branch.boutonX + boutonRadius * 0.3}
+                        cy={branch.boutonY}
+                        rx={boutonRadius * 0.4}
+                        ry={boutonRadius * 0.5}
+                        fill={isLit ? '#16a34a' : '#3b82f6'}
+                        opacity={isLit ? 0.8 : 0.5}
+                      />
+                    </g>
+                    
+                    {/* Synaptic vesicles inside bouton */}
+                    <g>
+                      {/* Cluster of vesicles */}
+                      <circle
+                        cx={branch.boutonX - 2}
+                        cy={branch.boutonY - 1}
+                        r="1.8"
+                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        opacity={isLit ? 0.9 : 0.4}
+                      />
+                      <circle
+                        cx={branch.boutonX + 1}
+                        cy={branch.boutonY + 1}
+                        r="1.5"
+                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        opacity={isLit ? 0.85 : 0.35}
+                      />
+                      <circle
+                        cx={branch.boutonX - 1}
+                        cy={branch.boutonY + 2}
+                        r="1.3"
+                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        opacity={isLit ? 0.8 : 0.3}
+                      />
+                      <circle
+                        cx={branch.boutonX + 2}
+                        cy={branch.boutonY - 2}
+                        r="1.6"
+                        fill={isLit ? '#4ade80' : '#60a5fa'}
+                        opacity={isLit ? 0.85 : 0.35}
+                      />
+                    </g>
+                    
+                    {/* Neurotransmitter release animation */}
+                    {isLit && (
+                      <>
+                        {/* Multiple neurotransmitter particles */}
+                        {[0, 120, 240].map((delay, idx) => (
+                          <circle
+                            key={`nt-${idx}`}
+                            cx={branch.boutonX + boutonRadius}
+                            cy={branch.boutonY + (idx - 1) * 2}
+                            r="1.5"
+                            fill="#22c55e"
+                            opacity="0"
+                          >
+                            <animate
+                              attributeName="cx"
+                              from={branch.boutonX + boutonRadius}
+                              to={branch.boutonX + boutonRadius + 15}
+                              dur="0.6s"
+                              begin={`${delay}ms`}
+                            />
+                            <animate
+                              attributeName="opacity"
+                              values="0;0.8;0.6;0"
+                              dur="0.6s"
+                              begin={`${delay}ms`}
+                            />
+                            <animate
+                              attributeName="r"
+                              values="1.5;2;1.8;1"
+                              dur="0.6s"
+                              begin={`${delay}ms`}
+                            />
+                          </circle>
+                        ))}
+                      </>
+                    )}
+                  </g>
+                );
+              })}
+              
+              {/* Additional fine terminal branches for density */}
+              {[-18, 18].map((angle, idx) => {
+                const extraX = primaryBranchX + 20;
+                const extraY = primaryBranchY + angle * 2;
+                const extraEndX = extraX + 35;
+                const extraEndY = extraY + angle * 1.5;
+                
+                return (
+                  <g key={`extra-terminal-${idx}`}>
+                    <path
+                      d={`M ${primaryBranchX},${primaryBranchY}
+                          Q ${extraX},${extraY}
+                            ${extraEndX},${extraEndY}`}
+                      stroke={isLit ? '#22c55e' : '#60a5fa'}
+                      strokeWidth="1"
+                      fill="none"
+                      opacity={isLit ? 0.5 : 0.25}
+                      strokeLinecap="round"
+                    />
+                    {/* Small bouton at the end */}
+                    <circle
+                      cx={extraEndX}
+                      cy={extraEndY}
+                      r="3.5"
+                      fill={isLit ? '#22c55e' : '#60a5fa'}
+                      opacity={isLit ? 0.7 : 0.4}
+                    />
+                  </g>
+                );
+              })}
             </g>
           );
-        })}
+        })()}
         
         {/* Labels */}
         <text x="50" y="50" fill="#e2e8f0" fontSize="11" fontWeight="500">
