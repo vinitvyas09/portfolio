@@ -805,9 +805,6 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               {(currentSum * 100).toFixed(1)}%
             </span>
             <span style={{ color: '#64748b' }}> / {(fireThreshold * 100).toFixed(0)}%</span>
-            <span style={{ color: '#64748b', fontSize: '12px', marginLeft: '8px' }}>
-              ({signals.filter(s => s > 0).length}/{inputs} active)
-            </span>
           </div>
           <div style={{
             padding: '0.25rem 0.75rem',
