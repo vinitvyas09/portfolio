@@ -23,8 +23,6 @@ So we're starting at the real beginning. Not with equations or Python classes, b
 
 Before we meet the perceptron (our star of the show), we need a 30-second neuroscience lesson. Don't worry, I'm not going to make you memorize dendrites and axons. Just the fun parts.
 
-{/*
-TODO: Replace with <NeuronAnimation /> once the component exists.
 <NeuronAnimation
   config={{
     inputs: 5,
@@ -34,7 +32,6 @@ TODO: Replace with <NeuronAnimation /> once the component exists.
     description: "Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!",
   }}
 />
-*/}
 
 A biological neuron is basically nature's tiny decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). Here's where it gets interesting: the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold—BOOM—it fires its own signal down the axon to the next neurons in line.
 
