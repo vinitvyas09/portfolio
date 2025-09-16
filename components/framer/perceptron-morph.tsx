@@ -908,7 +908,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             strokeWidth={i === 1 ? 3.4 : 3}
             strokeLinecap="round"
             fill="none"
-            mask={traceMaskUrl}
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ delay: 0.35 + i * 0.12, duration: 0.9, ease: 'easeInOut' }}
