@@ -54,66 +54,229 @@ const PerceptronContinuum = () => {
   
   const renderNeuron = () => (
     <svg viewBox="0 0 400 300" className="w-full h-full">
-      {/* Dendrites (inputs) */}
-      {[0, 1, 2, 3, 4].map((i) => (
-        <g key={`dendrite-${i}`}>
+      <defs>
+        {/* Gradient for cell body */}
+        <radialGradient id="cellGradient">
+          <stop offset="0%" stopColor="#475569" />
+          <stop offset="100%" stopColor="#1e293b" />
+        </radialGradient>
+        
+        {/* Gradient for signal flow */}
+        <linearGradient id="signalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
+          <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#10b981" stopOpacity="1" />
+        </linearGradient>
+        
+        {/* Filter for glow effect */}
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      
+      {/* Dendrites (inputs) - more organic branching structure */}
+      <g opacity="0.9">
+        {/* Main dendrite branches */}
+        <path
+          d="M 30 80 Q 70 90 120 130"
+          stroke="#475569"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 35 120 Q 75 125 120 140"
+          stroke="#475569"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 30 160 Q 70 155 120 150"
+          stroke="#475569"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 35 200 Q 75 185 120 160"
+          stroke="#475569"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 30 240 Q 70 220 120 170"
+          stroke="#475569"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        
+        {/* Smaller dendrite branches */}
+        <path
+          d="M 50 90 Q 60 85 65 78"
+          stroke="#475569"
+          strokeWidth="1"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 55 95 Q 65 100 70 95"
+          stroke="#475569"
+          strokeWidth="1"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 60 155 Q 70 150 75 145"
+          stroke="#475569"
+          strokeWidth="1"
+          fill="none"
+          strokeLinecap="round"
+        />
+        
+        {/* Synaptic terminals (input points) */}
+        <circle cx="30" cy="80" r="3" fill="#3b82f6" opacity="0.8" />
+        <circle cx="35" cy="120" r="3" fill="#3b82f6" opacity="0.8" />
+        <circle cx="30" cy="160" r="3" fill="#3b82f6" opacity="0.8" />
+        <circle cx="35" cy="200" r="3" fill="#3b82f6" opacity="0.8" />
+        <circle cx="30" cy="240" r="3" fill="#3b82f6" opacity="0.8" />
+      </g>
+      
+      {/* Cell body (soma) with nucleus */}
+      <g>
+        {/* Outer membrane */}
+        <ellipse
+          cx="150"
+          cy="150"
+          rx="38"
+          ry="35"
+          fill="url(#cellGradient)"
+          stroke="#64748b"
+          strokeWidth="2"
+          opacity="0.95"
+        />
+        
+        {/* Nucleus */}
+        <circle
+          cx="150"
+          cy="150"
+          r="15"
+          fill="#1e293b"
+          stroke="#334155"
+          strokeWidth="1"
+          opacity="0.8"
+        />
+        
+        {/* Nucleolus */}
+        <circle
+          cx="153"
+          cy="148"
+          r="5"
+          fill="#0f172a"
+          opacity="0.6"
+        />
+      </g>
+      
+      {/* Axon hillock and axon */}
+      <g>
+        {/* Axon hillock (cone shape) */}
+        <path
+          d="M 188 150 L 200 145 L 200 155 Z"
+          fill="#475569"
+          stroke="#64748b"
+          strokeWidth="1"
+        />
+        
+        {/* Axon with myelin sheaths */}
+        {[0, 1, 2, 3].map((i) => (
+          <g key={`myelin-${i}`}>
+            <rect
+              x={210 + i * 28}
+              y="145"
+              width="20"
+              height="10"
+              rx="5"
+              fill="#334155"
+              stroke="#475569"
+              strokeWidth="1"
+            />
+          </g>
+        ))}
+        
+        {/* Nodes of Ranvier (gaps between myelin) */}
+        {[0, 1, 2].map((i) => (
           <line
-            x1="50"
-            y1={50 + i * 40}
-            x2="150"
+            key={`node-${i}`}
+            x1={230 + i * 28}
+            y1="150"
+            x2={238 + i * 28}
             y2="150"
             stroke="#64748b"
             strokeWidth="2"
-            className="animate-pulse"
-            style={{ animationDelay: `${i * 0.2}s` }}
           />
-          <circle
-            cx="50"
-            cy={50 + i * 40}
-            r="4"
-            fill="#3b82f6"
-            className="animate-ping"
-            style={{ animationDelay: `${i * 0.2}s` }}
-          />
-        </g>
-      ))}
+        ))}
+      </g>
       
-      {/* Cell body */}
-      <circle
-        cx="150"
-        cy="150"
-        r="35"
-        fill="#1e293b"
-        stroke="#3b82f6"
-        strokeWidth="3"
+      {/* Axon terminals */}
+      <g>
+        <path
+          d="M 318 150 Q 330 145 340 143"
+          stroke="#475569"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 318 150 Q 330 150 340 150"
+          stroke="#475569"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 318 150 Q 330 155 340 157"
+          stroke="#475569"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        
+        {/* Synaptic boutons */}
+        <circle cx="340" cy="143" r="3" fill="#10b981" opacity="0.8" />
+        <circle cx="340" cy="150" r="3" fill="#10b981" opacity="0.8" />
+        <circle cx="340" cy="157" r="3" fill="#10b981" opacity="0.8" />
+      </g>
+      
+      {/* Subtle signal flow visualization */}
+      <rect
+        x="30"
+        y="148"
+        width="310"
+        height="4"
+        fill="url(#signalGradient)"
+        opacity="0.3"
+        rx="2"
       />
-      <text x="150" y="155" textAnchor="middle" fill="#f1f5f9" fontSize="12" fontWeight="600">
-        Σ
+      
+      {/* Elegant labels */}
+      <text x="25" y="60" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
+        Dendrites
       </text>
-      
-      {/* Axon (output) */}
-      <line
-        x1="185"
-        y1="150"
-        x2="320"
-        y2="150"
-        stroke="#64748b"
-        strokeWidth="3"
-      />
-      
-      {/* Output signal */}
-      <circle
-        cx="320"
-        cy="150"
-        r="6"
-        fill="#10b981"
-        className="animate-pulse"
-      />
-      
-      {/* Labels */}
-      <text x="30" y="30" fill="#94a3b8" fontSize="11">Inputs</text>
-      <text x="135" y="200" fill="#94a3b8" fontSize="11">Neuron</text>
-      <text x="310" y="180" fill="#94a3b8" fontSize="11">Output</text>
+      <text x="135" y="200" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
+        Soma
+      </text>
+      <text x="240" y="175" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
+        Axon
+      </text>
+      <text x="320" y="180" fill="#64748b" fontSize="10" fontFamily="serif" fontStyle="italic">
+        Terminals
+      </text>
     </svg>
   );
   
