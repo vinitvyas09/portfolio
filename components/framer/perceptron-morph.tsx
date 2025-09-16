@@ -87,26 +87,71 @@ const NeuronScene = ({ colors }: { colors: any }) => {
 
   const revealClipId = useRef(`neuron-reveal-${Math.random().toString(36).slice(2)}`);
 
-  const palette = useMemo(() => ({
-    somaGradientId: 'neuron-soma-detailed',
-    somaOuter: withAlpha(colors.neuronPrimary, 'dd'),
-    somaMid: withAlpha(colors.neuronPrimary, 'bb'),
-    somaInner: withAlpha(colors.neuronPrimary, '55'),
-    membrane: withAlpha(colors.neuronPrimary, 'ee'),
-    dendriteMain: withAlpha(colors.neuronPrimary, 'cc'),
-    dendriteSecondary: withAlpha(colors.neuronPrimary, '88'),
-    dendriteFine: withAlpha(colors.neuronPrimary, '5a'),
-    dendriteSpine: withAlpha(colors.neuronPrimary, '9d'),
-    axonHillock: withAlpha(colors.neuronPrimary, '66'),
-    axonCore: withAlpha(colors.neuronPrimary, 'bb'),
-    myelinFill: withAlpha(colors.neuronPrimary, '1c'),
-    myelinStroke: withAlpha(colors.neuronPrimary, '88'),
-    terminal: withAlpha(colors.neuronPrimary, 'cc'),
-    terminalSoft: withAlpha(colors.neuronPrimary, '88'),
-    vesicle: withAlpha(colors.neuronPrimary, 'aa'),
-    nucleus: withAlpha(colors.neuronPrimary, 'f0'),
-    nucleolus: withAlpha(colors.neuronPrimary, 'ff'),
-  }), [colors.neuronPrimary]);
+  const parseHex = (hex: string) => {
+    if (typeof hex !== 'string' || !hex.startsWith('#')) {
+      return null;
+    }
+    const normalized = hex.length === 9 ? hex.slice(0, 7) : hex;
+    if (normalized.length !== 7) {
+      return null;
+    }
+    const r = parseInt(normalized.slice(1, 3), 16);
+    const g = parseInt(normalized.slice(3, 5), 16);
+    const b = parseInt(normalized.slice(5, 7), 16);
+    if ([r, g, b].some((value) => Number.isNaN(value))) {
+      return null;
+    }
+    return { r, g, b };
+  };
+
+  const rgbToHex = (r: number, g: number, b: number) => {
+    const clamp = (value: number) => Math.max(0, Math.min(255, Math.round(value)));
+    return `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`;
+  };
+
+  const blendColors = (hexA: string, hexB: string, ratio: number) => {
+    const colorA = parseHex(hexA);
+    const colorB = parseHex(hexB);
+    if (!colorA || !colorB) {
+      return hexA;
+    }
+    const t = Math.max(0, Math.min(1, ratio));
+    const r = colorA.r + (colorB.r - colorA.r) * t;
+    const g = colorA.g + (colorB.g - colorA.g) * t;
+    const b = colorA.b + (colorB.b - colorA.b) * t;
+    return rgbToHex(r, g, b);
+  };
+
+  const lightenColor = (hex: string, amount: number) => blendColors(hex, '#ffffff', amount);
+  const darkenColor = (hex: string, amount: number) => blendColors(hex, '#000000', amount);
+
+  const palette = useMemo(() => {
+    const primary = colors.neuronPrimary;
+    const secondary = colors.neuronSecondary ?? colors.neuronPrimary;
+    const accentWarm = '#f59e0b';
+    const accentCool = '#14b8a6';
+
+    return {
+      somaGradientId: 'neuron-soma-detailed',
+      somaOuter: withAlpha(lightenColor(blendColors(primary, secondary, 0.25), 0.1), 'f0'),
+      somaMid: withAlpha(blendColors(primary, secondary, 0.45), 'd4'),
+      somaInner: withAlpha(darkenColor(primary, 0.2), '70'),
+      membrane: withAlpha(blendColors(primary, '#1f2937', 0.3), 'f0'),
+      dendriteMain: withAlpha(blendColors(primary, secondary, 0.2), 'cc'),
+      dendriteSecondary: withAlpha(lightenColor(primary, 0.25), 'aa'),
+      dendriteFine: withAlpha(blendColors(secondary, accentCool, 0.4), '66'),
+      dendriteSpine: withAlpha(lightenColor(secondary, 0.2), 'aa'),
+      axonHillock: withAlpha(blendColors(primary, secondary, 0.55), '88'),
+      axonCore: withAlpha(blendColors(secondary, accentCool, 0.3), 'd0'),
+      myelinFill: withAlpha(lightenColor(secondary, 0.45), '2a'),
+      myelinStroke: withAlpha(lightenColor(secondary, 0.15), 'a0'),
+      terminal: withAlpha(blendColors(secondary, accentWarm, 0.35), 'dd'),
+      terminalSoft: withAlpha(blendColors(secondary, accentCool, 0.5), 'a5'),
+      vesicle: withAlpha(blendColors(secondary, primary, 0.25), 'cc'),
+      nucleus: withAlpha(blendColors(primary, '#1d4ed8', 0.3), 'f0'),
+      nucleolus: withAlpha(lightenColor(secondary, 0.25), 'ff'),
+    };
+  }, [colors.neuronPrimary, colors.neuronSecondary]);
 
   const numMainBranches = 8;
 
