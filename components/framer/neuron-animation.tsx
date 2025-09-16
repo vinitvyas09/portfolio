@@ -28,12 +28,23 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const [terminalLit, setTerminalLit] = useState(false);
 
   const { inputs = 5, showWeights = true, fireThreshold = 0.4, animationMs = 3000, description } = config;
+  const axonSegmentCount = 4;
+  const axonSegmentSpacing = 82;
+  const axonSegmentWidth = 48;
+  const axonSegmentHeight = 20;
+  const axonStartX = 240;
+  const axonBaselineY = 160;
+  const axonCurveAmplitude = 6;
+  const firstSegmentY = axonBaselineY + Math.sin(0.9) * axonCurveAmplitude;
+  const terminalBaseY = axonBaselineY + Math.sin((axonSegmentCount + 1) * 0.9) * axonCurveAmplitude;
+  const axonSignalPath = `M 210,${axonBaselineY} C ${axonStartX + 32},${axonBaselineY - 14} ${axonStartX + axonSegmentSpacing * 1.6},${axonBaselineY + 18} 570,${terminalBaseY}`;
 
   // Generate random weights for each input (between 0.1 and 1)
   const weights = Array.from({ length: inputs }, (_, i) => {
     const weight = 0.2 + (Math.sin(i * 1.7) + 1) * 0.4;
     return Math.min(1, Math.max(0.1, weight));
   });
+  const totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
 
   useEffect(() => {
     const runAnimation = () => {
@@ -52,11 +63,12 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           
           setSignals([...signalValues]);
           
-          const sum = signalValues.reduce((acc, val) => acc + (val || 0), 0) / inputs;
-          setCurrentSum(sum);
+          const rawSum = signalValues.reduce((acc, val) => acc + (val || 0), 0);
+          const normalizedSum = totalWeight ? rawSum / totalWeight : 0;
+          setCurrentSum(normalizedSum);
           
           // Only fire if threshold is exceeded
-          if (sum >= fireThreshold) {
+          if (normalizedSum >= fireThreshold) {
             setTimeout(() => {
               setIsFiring(true);
               // Light up terminals after signal travels down axon
@@ -120,12 +132,15 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           const signal = signals[index] || 0;
           const isActive = signal > 0;
           
-          // Spread dendrites vertically
-          const yBase = 60 + (index * 200) / (inputs - 1);
-          
-          // Create organic branching paths
-          const path1 = `M 20,${yBase} Q 50,${yBase + (index % 2 ? -10 : 10)} 80,${yBase + 5} T 140,${160 + (index - 2) * 15}`;
-          const path2 = `M 40,${yBase + 10} Q 60,${yBase} 100,${yBase - 5} T 135,${160 + (index - 2) * 12}`;
+          const normalizedIndex = inputs > 1 ? index / (inputs - 1) : 0.5;
+          const yBase = 60 + normalizedIndex * 220 + Math.sin(index * 1.1) * 10;
+          const branchTargetY =
+            150 + (index - (inputs - 1) / 2) * 22 + Math.cos(index * 0.9) * 8;
+          const bend = Math.sin(index * 1.3) * 18;
+          const outward = 42 + Math.cos(index * 1.7) * 12;
+          const path1 = `M 15,${yBase} C ${35 + outward / 2},${yBase + bend} ${90 + outward},${branchTargetY - bend / 2} 148,${branchTargetY}`;
+          const path2 = `M 28,${yBase + 14} C ${54 + outward / 2},${yBase + bend * 0.6} ${108 + outward},${branchTargetY + bend * 0.8} 155,${branchTargetY + 12}`;
+          const twigPath = `M ${60 + outward / 4},${yBase - 6} Q ${66 + outward / 5},${yBase - 18} ${74 + outward / 4},${yBase - 2}`;
           
           return (
             <g key={`dendrite-${index}`}>
@@ -157,7 +172,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               
               {/* Small sub-branches for more organic look */}
               <path
-                d={`M 70,${yBase} L 75,${yBase - 12}`}
+                d={twigPath}
                 stroke={isActive ? '#3b82f6' : '#475569'}
                 strokeWidth={1}
                 opacity={isActive ? 0.7 : 0.2}
@@ -278,7 +293,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         
         {/* Axon Hillock */}
         <path
-          d="M 210,160 Q 220,160 230,160"
+          d={`M 210,${axonBaselineY} C 220,${axonBaselineY - 6} ${axonStartX - 24},${firstSegmentY - 6} ${axonStartX},${firstSegmentY}`}
           stroke={neuronColor}
           strokeWidth="8"
           strokeLinecap="round"
@@ -286,44 +301,51 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         />
         
         {/* Axon with Myelin Sheaths */}
-        {[0, 1, 2, 3, 4, 5].map((i) => {
-          const x = 240 + i * 55;
+        {Array.from({ length: axonSegmentCount }).map((_, i) => {
+          const x = axonStartX + i * axonSegmentSpacing;
+          const wave = Math.sin((i + 1) * 0.9) * axonCurveAmplitude;
+          const segmentY = axonBaselineY + wave;
+          const prevWave = Math.sin(i * 0.9) * axonCurveAmplitude;
+          const prevSegmentY = axonBaselineY + prevWave;
+          const connectorMidY = (prevSegmentY + segmentY) / 2 + Math.sin(i * 1.2) * 3;
+          const prevSegmentX = axonStartX + (i - 1) * axonSegmentSpacing;
+          const prevSegmentRight = prevSegmentX + axonSegmentWidth;
+          const gap = x - prevSegmentRight;
+          const connectorControlX = prevSegmentRight + gap / 2;
           return (
             <g key={`myelin-${i}`}>
               {/* Node of Ranvier (gap between myelin) */}
               {i > 0 && (
-                <line
-                  x1={x - 10}
-                  y1="160"
-                  x2={x - 5}
-                  y2="160"
+                <path
+                  d={`M ${prevSegmentRight},${prevSegmentY} Q ${connectorControlX},${connectorMidY} ${x},${segmentY}`}
                   stroke={isFiring ? '#22c55e' : '#60a5fa'}
                   strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
                 />
               )}
               
               {/* Myelin sheath segment */}
               <rect
                 x={x}
-                y="150"
-                width="40"
-                height="20"
+                y={segmentY - axonSegmentHeight / 2}
+                width={axonSegmentWidth}
+                height={axonSegmentHeight}
                 rx="10"
                 fill={isFiring ? '#bbf7d0' : '#dbeafe'}
                 stroke={isFiring ? '#22c55e' : '#3b82f6'}
                 strokeWidth="1.5"
                 opacity="0.9"
+                transform={`rotate(${Math.sin((i + 1) * 0.6) * 2} ${x + axonSegmentWidth / 2} ${segmentY})`}
               />
               
               {/* Inner axon line visible through myelin */}
-              <line
-                x1={x + 2}
-                y1="160"
-                x2={x + 38}
-                y2="160"
+              <path
+                d={`M ${x + 3},${segmentY} Q ${x + axonSegmentWidth / 2},${segmentY + Math.sin((i + 1) * 1.1)} ${x + axonSegmentWidth - 3},${segmentY}`}
                 stroke={isFiring ? '#16a34a' : '#2563eb'}
                 strokeWidth="2"
                 opacity="0.4"
+                fill="none"
               />
             </g>
           );
@@ -339,7 +361,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             <animateMotion
               dur="0.6s"
               repeatCount="1"
-              path="M 210,160 L 570,160"
+              path={axonSignalPath}
               begin="0.1s"
             />
             <animate
@@ -354,14 +376,14 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         
         {/* Axon Terminals */}
         {[-35, -15, 0, 15, 35].map((offset, i) => {
-          const terminalY = 160 + offset;
+          const terminalY = terminalBaseY + offset;
           const isLit = terminalLit;
           
           return (
             <g key={`terminal-${i}`}>
               {/* Branch to terminal */}
               <path
-                d={`M 570,160 Q 590,160 610,${terminalY}`}
+                d={`M 570,${terminalBaseY} Q 600,${terminalBaseY + offset * 0.3} 618,${terminalY}`}
                 stroke={isLit ? '#22c55e' : '#60a5fa'}
                 strokeWidth="2.5"
                 fill="none"
@@ -488,7 +510,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         color: '#e2e8f0'
       }}>
         <div>
-          <span style={{ color: '#94a3b8' }}>Signal Sum: </span>
+          <span style={{ color: '#94a3b8' }}>Signal Strength: </span>
           <span style={{ 
             fontWeight: 'bold',
             color: currentSum >= fireThreshold ? '#22c55e' : '#f59e0b'
