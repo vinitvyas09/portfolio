@@ -506,79 +506,287 @@ const CircuitScene = ({ colors }: { colors: any }) => (
   >
     <motion.svg viewBox="0 0 400 200" className="h-full w-full" fill="none">
       <defs>
+        {/* Sophisticated gradients */}
         <linearGradient id="circuit-signal" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={colors.circuitPrimary} stopOpacity="0.8" />
-          <stop offset="100%" stopColor={colors.circuitSecondary} stopOpacity="0.8" />
+          <stop offset="0%" stopColor={colors.circuitPrimary} stopOpacity="0.9" />
+          <stop offset="50%" stopColor={colors.circuitSecondary} stopOpacity="0.8" />
+          <stop offset="100%" stopColor={colors.mathPrimary} stopOpacity="0.7" />
         </linearGradient>
+        
+        <linearGradient id="circuit-trace" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={colors.circuitPrimary} stopOpacity="0.4" />
+          <stop offset="100%" stopColor={colors.circuitSecondary} stopOpacity="0.6" />
+        </linearGradient>
+        
+        <radialGradient id="circuit-node" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={colors.circuitPrimary} stopOpacity="1" />
+          <stop offset="70%" stopColor={colors.circuitPrimary} stopOpacity="0.8" />
+          <stop offset="100%" stopColor={colors.circuitSecondary} stopOpacity="0.6" />
+        </radialGradient>
+        
+        <filter id="circuit-glow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        
+        <filter id="circuit-shadow">
+          <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.2"/>
+        </filter>
       </defs>
       
-      {/* Input nodes */}
-      <motion.circle cx="50" cy="70" r="8" fill={colors.circuitPrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} />
-      <motion.circle cx="50" cy="100" r="8" fill={colors.circuitPrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }} />
-      <motion.circle cx="50" cy="130" r="8" fill={colors.circuitPrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} />
-      
-      {/* Input lines */}
-      <motion.line x1="58" y1="70" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.5 }} />
-      <motion.line x1="58" y1="100" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.6 }} />
-      <motion.line x1="58" y1="130" x2="140" y2="100" stroke="url(#circuit-signal)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.7 }} />
-      
-      {/* Summing junction */}
-      <motion.circle
-        cx="150"
-        cy="100"
-        r="20"
-        fill={`${colors.circuitSecondary}30`}
-        stroke={colors.circuitSecondary}
-        strokeWidth="2"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.8 }}
-      />
-      <motion.text
-        x="150"
-        y="108"
-        textAnchor="middle"
-        fontSize="24"
-        fill={colors.circuitSecondary}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
-        Σ
-      </motion.text>
-      
-      {/* Output line */}
-      <motion.line x1="170" y1="100" x2="280" y2="100" stroke="url(#circuit-signal)" strokeWidth="3" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 1.2 }} />
-      
-      {/* Activation function */}
+      {/* Circuit board trace pattern for sophistication */}
       <motion.rect
-        x="280"
-        y="80"
-        width="60"
-        height="40"
-        rx="8"
-        fill={`${colors.mathPrimary}30`}
-        stroke={colors.mathPrimary}
-        strokeWidth="2"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 1.4 }}
-      />
-      <motion.text
-        x="310"
-        y="105"
-        textAnchor="middle"
-        fontSize="16"
-        fill={colors.mathPrimary}
+        x="20"
+        y="40"
+        width="360"
+        height="120"
+        rx="2"
+        fill="none"
+        stroke={`${colors.borderColor}40`}
+        strokeWidth="0.5"
+        strokeDasharray="4 2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
-      >
-        f(x)
-      </motion.text>
+        transition={{ duration: 1 }}
+      />
       
-      {/* Output */}
-      <motion.circle cx="360" cy="100" r="6" fill={colors.codePrimary} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.8 }} />
+      {/* Input nodes - more sophisticated design */}
+      {[70, 100, 130].map((y, i) => (
+        <motion.g key={`input-${i}`} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 + i * 0.1, type: "spring", stiffness: 200 }}>
+          {/* Outer ring */}
+          <circle
+            cx="50"
+            cy={y}
+            r="12"
+            fill="none"
+            stroke={`${colors.circuitPrimary}60`}
+            strokeWidth="1.5"
+            filter="url(#circuit-shadow)"
+          />
+          {/* Inner filled circle */}
+          <circle
+            cx="50"
+            cy={y}
+            r="8"
+            fill="url(#circuit-node)"
+            filter="url(#circuit-glow)"
+          />
+          {/* Center dot */}
+          <circle
+            cx="50"
+            cy={y}
+            r="3"
+            fill={colors.sceneBg}
+          />
+          {/* Input label */}
+          <text
+            x="25"
+            y={y + 1}
+            fontSize="8"
+            fill={colors.textMuted}
+            textAnchor="middle"
+          >
+            x{i + 1}
+          </text>
+        </motion.g>
+      ))}
+      
+      {/* Input traces with PCB-like paths */}
+      {[70, 100, 130].map((y, i) => (
+        <motion.path
+          key={`trace-${i}`}
+          d={`M 62,${y} L 90,${y} Q 100,${y} 105,${y + (100 - y) * 0.3} T 140,100`}
+          stroke="url(#circuit-trace)"
+          strokeWidth="2.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ delay: 0.5 + i * 0.1, duration: 0.8, ease: "easeInOut" }}
+          filter="url(#circuit-shadow)"
+        />
+      ))}
+      
+      {/* Summing junction - sophisticated design */}
+      <motion.g initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.8, type: "spring", stiffness: 150 }}>
+        {/* Outer decorative ring */}
+        <circle
+          cx="150"
+          cy="100"
+          r="25"
+          fill="none"
+          stroke={`${colors.circuitSecondary}30`}
+          strokeWidth="1"
+          strokeDasharray="2 2"
+        />
+        {/* Main junction */}
+        <circle
+          cx="150"
+          cy="100"
+          r="20"
+          fill={`${colors.circuitSecondary}15`}
+          stroke={colors.circuitSecondary}
+          strokeWidth="2"
+          filter="url(#circuit-shadow)"
+        />
+        {/* Inner gradient circle */}
+        <circle
+          cx="150"
+          cy="100"
+          r="16"
+          fill={`${colors.circuitSecondary}25`}
+        />
+        {/* Sigma symbol */}
+        <text
+          x="150"
+          y="107"
+          textAnchor="middle"
+          fontSize="20"
+          fill={colors.circuitSecondary}
+          fontWeight="bold"
+        >
+          Σ
+        </text>
+      </motion.g>
+      
+      {/* Connection from summing to activation */}
+      <motion.path
+        d="M 170,100 L 280,100"
+        stroke="url(#circuit-signal)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
+        filter="url(#circuit-shadow)"
+      />
+      
+      {/* Activation function - sophisticated chip design */}
+      <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.4, type: "spring", stiffness: 120 }}>
+        {/* Chip body */}
+        <rect
+          x="280"
+          y="80"
+          width="60"
+          height="40"
+          rx="4"
+          fill={`${colors.mathPrimary}20`}
+          stroke={colors.mathPrimary}
+          strokeWidth="2"
+          filter="url(#circuit-shadow)"
+        />
+        {/* Chip pins */}
+        {[0, 1, 2, 3].map((i) => (
+          <rect
+            key={`pin-top-${i}`}
+            x={290 + i * 15}
+            y="76"
+            width="3"
+            height="4"
+            fill={colors.mathPrimary}
+          />
+        ))}
+        {[0, 1, 2, 3].map((i) => (
+          <rect
+            key={`pin-bottom-${i}`}
+            x={290 + i * 15}
+            y="120"
+            width="3"
+            height="4"
+            fill={colors.mathPrimary}
+          />
+        ))}
+        {/* Function label */}
+        <text
+          x="310"
+          y="105"
+          textAnchor="middle"
+          fontSize="14"
+          fill={colors.mathPrimary}
+          fontWeight="500"
+        >
+          f(x)
+        </text>
+        {/* Decorative circuit pattern */}
+        <path
+          d="M 285,90 L 335,90 M 285,110 L 335,110"
+          stroke={`${colors.mathPrimary}30`}
+          strokeWidth="0.5"
+        />
+      </motion.g>
+      
+      {/* Connection from activation to output - THIS WAS MISSING */}
+      <motion.path
+        d="M 340,100 L 355,100"
+        stroke="url(#circuit-signal)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ delay: 1.7, duration: 0.4 }}
+        filter="url(#circuit-shadow)"
+      />
+      
+      {/* Output node - sophisticated design */}
+      <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.8, type: "spring", stiffness: 180 }}>
+        {/* Outer glow effect */}
+        <circle
+          cx="365"
+          cy="100"
+          r="10"
+          fill={`${colors.codePrimary}20`}
+          filter="url(#circuit-glow)"
+        />
+        {/* Main output node */}
+        <circle
+          cx="365"
+          cy="100"
+          r="7"
+          fill={colors.codePrimary}
+          filter="url(#circuit-shadow)"
+        />
+        {/* Inner highlight */}
+        <circle
+          cx="365"
+          cy="100"
+          r="4"
+          fill={`${colors.codePrimary}dd`}
+        />
+        {/* Output label */}
+        <text
+          x="365"
+          y="118"
+          fontSize="8"
+          fill={colors.textMuted}
+          textAnchor="middle"
+        >
+          out
+        </text>
+      </motion.g>
+      
+      {/* Animated signal pulse */}
+      <motion.circle
+        r="3"
+        fill={colors.circuitSecondary}
+        filter="url(#circuit-glow)"
+        initial={{ x: 50, y: 100, opacity: 0 }}
+        animate={{
+          x: [50, 150, 310, 365],
+          y: [100, 100, 100, 100],
+          opacity: [0, 1, 1, 0]
+        }}
+        transition={{
+          delay: 2,
+          duration: 2,
+          repeat: Infinity,
+          repeatDelay: 1,
+          ease: "linear"
+        }}
+      />
     </motion.svg>
   </div>
 );
