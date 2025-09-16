@@ -769,28 +769,6 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           );
         })}
         
-        {/* Threshold indicator line */}
-        <line
-          x1="140"
-          y1="195"
-          x2="200"
-          y2="195"
-          stroke="#ef4444"
-          strokeWidth="1"
-          strokeDasharray="3,3"
-          opacity="0.5"
-        />
-        <text
-          x="170"
-          y="210"
-          fill="#ef4444"
-          fontSize="9"
-          textAnchor="middle"
-          opacity="0.7"
-        >
-          threshold: {(fireThreshold * 100).toFixed(0)}%
-        </text>
-        
         {/* Labels */}
         <text x="50" y="50" fill="#e2e8f0" fontSize="11" fontWeight="500">
           Dendrites
