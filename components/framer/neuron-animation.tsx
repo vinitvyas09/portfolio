@@ -130,256 +130,294 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
           </filter>
         </defs>
 
-        {/* Dendrites - Natural tree-like branching structure */}
+        {/* Dendrites - Dense tree-like branching in all directions */}
         {(() => {
-          // Create natural tree-like branching structure
-          const branches = [];
+          // Create dendrites radiating in all directions from the soma
+          const somaX = 170;
+          const somaY = 160;
           
-          // Main dendrite trunks (2-3 main branches)
-          const mainBranchCount = 3;
-          for (let b = 0; b < mainBranchCount; b++) {
-            const branchAngle = -60 + b * 40; // Spread branches naturally
-            const branchLength = 80 + Math.sin(b * 1.7) * 15;
-            const startX = 145;
-            const startY = 160;
+          // Create main dendrite trunks radiating outward
+          // More branches for denser canopy, but only on left/top/bottom (not right where axon is)
+          const mainBranches = [];
+          const numMainBranches = 7; // More main branches for density
+          
+          for (let i = 0; i < numMainBranches; i++) {
+            // Distribute branches around the left hemisphere (avoiding the right side where axon emerges)
+            const baseAngle = 90 + (i / (numMainBranches - 1)) * 180; // From 90° (top) to 270° (bottom)
+            const angleVariation = Math.sin(i * 2.7) * 15; // Natural variation
+            const angle = baseAngle + angleVariation;
             
-            // Calculate main branch endpoint with natural curve
-            const endX = startX - Math.cos(branchAngle * Math.PI / 180) * branchLength;
-            const endY = startY - Math.sin(branchAngle * Math.PI / 180) * branchLength;
+            const length = 45 + Math.sin(i * 1.3) * 15; // Varying lengths
+            const endX = somaX + Math.cos(angle * Math.PI / 180) * length;
+            const endY = somaY + Math.sin(angle * Math.PI / 180) * length;
             
-            branches.push({
-              type: 'main',
-              index: b,
-              startX,
-              startY,
+            mainBranches.push({
+              startX: somaX,
+              startY: somaY,
               endX,
               endY,
-              angle: branchAngle
+              angle,
+              index: i
             });
           }
           
-          // Distribute inputs across branches
-          const inputsPerBranch = Math.ceil(inputs / mainBranchCount);
+          // Map weights to branches
+          const inputsPerBranch = Math.ceil(inputs / numMainBranches);
           
-          return branches.map((branch, branchIdx) => {
-            const branchInputs = weights.slice(
-              branchIdx * inputsPerBranch,
-              Math.min((branchIdx + 1) * inputsPerBranch, inputs)
-            ).map((weight, i) => ({
-              weight,
-              signal: signals[branchIdx * inputsPerBranch + i] || 0,
-              index: branchIdx * inputsPerBranch + i
-            }));
-            
-            const isBranchActive = branchInputs.some(inp => inp.signal > 0);
-            
-            return (
-              <g key={`dendrite-branch-${branchIdx}`}>
-                {/* Main branch trunk with organic curve */}
-                <path
-                  d={`M ${branch.startX},${branch.startY}
-                      C ${branch.startX - 20},${branch.startY + (branch.angle > 0 ? -5 : 5)}
-                        ${branch.endX + 15},${branch.endY}
-                        ${branch.endX},${branch.endY}`}
-                  stroke={isBranchActive ? '#60a5fa' : '#475569'}
-                  strokeWidth={4.5 - branchIdx * 0.3}
-                  fill="none"
-                  opacity={isBranchActive ? 0.7 : 0.3}
-                  strokeLinecap="round"
-                  style={{
-                    transition: 'all 0.3s ease',
-                  }}
-                />
+          return (
+            <>
+              {mainBranches.map((branch, branchIdx) => {
+                const branchInputs = weights.slice(
+                  branchIdx * inputsPerBranch,
+                  Math.min((branchIdx + 1) * inputsPerBranch, inputs)
+                ).map((weight, i) => ({
+                  weight,
+                  signal: signals[branchIdx * inputsPerBranch + i] || 0,
+                  index: branchIdx * inputsPerBranch + i
+                }));
                 
-                {/* Secondary branches */}
-                {branchInputs.map((input, inputIdx) => {
-                  const progress = 0.3 + (inputIdx / branchInputs.length) * 0.6;
-                  const baseX = branch.startX + (branch.endX - branch.startX) * progress;
-                  const baseY = branch.startY + (branch.endY - branch.startY) * progress;
-                  
-                  // Add natural variation to each sub-branch
-                  const subAngle = branch.angle + (inputIdx % 2 === 0 ? -25 : 25) + Math.sin(inputIdx * 2.3) * 10;
-                  const subLength = 35 + Math.sin(inputIdx * 1.7) * 10;
-                  
-                  const midX = baseX - Math.cos(subAngle * Math.PI / 180) * (subLength * 0.5);
-                  const midY = baseY - Math.sin(subAngle * Math.PI / 180) * (subLength * 0.5);
-                  const endX = baseX - Math.cos(subAngle * Math.PI / 180) * subLength;
-                  const endY = baseY - Math.sin(subAngle * Math.PI / 180) * subLength;
-                  
-                  const isActive = input.signal > 0;
-                  
-                  // Create more tertiary branches for terminal points
-                  const tertiaryBranches = [];
-                  for (let t = 0; t < 2; t++) {
-                    const tAngle = subAngle + (t === 0 ? -20 : 20) + Math.sin(t * 3.1) * 5;
-                    const tLength = 15 + Math.sin((inputIdx + t) * 2.1) * 5;
-                    const tStartX = endX;
-                    const tStartY = endY;
-                    const tEndX = tStartX - Math.cos(tAngle * Math.PI / 180) * tLength;
-                    const tEndY = tStartY - Math.sin(tAngle * Math.PI / 180) * tLength;
+                const isBranchActive = branchInputs.some(inp => inp.signal > 0);
+                const avgWeight = branchInputs.length > 0 ? 
+                  branchInputs.reduce((sum, inp) => sum + inp.weight, 0) / branchInputs.length : 0.5;
+                
+                // Calculate control points for natural curve
+                const ctrl1X = branch.startX + (branch.endX - branch.startX) * 0.3 + Math.sin(branch.angle * 0.02) * 5;
+                const ctrl1Y = branch.startY + (branch.endY - branch.startY) * 0.3 + Math.cos(branch.angle * 0.02) * 5;
+                
+                return (
+                  <g key={`dendrite-tree-${branchIdx}`}>
+                    {/* Main dendrite trunk */}
+                    <path
+                      d={`M ${branch.startX},${branch.startY}
+                          Q ${ctrl1X},${ctrl1Y}
+                            ${branch.endX},${branch.endY}`}
+                      stroke={isBranchActive ? '#60a5fa' : '#475569'}
+                      strokeWidth={3 + avgWeight * 2}
+                      fill="none"
+                      opacity={isBranchActive ? 0.6 : 0.25}
+                      strokeLinecap="round"
+                      style={{
+                        transition: 'all 0.3s ease',
+                      }}
+                    />
                     
-                    tertiaryBranches.push({
-                      startX: tStartX,
-                      startY: tStartY,
-                      endX: tEndX,
-                      endY: tEndY
-                    });
-                  }
-                  
-                  const dendritePath = `M ${baseX},${baseY}
-                    C ${baseX - 5},${baseY + Math.sin(inputIdx) * 3}
-                      ${midX},${midY}
-                      ${endX},${endY}`;
-                  
-                  return (
-                    <g key={`sub-dendrite-${input.index}`}>
-                      {/* Secondary branch */}
-                      <path
-                        d={dendritePath}
-                        stroke={isActive ? '#60a5fa' : '#475569'}
-                        strokeWidth={showWeights ? 1.5 + input.weight * 2 : 2}
-                        fill="none"
-                        opacity={isActive ? 0.8 : 0.25}
-                        strokeLinecap="round"
-                        style={{
-                          transition: 'all 0.3s ease',
-                        }}
-                      />
+                    {/* Create secondary branches along the main trunk */}
+                    {[0.4, 0.6, 0.8].map((progress, pIdx) => {
+                      const trunkX = branch.startX + (branch.endX - branch.startX) * progress;
+                      const trunkY = branch.startY + (branch.endY - branch.startY) * progress;
                       
-                      {/* Tertiary branches (fine dendrite terminals) */}
-                      {tertiaryBranches.map((tbranch, tIdx) => (
+                      // Create 2-3 sub-branches at each point
+                      return [-30, 0, 30].map((angleOffset, sIdx) => {
+                        const subAngle = branch.angle + angleOffset + Math.sin((pIdx + sIdx) * 2.1) * 10;
+                        const subLength = 20 + Math.sin((pIdx + sIdx) * 1.7) * 8;
+                        const subEndX = trunkX + Math.cos(subAngle * Math.PI / 180) * subLength;
+                        const subEndY = trunkY + Math.sin(subAngle * Math.PI / 180) * subLength;
+                        
+                        const inputIdx = pIdx * 3 + sIdx;
+                        const input = branchInputs[inputIdx % branchInputs.length];
+                        const isActive = input && input.signal > 0;
+                        
+                        return (
+                          <g key={`sub-${branchIdx}-${pIdx}-${sIdx}`}>
+                            {/* Secondary branch */}
+                            <path
+                              d={`M ${trunkX},${trunkY}
+                                  C ${trunkX + 5},${trunkY + Math.sin(angleOffset) * 2}
+                                    ${(trunkX + subEndX) / 2},${(trunkY + subEndY) / 2}
+                                    ${subEndX},${subEndY}`}
+                              stroke={isActive ? '#60a5fa' : '#475569'}
+                              strokeWidth={1.5 + (input ? input.weight * 1.5 : 0.5)}
+                              fill="none"
+                              opacity={isActive ? 0.7 : 0.2}
+                              strokeLinecap="round"
+                              style={{
+                                transition: 'all 0.3s ease',
+                              }}
+                            />
+                            
+                            {/* Tertiary spikes for dense canopy effect */}
+                            {[-20, 20].map((tAngle, tIdx) => {
+                              const spikeAngle = subAngle + tAngle;
+                              const spikeLength = 8 + Math.sin((tIdx + sIdx) * 3.1) * 3;
+                              const spikeEndX = subEndX + Math.cos(spikeAngle * Math.PI / 180) * spikeLength;
+                              const spikeEndY = subEndY + Math.sin(spikeAngle * Math.PI / 180) * spikeLength;
+                              
+                              return (
+                                <path
+                                  key={`spike-${tIdx}`}
+                                  d={`M ${subEndX},${subEndY} L ${spikeEndX},${spikeEndY}`}
+                                  stroke={isActive ? '#60a5fa' : '#475569'}
+                                  strokeWidth="0.8"
+                                  opacity={isActive ? 0.5 : 0.15}
+                                  strokeLinecap="round"
+                                />
+                              );
+                            })}
+                            
+                            {/* Dendritic spine */}
+                            <circle
+                              cx={subEndX}
+                              cy={subEndY}
+                              r="1.2"
+                              fill={isActive ? '#60a5fa' : '#475569'}
+                              opacity={isActive ? 0.4 : 0.15}
+                            />
+                            
+                            {/* Signal animation for active inputs */}
+                            {isActive && isAnimating && Math.random() > 0.5 && (
+                              <circle
+                                r="2.5"
+                                fill="#60a5fa"
+                                opacity="0"
+                              >
+                                <animateMotion
+                                  dur="0.5s"
+                                  repeatCount="1"
+                                  path={`M ${subEndX},${subEndY} L ${trunkX},${trunkY}`}
+                                />
+                                <animate
+                                  attributeName="opacity"
+                                  values="0;0.8;0.8;0"
+                                  dur="0.5s"
+                                  repeatCount="1"
+                                />
+                              </circle>
+                            )}
+                          </g>
+                        );
+                      });
+                    })}
+                    
+                    {/* Terminal branches at the end */}
+                    {[-25, 0, 25].map((angleOffset, tIdx) => {
+                      const termAngle = branch.angle + angleOffset;
+                      const termLength = 12;
+                      const termEndX = branch.endX + Math.cos(termAngle * Math.PI / 180) * termLength;
+                      const termEndY = branch.endY + Math.sin(termAngle * Math.PI / 180) * termLength;
+                      
+                      return (
                         <path
-                          key={`tertiary-${input.index}-${tIdx}`}
-                          d={`M ${tbranch.startX},${tbranch.startY}
-                              C ${tbranch.startX - 3},${tbranch.startY + 2}
-                                ${(tbranch.startX + tbranch.endX) / 2},${(tbranch.startY + tbranch.endY) / 2}
-                                ${tbranch.endX},${tbranch.endY}`}
-                          stroke={isActive ? '#60a5fa' : '#475569'}
-                          strokeWidth={showWeights ? 0.5 + input.weight : 1}
-                          fill="none"
-                          opacity={isActive ? 0.6 : 0.15}
+                          key={`term-${tIdx}`}
+                          d={`M ${branch.endX},${branch.endY} L ${termEndX},${termEndY}`}
+                          stroke={isBranchActive ? '#60a5fa' : '#475569'}
+                          strokeWidth="1"
+                          opacity={isBranchActive ? 0.4 : 0.12}
                           strokeLinecap="round"
                         />
-                      ))}
-                      
-                      {/* Dendritic spines (small protrusions) */}
-                      <circle
-                        cx={endX - 2}
-                        cy={endY}
-                        r="1.5"
-                        fill={isActive ? '#60a5fa' : '#475569'}
-                        opacity={isActive ? 0.5 : 0.2}
-                      />
-                      <circle
-                        cx={midX}
-                        cy={midY + 2}
-                        r="1"
-                        fill={isActive ? '#60a5fa' : '#475569'}
-                        opacity={isActive ? 0.4 : 0.15}
-                      />
-                      
-                      {/* Signal pulse animation */}
-                      {isActive && isAnimating && (
-                        <circle
-                          r="3"
-                          fill="#60a5fa"
-                          opacity="0"
-                        >
-                          <animateMotion
-                            dur="0.6s"
-                            repeatCount="1"
-                            path={dendritePath}
-                          />
-                          <animate
-                            attributeName="opacity"
-                            values="0;0.8;1;0.8;0"
-                            dur="0.6s"
-                            repeatCount="1"
-                          />
-                        </circle>
-                      )}
-                      
-                      {/* Weight label at terminal */}
-                      {showWeights && (
-                        <text
-                          x={tertiaryBranches[0].endX}
-                          y={tertiaryBranches[0].endY - 3}
-                          fill="#94a3b8"
-                          fontSize="8"
-                          textAnchor="middle"
-                        >
-                          {input.weight.toFixed(2)}
-                        </text>
-                      )}
-                    </g>
-                  );
-                })}
+                      );
+                    })}
+                  </g>
+                );
+              })}
+              
+              {/* Additional fine dendrites for extra density */}
+              {[45, 135, 180, 225, 315].map((angle, idx) => {
+                const length = 25 + Math.sin(idx * 2.3) * 10;
+                const endX = somaX + Math.cos(angle * Math.PI / 180) * length;
+                const endY = somaY + Math.sin(angle * Math.PI / 180) * length;
+                const isActive = signals[idx % signals.length] > 0;
                 
-                {/* Additional organic details - small branches */}
-                <path
-                  d={`M ${branch.endX + 10},${branch.endY - 5}
-                      L ${branch.endX + 5},${branch.endY}`}
-                  stroke={isBranchActive ? '#60a5fa' : '#475569'}
-                  strokeWidth="0.8"
-                  opacity="0.2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d={`M ${branch.endX + 8},${branch.endY + 5}
-                      L ${branch.endX + 3},${branch.endY + 2}`}
-                  stroke={isBranchActive ? '#60a5fa' : '#475569'}
-                  strokeWidth="0.8"
-                  opacity="0.2"
-                  strokeLinecap="round"
-                />
-              </g>
-            );
-          });
+                return (
+                  <g key={`extra-dendrite-${idx}`}>
+                    <path
+                      d={`M ${somaX},${somaY} L ${endX},${endY}`}
+                      stroke={isActive ? '#60a5fa' : '#475569'}
+                      strokeWidth="1.5"
+                      opacity={isActive ? 0.4 : 0.1}
+                      strokeLinecap="round"
+                    />
+                    {/* Small branches */}
+                    {[-15, 15].map((offset, i) => (
+                      <path
+                        key={i}
+                        d={`M ${endX},${endY} 
+                            L ${endX + Math.cos((angle + offset) * Math.PI / 180) * 8},
+                              ${endY + Math.sin((angle + offset) * Math.PI / 180) * 8}`}
+                        stroke={isActive ? '#60a5fa' : '#475569'}
+                        strokeWidth="0.6"
+                        opacity={isActive ? 0.3 : 0.08}
+                        strokeLinecap="round"
+                      />
+                    ))}
+                  </g>
+                );
+              })}
+            </>
+          );
         })()}
         
-        {/* Cell Body (Soma) - Simplified organic shape */}
+        {/* Cell Body (Soma) - Star-shaped irregular organic form */}
         <g filter={isFiring ? "url(#glow)" : ""}>
-          {/* Main cell body - slightly irregular circle */}
-          <ellipse
-            cx="170"
-            cy="160"
-            rx="38"
-            ry="35"
+          {/* Create a more irregular, star-like soma shape */}
+          <path
+            d={`M 170,160
+                m 0,-35
+                c 8,-5 15,-3 20,2
+                c 5,5 7,12 5,18
+                c 3,4 12,5 15,10
+                c 3,5 2,10 -2,15
+                c 4,3 8,8 7,14
+                c -1,6 -5,10 -10,12
+                c 0,5 -2,10 -7,13
+                c -5,3 -11,3 -16,0
+                c -4,2 -9,3 -14,0
+                c -5,-3 -8,-8 -8,-13
+                c -5,-2 -10,-6 -11,-12
+                c -1,-6 2,-11 6,-14
+                c -4,-5 -5,-10 -2,-15
+                c 3,-5 10,-6 15,-10
+                c -2,-6 0,-13 5,-18
+                c 5,-5 12,-7 20,-2
+                Z`}
             fill="url(#somaGradient)"
-            transform="rotate(-8 170 160)"
+            opacity="0.8"
           />
           
-          {/* Subtle organic bumps for natural look */}
+          {/* Additional organic irregularities */}
           <ellipse
-            cx="158"
-            cy="155"
-            rx="32"
-            ry="28"
+            cx="165"
+            cy="158"
+            rx="28"
+            ry="26"
             fill={neuronColor}
-            opacity="0.5"
-            transform="rotate(12 158 155)"
+            opacity="0.4"
+            transform="rotate(25 165 158)"
           />
           <ellipse
             cx="175"
-            cy="165"
-            rx="28"
-            ry="30"
+            cy="162"
+            rx="25"
+            ry="28"
             fill={neuronColor}
-            opacity="0.4"
-            transform="rotate(-15 175 165)"
+            opacity="0.3"
+            transform="rotate(-20 175 162)"
           />
           
-          {/* Cell membrane */}
-          <ellipse
-            cx="170"
-            cy="160"
-            rx="38"
-            ry="35"
+          {/* Cell membrane with irregular outline */}
+          <path
+            d={`M 170,160
+                m 0,-35
+                c 8,-5 15,-3 20,2
+                c 5,5 7,12 5,18
+                c 3,4 12,5 15,10
+                c 3,5 2,10 -2,15
+                c 4,3 8,8 7,14
+                c -1,6 -5,10 -10,12
+                c 0,5 -2,10 -7,13
+                c -5,3 -11,3 -16,0
+                c -4,2 -9,3 -14,0
+                c -5,-3 -8,-8 -8,-13
+                c -5,-2 -10,-6 -11,-12
+                c -1,-6 2,-11 6,-14
+                c -4,-5 -5,-10 -2,-15
+                c 3,-5 10,-6 15,-10
+                c -2,-6 0,-13 5,-18
+                c 5,-5 12,-7 20,-2
+                Z`}
             fill="none"
             stroke={isFiring ? '#22c55e' : '#3b82f6'}
-            strokeWidth="2.5"
+            strokeWidth="2"
             opacity="0.9"
-            transform="rotate(-8 170 160)"
           />
         </g>
         
@@ -670,10 +708,10 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         </text>
         
         {/* Labels */}
-        <text x="60" y="35" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="90" y="85" fill="#e2e8f0" fontSize="11" fontWeight="500">
           Dendrites
         </text>
-        <text x="170" y="130" fill="#e2e8f0" fontSize="11" fontWeight="500">
+        <text x="170" y="125" fill="#e2e8f0" fontSize="11" fontWeight="500">
           Cell Body
         </text>
         <text x="400" y="135" fill="#e2e8f0" fontSize="11" fontWeight="500">
