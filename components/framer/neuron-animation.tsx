@@ -652,9 +652,9 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               return path;
             })()}
             fill="none"
-            stroke={isFiring ? colors.axonActive : colors.axonInactive}
-            strokeWidth="2.5"
-            opacity="0.9"
+            stroke={isFiring ? colors.neuronActive : colors.neuronResting}
+            strokeWidth={isFiring ? "1.5" : "1"}
+            opacity={isDark ? "0.8" : "0.9"}
           />
         </g>
         
