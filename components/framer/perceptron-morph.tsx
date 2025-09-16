@@ -671,7 +671,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const weightBlock = { x: 112, width: 26, height: 18 };
   const sumNode = { x: 224, y: 100, radius: 20 };
   const activationBlock = { x: sumNode.x + 60, width: weightBlock.width, height: weightBlock.height };
-  const outputNodeX = sumNode.x + 136; // Position output node with tighter spacing
+  const outputNodeX = sumNode.x + 136;
 
   const inputNode = { x: 50, radius: 13 };
   const weightEntryX = weightBlock.x;
@@ -682,9 +682,9 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const activationExitX = activationBlock.x + activationBlock.width;
   const angledTraceExitX = weightExitX + 20;
 
-  const inputLeadInX = inputNode.x + inputNode.radius; // Hard-connect the traces to the right edge of the input nodes
-  const traceMaskId = 'circuit-trace-mask';
+  const inputLeadInX = inputNode.x + inputNode.radius;
 
+  // FIXED: Only connection segments, no "through" segments
   const centralTraceSegments = useMemo(() => {
     const y = sumNode.y;
     return [
@@ -695,22 +695,10 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         strokeWidth: 3.6,
       },
       {
-        key: 'through-weight',
-        d: `M ${weightEntryX},${y} L ${weightExitX},${y}`,
-        stroke: colors.circuitPrimary,
-        strokeWidth: 3.6,
-      },
-      {
         key: 'weight-to-sum',
         d: `M ${weightExitX},${y} L ${sumEntryX},${y}`,
-        stroke: colors.circuitPrimary,
-        strokeWidth: 3.6,
-      },
-      {
-        key: 'sum-cross',
-        d: `M ${sumEntryX},${y} L ${sumExitX},${y}`,
         stroke: colors.circuitSecondary,
-        strokeWidth: 3.4,
+        strokeWidth: 3.6,
       },
       {
         key: 'sum-to-activation',
@@ -719,14 +707,8 @@ const CircuitScene = ({ colors }: { colors: any }) => {
         strokeWidth: 3.4,
       },
       {
-        key: 'through-activation',
-        d: `M ${activationEntryX},${y} L ${activationExitX},${y}`,
-        stroke: colors.mathPrimary,
-        strokeWidth: 3.2,
-      },
-      {
         key: 'activation-to-output',
-        d: `M ${activationExitX},${y} L ${outputNodeX},${y}`,
+        d: `M ${activationExitX},${y} L ${outputNodeX - 10},${y}`,
         stroke: colors.mathPrimary,
         strokeWidth: 3.2,
       },
@@ -747,18 +729,15 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   ]);
 
   const createTracePath = (y: number, index: number) => {
-    // Create individual straight line paths from each input through its weight block to summation
     if (index === 1) {
       return '';
     }
-
-    // Top and bottom traces (x1 and x3) - need to angle to summation node
     return [
-      `M ${inputLeadInX},${y}`,           // Start at input lead-in
-      `L ${weightEntryX},${y}`,           // Line to weight block entry
-      `L ${weightExitX},${y}`,            // Line through weight block
-      `L ${angledTraceExitX},${y}`,       // Extend horizontally a bit
-      `L ${sumEntryX},${sumNode.y}`,      // Angle to summation node
+      `M ${inputLeadInX},${y}`,
+      `L ${weightEntryX},${y}`,
+      `L ${weightExitX},${y}`,
+      `L ${angledTraceExitX},${y}`,
+      `L ${sumEntryX},${sumNode.y}`,
     ].join(' ');
   };
 
@@ -856,36 +835,9 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <filter id="circuit-shadow">
             <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.18" />
           </filter>
-          <mask id={traceMaskId} maskUnits="userSpaceOnUse">
-            <rect x="0" y="0" width="400" height="200" fill="white" />
-            {inputYs.map((y, i) => (
-              <circle key={`mask-input-${i}`} cx={50} cy={y} r={11} fill="black" />
-            ))}
-            {inputYs.map((y, i) => (
-              <rect
-                key={`mask-weight-${i}`}
-                x={weightBlock.x - 2}
-                y={y - weightBlock.height / 2 - 2}
-                width={weightBlock.width + 6}
-                height={weightBlock.height + 4}
-                rx={6}
-                fill="black"
-              />
-            ))}
-            <circle cx={sumNode.x} cy={sumNode.y} r={sumNode.radius - 2} fill="black" />
-            <rect
-              x={activationBlock.x - 2}
-              y={sumNode.y - activationBlock.height / 2 - 2}
-              width={activationBlock.width + 4}
-              height={activationBlock.height + 4}
-              rx={6}
-              fill="black"
-            />
-            <circle cx={outputNodeX} cy={sumNode.y} r={8.5} fill="black" />
-          </mask>
         </defs>
 
-        {/* Board backplate with subtle texture */}
+        {/* Board backplate */}
         <motion.rect
           x={board.x}
           y={board.y}
@@ -909,12 +861,11 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           transition={{ delay: 0.2, duration: 0.6 }}
         />
 
-        {/* Input traces for x₁ and x₃ - render these FIRST */}
+        {/* Traces for x₁ and x₃ - render FIRST */}
         {inputYs.map((y, i) => {
           if (i === 1) {
             return null;
           }
-
           return (
             <motion.path
               key={`trace-${i}`}
@@ -952,8 +903,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           />
         ))}
 
-        {/* THEN render all components on top of traces */}
-        
         {/* Input nodes */}
         {inputYs.map((y, i) => (
           <motion.g
@@ -1089,7 +1038,6 @@ const CircuitScene = ({ colors }: { colors: any }) => {
           <circle cx={outputNodeX} cy={sumNode.y} r={3.6} fill={`${colors.codePrimary}ee`} />
           <text x={outputNodeX} y={sumNode.y + 20} fontSize={9} fill={colors.textMuted} textAnchor="middle">output (y)</text>
         </motion.g>
-
 
         {/* Animated signal pulse */}
         {pulseTrajectory && (
@@ -1353,7 +1301,7 @@ const PerceptronContinuum = () => {
     }, STAGE_DURATION);
 
     return () => window.clearTimeout(timeout);
-  }, [stageIndex]);
+  }, [stageIndex, STAGES.length]);
 
   const stage = STAGES[stageIndex];
   const StageVisual = STAGE_COMPONENTS[stage.id];
