@@ -292,7 +292,7 @@ const CodeScene = ({ colors }: { colors: any }) => (
     >
       <div 
         className="space-y-2 font-mono text-sm"
-        style={{ color: colors.textSecondary }}
+        style={{ color: colors.textSecondary, whiteSpace: 'pre' }}
       >
         {CODE_LINES.map((line, index) => (
           <motion.div
