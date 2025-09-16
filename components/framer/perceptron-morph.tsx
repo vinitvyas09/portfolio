@@ -18,7 +18,7 @@ const getStages = (isDark: boolean): StageDefinition[] => [
   {
     id: 'neuron',
     step: 1,
-    title: 'Biological Neuron',
+    title: 'Simple Neuron',
     accent: isDark ? '#818cf8' : '#6366f1',
   },
   {
