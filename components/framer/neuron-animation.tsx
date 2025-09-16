@@ -1026,10 +1026,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
             }}>
               <div style={{
                 height: '100%',
-                width: `${Math.min(currentSum / fireThreshold * 100, 100)}%`,
-                background: currentSum >= fireThreshold 
-                  ? 'linear-gradient(90deg, #22c55e, #4ade80)' 
-                  : 'linear-gradient(90deg, #f59e0b, #fbbf24)',
+                width: `${Math.min(currentSum * 100, 100)}%`,
+                background: 'linear-gradient(90deg, #22c55e, #4ade80)',
                 borderRadius: '3px',
                 transition: 'all 0.3s ease'
               }} />
