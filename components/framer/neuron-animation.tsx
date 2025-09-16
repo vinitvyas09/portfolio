@@ -701,7 +701,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         <text
           x="168"
           y="162"
-            fill={colors.textPrimary}
+          fill="white"
           fontSize="11"
           textAnchor="middle"
           fontWeight="bold"
