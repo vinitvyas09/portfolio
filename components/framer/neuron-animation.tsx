@@ -218,8 +218,9 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   // - 0.7 = 70% of total possible activation needed
 
   useEffect(() => {
-    const runAnimation = () => {
-      setAnimationCycle(prev => prev + 1);
+    let timeoutId: NodeJS.Timeout;
+    
+    const runAnimation = (currentCycle: number) => {
       setIsAnimating(true);
       setSignals([]);
       setCurrentSum(0);
@@ -230,7 +231,8 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       const signalValues: number[] = [];
       weights.forEach((weight, index) => {
         setTimeout(() => {
-          const signalStrength = pseudoRandom(animationCycle * 1000 + index) > 0.4 ? weight : 0;
+          // Use currentCycle for randomness - this ensures each cycle is truly random
+          const signalStrength = pseudoRandom(currentCycle * 1000 + index * 37) > 0.4 ? weight : 0;
           signalValues[index] = signalStrength;
           
           setSignals([...signalValues]);
@@ -250,15 +252,27 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         }, (index * animationMs) / (inputs * 2));
       });
 
-      // Reset and loop
-      setTimeout(() => {
+      // Reset and loop with incremented cycle
+      timeoutId = setTimeout(() => {
         setIsAnimating(false);
-        setTimeout(runAnimation, 1500);
+        const nextCycle = currentCycle + 1;
+        setAnimationCycle(nextCycle);
+        setTimeout(() => runAnimation(nextCycle), 1500);
       }, animationMs + 1000);
     };
 
-    runAnimation();
-  }, []);
+    // Start the animation loop
+    const initialCycle = Date.now(); // Use timestamp for initial randomness
+    setAnimationCycle(initialCycle);
+    runAnimation(initialCycle);
+    
+    // Cleanup function
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []); // Empty dependency array is fine since we manage the cycle internally
 
   const neuronColor = isFiring ? colors.neuronActive : colors.neuronResting;
   const nucleusColor = isFiring ? colors.nucleusActive : colors.nucleusResting;
