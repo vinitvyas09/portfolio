@@ -682,28 +682,69 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   const activationExitX = activationBlock.x + activationBlock.width;
   const angledTraceExitX = weightExitX + 20;
 
-  const inputLeadInX = inputNode.x + inputNode.radius; // Hard-connect the central trace to x₂
+  const inputLeadInX = inputNode.x + inputNode.radius; // Hard-connect the traces to the right edge of the input nodes
   const traceMaskId = 'circuit-trace-mask';
-  const traceMaskUrl = `url(#${traceMaskId})`;
 
-  const activationConnectorPath = [
-    `M ${sumExitX},${sumNode.y}`,
-    `L ${activationEntryX},${sumNode.y}`,
-  ].join(' ');
-
-  const activationToOutputPath = [
-    `M ${activationExitX},${sumNode.y}`,
-    `L ${outputNodeX},${sumNode.y}`,
-  ].join(' ');
-
-  const centerTracePath = useMemo(() => {
+  const centralTraceSegments = useMemo(() => {
+    const y = sumNode.y;
     return [
-      `M ${inputLeadInX},${sumNode.y}`,
-      `L ${weightEntryX},${sumNode.y}`,
-      `L ${weightExitX},${sumNode.y}`,
-      `L ${sumEntryX},${sumNode.y}`,
-    ].join(' ');
-  }, [inputLeadInX, weightEntryX, weightExitX, sumEntryX, sumNode.y]);
+      {
+        key: 'x2-to-weight',
+        d: `M ${inputLeadInX},${y} L ${weightEntryX},${y}`,
+        stroke: colors.circuitPrimary,
+        strokeWidth: 3.6,
+      },
+      {
+        key: 'through-weight',
+        d: `M ${weightEntryX},${y} L ${weightExitX},${y}`,
+        stroke: colors.circuitPrimary,
+        strokeWidth: 3.6,
+      },
+      {
+        key: 'weight-to-sum',
+        d: `M ${weightExitX},${y} L ${sumEntryX},${y}`,
+        stroke: colors.circuitPrimary,
+        strokeWidth: 3.6,
+      },
+      {
+        key: 'sum-cross',
+        d: `M ${sumEntryX},${y} L ${sumExitX},${y}`,
+        stroke: colors.circuitSecondary,
+        strokeWidth: 3.4,
+      },
+      {
+        key: 'sum-to-activation',
+        d: `M ${sumExitX},${y} L ${activationEntryX},${y}`,
+        stroke: colors.circuitSecondary,
+        strokeWidth: 3.4,
+      },
+      {
+        key: 'through-activation',
+        d: `M ${activationEntryX},${y} L ${activationExitX},${y}`,
+        stroke: colors.mathPrimary,
+        strokeWidth: 3.2,
+      },
+      {
+        key: 'activation-to-output',
+        d: `M ${activationExitX},${y} L ${outputNodeX},${y}`,
+        stroke: colors.mathPrimary,
+        strokeWidth: 3.2,
+      },
+    ];
+  }, [
+    activationEntryX,
+    activationExitX,
+    colors.circuitPrimary,
+    colors.circuitSecondary,
+    colors.mathPrimary,
+    inputLeadInX,
+    outputNodeX,
+    sumEntryX,
+    sumExitX,
+    sumNode.y,
+    weightEntryX,
+    weightExitX,
+  ]);
 
   const createTracePath = (y: number, index: number) => {
     // Create individual straight line paths from each input through its weight block to summation
@@ -1018,52 +1059,34 @@ const CircuitScene = ({ colors }: { colors: any }) => {
               strokeWidth={3.2}
               strokeLinecap="round"
               fill="none"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
               transition={{ delay: 0.35 + i * 0.12, duration: 0.9, ease: 'easeInOut' }}
               filter="url(#circuit-shadow)"
             />
           );
         })}
 
-        {/* Primary path from x₂ through w₂ into the summation node */}
-        <motion.path
-          d={centerTracePath}
-          stroke={colors.circuitPrimary}
-          strokeWidth={3.6}
-          strokeLinecap="round"
-          fill="none"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay: 0.35 + 1 * 0.12, duration: 0.9, ease: 'easeInOut' }}
-          filter="url(#circuit-shadow)"
-        />
-
-        {/* Connector from summation node to activation block */}
-        <motion.path
-          d={activationConnectorPath}
-          stroke={colors.circuitSecondary}
-          strokeWidth={3.4}
-          strokeLinecap="round"
-          fill="none"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 1.05, duration: 0.5, ease: 'easeInOut' }}
-          filter="url(#circuit-shadow)"
-        />
-
-        {/* Connector from activation block to output node */}
-        <motion.path
-          d={activationToOutputPath}
-          stroke={colors.mathPrimary}
-          strokeWidth={3.2}
-          strokeLinecap="round"
-          fill="none"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 1.45, duration: 0.4, ease: 'easeOut' }}
-          filter="url(#circuit-shadow)"
-        />
+        {/* Central trace showing x₂ travelling through each module */}
+        {centralTraceSegments.map((segment, segmentIndex) => (
+          <motion.path
+            key={segment.key}
+            d={segment.d}
+            stroke={segment.stroke}
+            strokeWidth={segment.strokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{
+              delay: 0.35 + 1 * 0.12 + segmentIndex * 0.08,
+              duration: 0.55,
+              ease: 'easeInOut',
+            }}
+            filter="url(#circuit-shadow)"
+          />
+        ))}
 
 
         {/* Animated signal pulse */}
