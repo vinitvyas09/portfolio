@@ -15,7 +15,15 @@ import PerceptronContinuum from "../../../components/framer/perceptron-morph"
 import NeuronAnimation from "../../../components/framer/neuron-animation"
 import NeuronVsPerceptron from "../../../components/framer/neuron-vs-perceptron"
 
+// Caption component for styled text
+const Caption = ({ children, ...props }: any) => (
+  <p {...props} className="text-sm text-gray-600 text-center mt-2 italic">
+    {children}
+  </p>
+)
+
 export const mdxComponents = {
+  Caption,
   Intuition,
   Math,
   Code,
