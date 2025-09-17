@@ -181,7 +181,7 @@ const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
       nucleus: withAlpha(blendColors(blendColors(primary, '#1d4ed8', 0.4), accentElectric, 0.2), 'f8'),
       nucleolus: withAlpha(blendColors(lightenColor(secondary, 0.3), accentGold, 0.3), 'ff'),
     };
-  }, [colors.neuronPrimary, colors.neuronSecondary, blendColors, darkenColor, lightenColor]);
+  }, [colors.neuronPrimary, colors.neuronSecondary]);
 
   const numMainBranches = 8;
 
@@ -518,7 +518,7 @@ const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
           <circle cx={somaX} cy={somaY} r={somaRadius + 8} fill="url(#neuron-membrane-glow)" opacity={0.6} />
           <path d={somaPaths.fill} fill={`url(#${palette.somaGradientId})`} opacity={0.92} filter="url(#neuron-glow)" />
           <ellipse cx="168" cy="160" rx="26" ry="24" fill={palette.somaInner} opacity={0.4} transform="rotate(15 168 160)" />
-          <ellipse cx="172" cy="158" rx="22" ry="20" fill={withAlpha(colors.neuronSecondary, '35')} opacity={0.6} transform="rotate(-25 172 158)" />
+          <ellipse cx="172" cy="158" rx="22" ry="20" fill={withAlpha(colors.neuronSecondary || colors.neuronPrimary, '35')} opacity={0.6} transform="rotate(-25 172 158)" />
           <path d={somaPaths.outline} fill="none" stroke={palette.membrane} strokeWidth={1.3} opacity={0.95} />
           <circle cx={somaX - 5} cy={somaY - 5} r={3} fill={withAlpha(lightenColor(colors.neuronPrimary, 0.4), 'aa')} opacity={0.8} />
 
