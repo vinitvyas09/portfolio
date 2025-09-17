@@ -661,6 +661,59 @@ New activation = (w₁ + x₁) × x₁ + (w₂ + x₂) × x₂ + (bias + 1)
 
 Since x₁² and x₂² are always positive, the new activation is always at least the old activation plus 1. We've moved in the right direction! We might not classify it correctly yet (if the old activation was -10, adding 1 only gets us to -9), but we're definitely closer.
 
+### Critical Nuance #1: The Order Matters (A Lot!)
+
+Here's something that might blow your mind: the order you show examples to your perceptron can make the difference between learning in seconds or never learning at all.
+
+/*
+<OrderMattersDemo
+config={{
+scenarios: [
+{
+name: "Fixed Order Disaster",
+order: "500 cats, then 500 dogs",
+description: "Watch the perceptron get stuck"
+},
+{
+name: "Shuffled Success",
+order: "Random mix",
+description: "Same data, different order, instant learning"
+}
+],
+showConvergenceRate: true,
+animateTraining: true
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Same data, different order: disaster vs success</p>
+
+Imagine training on 500 cat examples followed by 500 dog examples:
+
+After 5 cats: "Everything is a cat!"
+Next 495 cats: "I'm a genius!"
+First dog appears: "Wait, what?"
+After 10 dogs: "Everything is a dog!"
+Next 490 dogs: "Still a genius!"
+
+By the end, your perceptron has really only learned from about 15 examples out of 1000. The rest was just reinforcement of wrong ideas.
+
+The fix: Shuffle your data! In practice, reshuffling every iteration (epoch) gives you about 20% faster convergence. It's theoretically proven to be about 2× faster on average.
+
+```python
+# Bad: Fixed order
+for epoch in range(num_epochs):
+    for point, label in zip(data_points, labels):  # Always same order
+        train_step(point, label)
+
+# Good: Shuffle each epoch
+for epoch in range(num_epochs):
+    indices = random.permutation(len(data_points))
+    for i in indices:  # Different order each time
+        train_step(data_points[i], labels[i])
+```
+
+
 
 
 
