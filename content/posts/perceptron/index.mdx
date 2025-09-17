@@ -209,5 +209,87 @@ There's a famous example called XOR that's so simple a toddler could solve it, b
 </InfoBox>
 */
 
+## The Math: Which Side Are You On?
+
+Now let's get mathematical (but in a fun way, I promise). We need to figure out: given a line and a point, which side is the point on?
+
+Let's say we've somehow found our magic separating line. In math terms, every line in 2D can be written as:
+
+Ax + By + C = 0
+
+Where A, B, and C are just numbers that define the line's position and angle. For example:
+
+2x + 3y - 6 = 0 might be our cat/dog separator
+Points where 2x + 3y - 6 = 0 are exactly on the line
+But what about points that are NOT on the line?
+
+Here's the interesting part: if you plug any point's coordinates into that equation, the result tells you everything:
+
+/*
+<LineEquationInteractive
+config={{
+equation: "2x + 3y - 6 = 0",
+showRegions: true,
+testPoints: [
+{ x: 1, y: 3, label: "Sleepy cat" },
+{ x: 3, y: 1, label: "Energetic dog" },
+{ x: 2, y: 0.67, label: "On the fence" }
+],
+animateCalculation: true,
+showDistanceFormula: false
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Drag points around to see how the equation's value changes. Notice the pattern?</p>
+The trick is stupidly simple:
+
+Ax + By + C > 0: Point is on one side (let's say "dogs")
+Ax + By + C = 0: Point is exactly on the line (confused veterinarian)
+Ax + By + C < 0: Point is on the other side ("cats")
+
+Let me show you why this works with a concrete example:
+
+/*
+<StepByStepLineCheck
+config={{
+line: "2x + 3y - 6 = 0",
+points: [
+{ x: 0, y: 2, expected: "on line" },
+{ x: 0, y: 3, expected: "above line" },
+{ x: 0, y: 1, expected: "below line" }
+],
+showCalculations: true,
+highlightPattern: true
+}}
+/>
+*/
+
+See the pattern? We have three points with the same x-coordinate (0) but different y-coordinates:
+
+Point at (0, 2): Plugging in gives 2(0) + 3(2) - 6 = 0 → On the line
+Point at (0, 3): Plugging in gives 2(0) + 3(3) - 6 = 3 → Positive, above the line
+Point at (0, 1): Plugging in gives 2(0) + 3(1) - 6 = -3 → Negative, below the line
+
+The y-coordinate increased from 1 to 3, and our equation's result went from negative to positive. That's not a coincidence: it's exactly how the math works!
+
+/*
+<ThreeRegionViz
+config={{
+equation: "Ax + By + C",
+regions: [
+{ condition: "= 0", label: "On the line", color: "neutral" },
+{ condition: "> 0", label: "One side (e.g., dogs)", color: "positive" },
+{ condition: "< 0", label: "Other side (e.g., cats)", color: "negative" }
+],
+animateRegionFill: true,
+interactive: true,
+allowEquationEdit: true
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">The plane divided into three regions: the line itself (= 0) and the two sides (> 0 and < 0)</p>
+
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
