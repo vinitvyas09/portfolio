@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
+import React from "react"
 import { Intuition } from "./Intuition"
 import { Math } from "./Math"
 import { Code } from "./Code"
@@ -32,7 +33,20 @@ export const mdxComponents = {
   h2: (props: any) => <h2 {...props} className="text-3xl font-light tracking-tight mt-10 mb-4" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h3: (props: any) => <h3 {...props} className="text-2xl font-light tracking-tight mt-8 mb-3" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h4: (props: any) => <h4 {...props} className="text-xl font-light mt-6 mb-2" />,
-  p: (props: any) => <p {...props} className="mb-6 leading-relaxed" />,
+  p: (props: any) => {
+    // Check if children contain a <p> element to avoid nesting
+    const hasNestedP = React.Children.toArray(props.children).some((child: any) =>
+      child?.type === 'p' ||
+      (typeof child === 'object' && child?.props?.className?.includes('text-'))
+    );
+
+    // If there's already a <p> tag inside, render as a div to avoid nesting
+    if (hasNestedP) {
+      return <div {...props} className="mb-6 leading-relaxed" />;
+    }
+
+    return <p {...props} className="mb-6 leading-relaxed" />;
+  },
   ul: (props: any) => <ul {...props} className="mb-6 ml-6 list-disc" />,
   ol: (props: any) => <ol {...props} className="mb-6 ml-6 list-decimal" />,
   li: (props: any) => <li {...props} className="mb-2" />,
