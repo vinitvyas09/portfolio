@@ -374,9 +374,9 @@ const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
             <stop offset="100%" stopColor={palette.dendriteFine} />
           </linearGradient>
           <radialGradient id="axon-pulse" cx="50%" cy="50%" r="70%">
-            <stop offset="0%" stopColor={withAlpha(lightenColor(colors.neuronSecondary, 0.2), 'cc')} />
+            <stop offset="0%" stopColor={withAlpha(lightenColor(colors.neuronSecondary || colors.neuronPrimary, 0.2), 'cc')} />
             <stop offset="60%" stopColor={palette.axonCore} />
-            <stop offset="100%" stopColor={withAlpha(darkenColor(colors.neuronSecondary, 0.2), '80')} />
+            <stop offset="100%" stopColor={withAlpha(darkenColor(colors.neuronSecondary || colors.neuronPrimary, 0.2), '80')} />
           </radialGradient>
           <filter id="neuron-glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
