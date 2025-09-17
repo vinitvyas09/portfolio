@@ -859,6 +859,62 @@ activation = w1*x1 + w2*x2 + w3*x3 + bias
 activation = sum(wi*xi for wi, xi in zip(weights, inputs)) + bias
 ```
 
+## The Universal Perceptron: Any Number of Dimensions
+
+Here's where it gets mind-blowing. That same simple update rule works whether you have 2 features or 2,000:
+
+```python
+def train_perceptron_any_dimension(data_points, labels, learning_rate=1.0):
+    """Works for any number of dimensions!"""
+    
+    # Figure out dimensionality from first example
+    num_features = len(data_points[0])
+    
+    # Random initialization
+    weights = [random.uniform(-1, 1) for _ in range(num_features)]
+    bias = random.uniform(-1, 1)
+    
+    for epoch in range(num_epochs):
+        # Shuffle for better convergence
+        indices = random.permutation(len(data_points))
+        
+        for i in indices:
+            point = data_points[i]
+            true_label = labels[i]
+            
+            # Compute activation (works for any dimension!)
+            activation = sum(w * x for w, x in zip(weights, point)) + bias
+            
+            # Update if wrong
+            if true_label * activation <= 0:
+                # Update each weight
+                for j in range(num_features):
+                    weights[j] += learning_rate * true_label * point[j]
+                bias += learning_rate * true_label
+    
+    return weights, bias
+```
+
+Whether you're classifying images (784 dimensions for MNIST), text (thousands of word frequencies), or cat videos (millions of pixels), the perceptron uses the exact same algorithm. The only difference is the loop runs longer.
+
+/*
+<DimensionScalingFinal
+config={{
+examples: [
+{ dims: 2, use_case: "Cats vs dogs (sleep, speed)" },
+{ dims: 3, use_case: "Add bark frequency" },
+{ dims: 784, use_case: "Handwritten digits (28×28 pixels)" },
+{ dims: 50000, use_case: "Text classification (word vectors)" },
+{ dims: "∞", use_case: "The math doesn't care!" }
+],
+emphasize: "Same algorithm, just more loops"
+}}
+/>
+*/
+
+And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature. 
+
+
 
 
 
