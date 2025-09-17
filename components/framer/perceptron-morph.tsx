@@ -71,7 +71,26 @@ const CODE_LINES = [
 ] as const;
 
 
-const NeuronScene = ({ colors }: { colors: any }) => {
+interface ColorScheme {
+  neuronPrimary: string;
+  neuronSecondary?: string;
+  sceneBg: string;
+  textPrimary?: string;
+  textMuted?: string;
+  circuitPrimary?: string;
+  circuitSecondary?: string;
+  mathPrimary?: string;
+  codePrimary?: string;
+  chatPrimary?: string;
+  textSecondary?: string;
+  cardBg?: string;
+  borderColor?: string;
+  timelineTrack?: string;
+  timelineBg?: string;
+  timelineDot?: string;
+}
+
+const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
   const somaX = 170;
   const somaY = 160;
   const somaRadius = 35;
@@ -665,7 +684,7 @@ const NeuronScene = ({ colors }: { colors: any }) => {
   );
 };
 
-const CircuitScene = ({ colors }: { colors: any }) => {
+const CircuitScene = ({ colors }: { colors: ColorScheme }) => {
   // Layout
   const layout = {
     inputs: { x: 60, ys: [70, 100, 130], radius: 8 },
@@ -809,7 +828,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
             Drawn LAST so they sit on top and can’t be hidden by node fills.
             No pathLength animation; just solid strokes for reliability.
         */}
-        {weights.map((w, i) => (
+        {weights.map((w) => (
           <g key={`wiring-${w.id}`}>
             {/* x_i -> w_i */}
             <path d={w.segL} stroke={C.primary} strokeWidth={2.5} strokeOpacity={0.95} strokeLinecap="round" fill="none" vectorEffect="non-scaling-stroke" />
@@ -867,7 +886,7 @@ const CircuitScene = ({ colors }: { colors: any }) => {
   );
 };
 
-const MathScene = ({ colors }: { colors: any }) => (
+const MathScene = ({ colors }: { colors: ColorScheme }) => (
   <div 
     className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-8 text-center"
     style={{ backgroundColor: colors.sceneBg }}
@@ -889,7 +908,7 @@ const MathScene = ({ colors }: { colors: any }) => (
   </div>
 );
 
-const CodeScene = ({ colors }: { colors: any }) => (
+const CodeScene = ({ colors }: { colors: ColorScheme }) => (
   <div 
     className="relative flex h-full w-full flex-col justify-center overflow-hidden px-8 py-8"
     style={{ backgroundColor: colors.sceneBg }}
@@ -926,7 +945,7 @@ const CodeScene = ({ colors }: { colors: any }) => (
   </div>
 );
 
-const ChatScene = ({ colors }: { colors: any }) => (
+const ChatScene = ({ colors }: { colors: ColorScheme }) => (
   <div 
     className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-8"
     style={{ backgroundColor: colors.sceneBg }}
@@ -993,7 +1012,7 @@ const ChatScene = ({ colors }: { colors: any }) => (
   </div>
 );
 
-const STAGE_COMPONENTS: Record<StageId, (props: { colors: any }) => React.JSX.Element> = {
+const STAGE_COMPONENTS: Record<StageId, (props: { colors: ColorScheme }) => React.JSX.Element> = {
   neuron: NeuronScene,
   circuit: CircuitScene,
   math: MathScene,
@@ -1175,7 +1194,7 @@ const PerceptronContinuum = () => {
 interface TimelineProps {
   stages: StageDefinition[];
   stageIndex: number;
-  colors: any;
+  colors: ColorScheme;
   currentTitle: string;
   onSelectStage: (index: number) => void;
 }
@@ -1213,7 +1232,6 @@ const Timeline = ({ stages, stageIndex, colors, currentTitle, onSelectStage }: T
           <div className="relative flex items-center justify-between">
             {stages.map((stage, index) => {
               const isActive = index === stageIndex;
-              const dotX = dotPositions[index];
               
               return (
                 <button
