@@ -371,6 +371,8 @@ Here's something cool: the value of `Ax + By + C` doesn't just tell you which si
 The exact signed distance from point (x₀, y₀) to line Ax + By + C = 0 is:
 d = (Ax₀ + By₀ + C) / √(A² + B²)
 Since √(A² + B²) is always positive, it doesn't affect the sign. That's why we can ignore it for classification and just use Ax + By + C.
+
+/*
 <SignedDistanceViz
 config={{
 showFormula: true,
@@ -379,6 +381,8 @@ colorByDistance: true,
 interactive: true
 }}
 />
+*/
+
 Points far from the line have large absolute values (very positive or very negative), while points near the line have values close to zero. This becomes important later when we talk about "confidence" in predictions!
 </InfoBox>
 
