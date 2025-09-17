@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
@@ -128,7 +128,7 @@ const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
     return `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`;
   };
 
-  const blendColors = (hexA: string, hexB: string, ratio: number) => {
+  const blendColors = useCallback((hexA: string, hexB: string, ratio: number) => {
     const colorA = parseHex(hexA);
     const colorB = parseHex(hexB);
     if (!colorA || !colorB) {
@@ -139,10 +139,10 @@ const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
     const g = colorA.g + (colorB.g - colorA.g) * t;
     const b = colorA.b + (colorB.b - colorA.b) * t;
     return rgbToHex(r, g, b);
-  };
+  }, []);
 
-  const lightenColor = (hex: string, amount: number) => blendColors(hex, '#ffffff', amount);
-  const darkenColor = (hex: string, amount: number) => blendColors(hex, '#000000', amount);
+  const lightenColor = useCallback((hex: string, amount: number) => blendColors(hex, '#ffffff', amount), [blendColors]);
+  const darkenColor = useCallback((hex: string, amount: number) => blendColors(hex, '#000000', amount), [blendColors]);
 
   const palette = useMemo(() => {
     const primary = colors.neuronPrimary;
