@@ -918,5 +918,73 @@ And that's the magic of the perceptron: a simple idea that scales from toy probl
 
 
 
+## Coming Next: Advanced Topics
+
+### Decision Boundaries: The Geometry of Classification
+- **Understanding the decision boundary**
+  - Where activation changes from positive to negative
+  - The hyperplane perpendicular to weight vector
+- **Role of weights as directional vectors**
+  - Weight vector points toward positive examples
+  - Scale irrelevance: 2w gives same classification as w
+- **The bias as boundary shifter**
+  - Moves decision boundary away from origin
+  - Positive bias → more positive classifications
+- **Projections and dot products**
+  - Activation as projection onto weight vector
+  - 1D representation of multi-dimensional data
+
+### Interpreting Perceptron Weights
+- **Weight sensitivity analysis**
+  - Derivative interpretation: ∂activation/∂feature = weight
+  - Weights show feature importance for classification
+- **Practical heuristic**
+  - Top 10 weights: most important for positive predictions
+  - Bottom 10 weights: most important for negative predictions
+
+### The Convergence Theorem
+- **When will a perceptron converge?**
+  - Only if data is linearly separable
+  - Interactive examples of convergent vs non-convergent datasets
+- **The concept of margin (γ)**
+  - Distance from decision boundary to nearest point
+  - Large margins = easy problems
+  - Small margins = hard problems
+- **Proof of convergence**
+  - Upper bound on number of updates needed
+  - Relationship to margin size
+  - What the proof guarantees (and doesn't)
+
+### Variations: Making Perceptrons Practical
+- **The late-update problem**
+  - Why vanilla perceptron overweights recent examples
+- **Voted perceptron**
+  - Weight vectors vote proportional to survival time
+  - Better generalization, but impractical storage
+- **Averaged perceptron**
+  - Maintains running average of weight vectors
+  - Practical implementation with same efficiency
+  - Almost always better than vanilla perceptron
+
+### The XOR Problem: When Lines Aren't Enough
+- **Non-linearly separable data**
+  - Real-world XOR: sentiment with negation
+  - Visual demonstration of impossible separation
+- **Historical significance**
+  - The problem that caused the first AI winter
+  - Why it killed linear classifier research for decades
+- **Solutions and workarounds**
+  - Feature engineering (pairs, triples)
+  - Preview: Neural networks (Chapter 10)
+  - Preview: Kernel methods (Chapter 11)
+
+### The "Wait, That's It?" Moment
+- **The power of simplicity**
+  - Just a weighted sum with threshold
+  - Parallels: wheel, electricity, perceptron
+- **From simple beginnings to modern AI**
+  - Building block of deep learning
+  - The foundation that enabled GPTs and diffusion models
+
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
