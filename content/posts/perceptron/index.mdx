@@ -561,7 +561,7 @@ examples: [
 
 ## The Complete Training Algorithm
 
-Let's put it all together in actual code:
+Let's break down what's actually happening when a perceptron learns. As I said before, the algorithm maintains a "guess" at good parameters (weights and bias) and improves them one mistake at a time. Here's the interesting part: it only changes when it's wrong. When it's right, it has the confidence to do absolutely nothing. Let's put it all together in actual code:
 
 ```python
 def train_perceptron(data_points, labels, max_iterations=100):
