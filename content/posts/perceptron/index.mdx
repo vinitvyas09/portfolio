@@ -97,7 +97,7 @@ def perceptron(inputs, weights, bias):
 ```
 That's it. A brain cell in 4 lines of Python.
 
-{{/* TODO: IMPLEMENT LATER
+{/* TODO: Implement InteractivePerceptronPlayground component
 <InteractivePerceptronPlayground
 config={{
 inputs: ["coffee_consumed", "hours_slept", "deadline_proximity"],
@@ -108,7 +108,7 @@ preset: "anxiety_detector"
 }}
 />
 <p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the weights to create your own "decision neuron"</p>
-*/}}
+*/}
 
 Now that we have gotten a high level intuition for what a perceptron is, let's now dive deeper!
 
@@ -121,7 +121,7 @@ Running speed in mph (y-axis)
 
 Cats sleep more and run slower. Dogs sleep less and zoom around like caffeinated toddlers. Plot a bunch of examples, and something very interesting happens:
 
-{{/*
+{/*
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
@@ -134,13 +134,13 @@ showLegend: true,
 interactive: false
 }}
 />
-*/}}
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Each point represents one animal. Notice how they naturally cluster into two groups?</p>
 
 Now watch what happens when we draw a single line:
 
-{{/*
+{/*
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
@@ -154,7 +154,7 @@ regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
 interactive: false
 }}
 />
-*/}}
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">One line. Perfect separation. This is what "linearly separable" means.</p>
 
@@ -164,7 +164,7 @@ This is what we're asking the perceptron to do: find that line. Given a new anim
 
 You might be thinking: "I can literally see where to draw that line. Why do we need a fancy algorithm?" Fair point! In 2D, with data this clean, you could absolutely eyeball it. But here's where it gets interesting:
 
-{{/*
+{/*
 <DimensionScalingViz
 config={{
 startDimension: 2,
@@ -180,7 +180,7 @@ animationMs: 4000,
 showHumanLimit: true
 }}
 />
-*/}}
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Good luck "eyeballing" a separating hyperplane in 100 dimensions!</p>
 Real-world data doesn't come in neat 2D packages. When you're classifying:
@@ -191,9 +191,9 @@ Medical diagnoses: Dozens of test results, symptoms, and patient history
 
 Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care—the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
 
-{/*
+{/* TODO: Implement InfoBox component
 <InfoBox type="insight" title="The Hyperplane Pattern">
-**Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern? 
+**Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern?
 To separate data in n dimensions, you need an (n-1) dimensional hyperplane.
 It's like how a piece of paper (2D) can divide a room (3D) into two halves, or how a line (1D) divides a paper (2D). The perceptron is just finding the right orientation for that dividing surface, regardless of how many dimensions we're working in.
 </InfoBox>
@@ -366,13 +366,13 @@ dataset: "cats_vs_dogs"
 
 ### The Signed Distance (For the Curious)
 
+{/* TODO: Implement InfoBox component
 <InfoBox type="advanced" title="Going Deeper: It's Actually Distance!">
 Here's something cool: the value of `Ax + By + C` doesn't just tell you which side of the line you're on—it's actually proportional to your distance from the line!
 The exact signed distance from point (x₀, y₀) to line Ax + By + C = 0 is:
 d = (Ax₀ + By₀ + C) / √(A² + B²)
 Since √(A² + B²) is always positive, it doesn't affect the sign. That's why we can ignore it for classification and just use Ax + By + C.
 
-{/*
 <SignedDistanceViz
 config={{
 showFormula: true,
@@ -381,10 +381,10 @@ colorByDistance: true,
 interactive: true
 }}
 />
-*/}
 
 Points far from the line have large absolute values (very positive or very negative), while points near the line have values close to zero. This becomes important later when we talk about "confidence" in predictions!
 </InfoBox>
+*/}
 
 ## The Activation Function: Teaching Our Perceptron to Make Decisions
 
