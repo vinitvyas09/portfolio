@@ -91,7 +91,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
   }, [isDark, mounted]);
 
   const BiologicalNeuron = ({ showLabels: showL = true, labels = neuronLabels }) => {
-    const somaX = 200;
+    const somaX = 150;
     const somaY = 120;
     const somaRadius = 40;
 
