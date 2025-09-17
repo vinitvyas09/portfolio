@@ -45,7 +45,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const [terminalLit, setTerminalLit] = useState(false);
   const [animationCycle, setAnimationCycle] = useState(0);
 
-  const { inputs = 5, showWeights = true, fireThreshold = 0.4, animationMs = 3000, description } = config;
+  const { inputs = 5, fireThreshold = 0.4, animationMs = 3000, description } = config;
   
   // Sophisticated color palette
   const colors = useMemo(() => {
@@ -272,7 +272,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
         clearTimeout(timeoutId);
       }
     };
-  }, []); // Empty dependency array is fine since we manage the cycle internally
+  }, [weights, totalWeight, fireThreshold, animationMs, inputs]); // Dependencies for animation parameters
 
   const neuronColor = isFiring ? colors.neuronActive : colors.neuronResting;
   const nucleusColor = isFiring ? colors.nucleusActive : colors.nucleusResting;
