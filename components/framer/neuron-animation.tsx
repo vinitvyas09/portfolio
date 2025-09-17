@@ -205,11 +205,14 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
 
   // Generate deterministic weights for each input (between 0.1 and 1)
   // Using sine function for consistent but varied weights across inputs
-  const weights = Array.from({ length: inputs }, (_, i) => {
-    const weight = 0.2 + (Math.sin(i * 1.7) + 1) * 0.4;
-    return Math.min(1, Math.max(0.1, weight));
-  });
-  const totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+  const weights = useMemo(() =>
+    Array.from({ length: inputs }, (_, i) => {
+      const weight = 0.2 + (Math.sin(i * 1.7) + 1) * 0.4;
+      return Math.min(1, Math.max(0.1, weight));
+    }), [inputs]);
+
+  const totalWeight = useMemo(() =>
+    weights.reduce((acc, weight) => acc + weight, 0), [weights]);
   
   // Threshold explanation:
   // fireThreshold is a value between 0-1 representing the percentage of total possible
@@ -218,9 +221,17 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   // - 0.7 = 70% of total possible activation needed
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
+    let timeouts: NodeJS.Timeout[] = [];
+    let animationStopped = false;
+
+    const clearAllTimeouts = () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+      timeouts = [];
+    };
+
     const runAnimation = (currentCycle: number) => {
+      if (animationStopped) return;
+
       setIsAnimating(true);
       setSignals([]);
       setCurrentSum(0);
@@ -230,47 +241,60 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
       // Stagger signal arrivals
       const signalValues: number[] = [];
       weights.forEach((weight, index) => {
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
+          if (animationStopped) return;
+
           // Use currentCycle for randomness - this ensures each cycle is truly random
           const signalStrength = pseudoRandom(currentCycle * 1000 + index * 37) > 0.4 ? weight : 0;
           signalValues[index] = signalStrength;
-          
+
           setSignals([...signalValues]);
-          
+
           const rawSum = signalValues.reduce((acc, val) => acc + (val || 0), 0);
           const normalizedSum = totalWeight ? rawSum / totalWeight : 0;
           setCurrentSum(normalizedSum);
-          
+
           // Only fire if threshold is exceeded
           if (normalizedSum >= fireThreshold) {
-            setTimeout(() => {
+            const fireTimeout = setTimeout(() => {
+              if (animationStopped) return;
               setIsFiring(true);
               // Light up terminals after signal travels down axon
-              setTimeout(() => setTerminalLit(true), 600);
+              const terminalTimeout = setTimeout(() => {
+                if (animationStopped) return;
+                setTerminalLit(true);
+              }, 600);
+              timeouts.push(terminalTimeout);
             }, 100);
+            timeouts.push(fireTimeout);
           }
         }, (index * animationMs) / (inputs * 2));
+        timeouts.push(timeout);
       });
 
       // Reset and loop with incremented cycle
-      timeoutId = setTimeout(() => {
+      const cycleTimeout = setTimeout(() => {
+        if (animationStopped) return;
         setIsAnimating(false);
         const nextCycle = currentCycle + 1;
-        setAnimationCycle(nextCycle);
-        setTimeout(() => runAnimation(nextCycle), 1500);
+
+        const loopTimeout = setTimeout(() => {
+          if (animationStopped) return;
+          runAnimation(nextCycle);
+        }, 1500);
+        timeouts.push(loopTimeout);
       }, animationMs + 1000);
+      timeouts.push(cycleTimeout);
     };
 
     // Start the animation loop
     const initialCycle = Date.now(); // Use timestamp for initial randomness
-    setAnimationCycle(initialCycle);
     runAnimation(initialCycle);
-    
+
     // Cleanup function
     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+      animationStopped = true;
+      clearAllTimeouts();
     };
   }, [weights, totalWeight, fireThreshold, animationMs, inputs]); // Dependencies for animation parameters
 
