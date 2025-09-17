@@ -40,7 +40,7 @@ Before we meet the perceptron (our star of the show), we need a 30-second neuros
     animationMs: 3000,
   }}
 />
-<p className="text-sm text-gray-600 text-center mt-2 italic">Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Watch signals arrive at different strengths (thickness &#61; importance). When enough strong signals align, the neuron fires!</p>
 
 A biological neuron is basically nature's tiny decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). Here's where it gets interesting: the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold—BOOM—it fires its own signal down the axon to the next neurons in line.
 
@@ -289,7 +289,7 @@ allowEquationEdit: true
 />
 */}
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">The plane divided into three regions: the line itself (= 0) and the two sides (> 0 and < 0)</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">The plane divided into three regions: the line itself (&#61; 0) and the two sides (&gt; 0 and &lt; 0)</p>
 
 ## Making Predictions: The Sign Function
 
@@ -617,14 +617,14 @@ compareToModernMethods: false  // We'll save this comparison for later
 
 ### The Clever Trick: Why y × a Tells Us If We're Right
 
-There's a neat trick in line 3 above. Instead of checking if prediction != true_label, we check if true_label * activation <= 0. Why?
+There's a neat trick in line 3 above. Instead of checking if prediction !&#61; true_label, we check if true_label * activation &lt;&#61; 0. Why?
 
 Think about it:
 
-If true_label = 1 (dog) and activation > 0 (we think dog), then 1 × positive = positive ✓
-If true_label = -1 (cat) and activation < 0 (we think cat), then -1 × negative = positive ✓
-If true_label = 1 (dog) and activation < 0 (we think cat), then 1 × negative = negative ✗
-If true_label = -1 (cat) and activation > 0 (we think dog), then -1 × positive = negative ✗
+If true_label &#61; 1 (dog) and activation &gt; 0 (we think dog), then 1 × positive &#61; positive ✓
+If true_label &#61; -1 (cat) and activation &lt; 0 (we think cat), then -1 × negative &#61; positive ✓
+If true_label &#61; 1 (dog) and activation &lt; 0 (we think cat), then 1 × negative &#61; negative ✗
+If true_label &#61; -1 (cat) and activation &gt; 0 (we think dog), then -1 × positive &#61; negative ✗
 
 The product is positive when we're right, negative when we're wrong. Elegant!
 
