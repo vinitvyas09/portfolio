@@ -1239,9 +1239,8 @@ const Timeline = ({ stages, stageIndex, colors, currentTitle, onSelectStage }: T
                   type="button"
                   onClick={() => onSelectStage(index)}
                   className="group relative z-10 flex flex-col items-center gap-1.5 text-xs transition-colors"
-                  style={{ 
-                    color: colors.textMuted,
-                    ['&:hover' as any]: { color: colors.textSecondary }
+                  style={{
+                    color: colors.textMuted
                   }}
                 >
                   <span className="relative flex h-5 w-5 items-center justify-center">
