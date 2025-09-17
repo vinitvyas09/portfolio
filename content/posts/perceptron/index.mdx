@@ -829,6 +829,36 @@ visualizeDecisionBoundary: true
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Try different datasets, add your own points, and watch the perceptron learn!</p>
 
+## Beyond 2D: When Lines Become Planes (and Hyperplanes)
+
+So far we've been working in 2D—easy to visualize, easy to understand. But what about 3D data? Instead of a line, we get a plane: Ax + By + Cz + D = 0
+
+/*
+<ThreeDPerceptronViz
+config={{
+dataset: "3d_classification",
+rotatable: true,
+showPlane: true,
+animatePlaneAdjustment: true,
+features: ["Height", "Weight", "Age"]
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Drag to rotate: In 3D, we separate with a plane instead of a line</p>
+The awesome part? The math stays exactly the same! Just add another weight:
+
+```python
+# 2D version
+activation = w1*x1 + w2*x2 + bias
+
+# 3D version  
+activation = w1*x1 + w2*x2 + w3*x3 + bias
+
+# 4D? 100D? No problem!
+activation = sum(wi*xi for wi, xi in zip(weights, inputs)) + bias
+```
+
 
 
 
