@@ -435,5 +435,41 @@ def sign(x):
 
 Dead simple. No probabilities, no gradients, just a hard decision. This binary nature is both the perceptron's strength (clear decisions) and its weakness (can't express uncertainty). But for now, it's perfect for our cat/dog classifier.
 
+## Training: Teaching a Random Line to Find Its Purpose
+
+Here's where the magic happens. We don't start with the perfect line that separates cats from dogs. We start with absolute chaos: a random line that's probably wrong about everything.
+
+/*
+<RandomLineInitialization
+config={{
+dataset: "cats_vs_dogs",
+showMisclassifications: true,
+animateRandomLines: true,
+numberOfAttempts: 3,
+displayAccuracy: true
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Random initialization: Your perceptron starts life as a terrible classifier</p>
+
+Our line equation Ax + By + C = 0 needs values for A, B, and C. Since we have no idea what they should be, we just... make them up:
+
+```python
+import random
+
+# Birth of a perceptron: random and clueless
+A = random.uniform(-1, 1)  # Maybe 0.73
+B = random.uniform(-1, 1)  # Maybe -0.41  
+C = random.uniform(-1, 1)  # Maybe 0.22
+
+# Our initial line: 0.73x - 0.41y + 0.22 = 0
+# Probably terrible at classifying anything!
+```
+
+These numbers (A, B, and C) are our parameters (also called weights and bias). They completely define our line. Change them, and the line moves. The entire "learning" process is just finding the right values for these three numbers.
+
+
+
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
