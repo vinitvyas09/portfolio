@@ -91,12 +91,12 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
   }, [isDark, mounted]);
 
   const BiologicalNeuron = ({ showLabels: showL = true, labels = neuronLabels }) => {
-    const somaX = 150;
+    const somaX = 180;
     const somaY = 120;
-    const somaRadius = 30;
+    const somaRadius = 35;
 
     return (
-      <svg viewBox="0 60 400 120" className="w-full h-full" fill="none">
+      <svg viewBox="-20 50 440 140" className="w-full h-full" fill="none">
         <defs>
           <radialGradient id="neuron-soma-grad" cx="50%" cy="50%" r="85%">
             <stop offset="0%" stopColor={`${colors.neuronPrimary}30`} />
@@ -114,11 +114,11 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
         {/* Dendrites */}
         {[
-          { angle: 135, length: 70 },
-          { angle: 160, length: 60 },
-          { angle: 180, length: 75 },
-          { angle: 200, length: 65 },
-          { angle: 225, length: 70 },
+          { angle: 135, length: 80 },
+          { angle: 160, length: 70 },
+          { angle: 180, length: 85 },
+          { angle: 200, length: 75 },
+          { angle: 225, length: 80 },
         ].map((d, i) => {
           const rad = (d.angle * Math.PI) / 180;
           const endX = somaX + Math.cos(rad) * d.length;
@@ -332,7 +332,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
   const PerceptronDiagram = ({ showLabels: showL = true, labels = perceptronLabels }) => {
     return (
-      <svg viewBox="0 60 400 120" className="w-full h-full" fill="none">
+      <svg viewBox="-10 50 420 140" className="w-full h-full" fill="none">
         <defs>
           <linearGradient id="perceptron-grad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={colors.perceptronSecondary} />
@@ -353,7 +353,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
             <motion.circle
               cx={60}
               cy={y}
-              r={8}
+              r={10}
               fill={colors.perceptronSecondary}
               opacity={0.8}
               initial={{ scale: 0, x: -20 }}
@@ -423,7 +423,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         <motion.circle
           cx={160}
           cy={107}
-          r={20}
+          r={24}
           fill="url(#perceptron-grad)"
           filter="url(#perceptron-glow)"
           initial={{ scale: 0 }}
@@ -507,7 +507,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
           animate={{ scale: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 1.3 }}
         >
-          <circle cx={320} cy={107} r={12} fill={colors.accent} filter="url(#perceptron-glow)" />
+          <circle cx={320} cy={107} r={14} fill={colors.accent} filter="url(#perceptron-glow)" />
           <text x={345} y={111} fill={colors.text} fontSize={12} textAnchor="middle" fontWeight="500">
             y
           </text>
@@ -820,14 +820,14 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         )}
 
         {side === 'vertical' && (
-          <div className="space-y-2">
+          <div className="space-y-4">
             {/* Biological Neuron */}
             <div className="relative rounded-lg overflow-hidden" style={{
               background: `linear-gradient(135deg, ${colors.bg} 0%, ${isDark ? '#0a0a0a' : '#fcfcfc'} 100%)`
             }}>
-              <div className="absolute top-2 left-3 z-10">
+              <div className="absolute top-3 left-4 z-10">
                 <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${colors.neuronPrimary}15`,
                     color: colors.neuronPrimary,
@@ -837,36 +837,72 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
                   Biological Neuron
                 </span>
               </div>
-              <div className="h-32 flex items-center justify-center">
+              <div className="h-44 flex items-center justify-center">
                 <BiologicalNeuron showLabels={showLabels} labels={neuronLabels} />
               </div>
             </div>
 
             {/* Divider with arrow */}
-            <div className="relative flex items-center justify-center" style={{ height: '20px' }}>
-              <div className="absolute inset-x-8" style={{
-                height: '1px',
+            <div className="relative flex items-center justify-center" style={{ height: '40px' }}>
+              <div className="absolute inset-x-0" style={{
+                height: '2px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                background: `linear-gradient(90deg, transparent 0%, ${colors.border}40 30%, ${colors.border}40 70%, transparent 100%)`
+                background: `linear-gradient(90deg, transparent 0%, ${colors.accent}30 25%, ${colors.accent}50 50%, ${colors.accent}30 75%, transparent 100%)`
               }} />
               <motion.div
-                className="relative bg-white dark:bg-gray-900 rounded-full shadow-sm z-10 flex items-center justify-center"
+                className="absolute"
                 style={{
-                  border: `1px solid ${colors.border}`,
-                  width: '20px',
-                  height: '20px',
-                  transform: 'rotate(90deg)'
+                  width: '60px',
+                  height: '60px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+                animate={{
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
                 }}
               >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M13 5l7 7-7 7M4 12h16"
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `radial-gradient(circle, ${colors.accent}20 0%, transparent 60%)`,
+                    filter: 'blur(8px)'
+                  }}
+                />
+              </motion.div>
+              <motion.div
+                className="relative bg-white dark:bg-gray-900 rounded-full shadow-lg z-10 flex items-center justify-center"
+                style={{
+                  border: `2px solid ${colors.accent}`,
+                  width: '36px',
+                  height: '36px',
+                  transform: 'rotate(90deg)'
+                }}
+                animate={{
+                  y: [0, 3, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <motion.path
+                    d="M12 4l8 8-8 8M3 12h17"
                     stroke={colors.accent}
-                    strokeWidth={3}
+                    strokeWidth={2.5}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    opacity={0.6}
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1.5, delay: 0.5 }}
                   />
                 </svg>
               </motion.div>
@@ -876,9 +912,9 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
             <div className="relative rounded-lg overflow-hidden" style={{
               background: `linear-gradient(225deg, ${colors.bg} 0%, ${isDark ? '#0a0a0a' : '#fcfcfc'} 100%)`
             }}>
-              <div className="absolute top-2 right-3 z-10">
+              <div className="absolute top-3 right-4 z-10">
                 <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${colors.perceptronPrimary}15`,
                     color: colors.perceptronPrimary,
@@ -888,7 +924,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
                   Artificial Perceptron
                 </span>
               </div>
-              <div className="h-32 flex items-center justify-center">
+              <div className="h-44 flex items-center justify-center">
                 <PerceptronDiagram showLabels={showLabels} labels={perceptronLabels} />
               </div>
             </div>
