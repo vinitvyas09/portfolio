@@ -92,11 +92,11 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
   const BiologicalNeuron = ({ showLabels: showL = true, labels = neuronLabels }) => {
     const somaX = 150;
-    const somaY = 150;
+    const somaY = 120;
     const somaRadius = 30;
 
     return (
-      <svg viewBox="0 0 400 300" className="w-full h-full" fill="none">
+      <svg viewBox="0 30 400 220" className="w-full h-full" fill="none">
         <defs>
           <radialGradient id="neuron-soma-grad" cx="50%" cy="50%" r="85%">
             <stop offset="0%" stopColor={`${colors.neuronPrimary}30`} />
@@ -297,32 +297,32 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
               transition={{ delay: 1.5 }}
             >
               {/* Dendrites Label */}
-              <rect x={45} y={85} width={55} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={72} y={97} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={45} y={60} width={55} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={72} y={71} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[0]}
               </text>
-              <line x1={100} y1={94} x2={110} y2={110} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={100} y1={68} x2={110} y2={85} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Cell Body Label */}
-              <rect x={125} y={190} width={50} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={150} y={202} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={125} y={155} width={50} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={150} y={166} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[1]}
               </text>
-              <line x1={150} y1={190} x2={150} y2={180} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={150} y1={155} x2={150} y2={150} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Axon Label */}
-              <rect x={225} y={125} width={35} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={242} y={137} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={225} y={95} width={35} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={242} y={106} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[2]}
               </text>
-              <line x1={225} y1={134} x2={215} y2={142} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={225} y1={103} x2={215} y2={112} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Chemical Signals Label */}
-              <rect x={290} y={140} width={85} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={332} y={152} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={290} y={110} width={85} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={332} y={121} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[3]}
               </text>
-              <line x1={290} y1={149} x2={280} y2={150} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={290} y1={118} x2={280} y2={120} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
             </motion.g>
           </g>
         )}
@@ -332,7 +332,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
   const PerceptronDiagram = ({ showLabels: showL = true, labels = perceptronLabels }) => {
     return (
-      <svg viewBox="0 0 400 300" className="w-full h-full" fill="none">
+      <svg viewBox="0 30 400 220" className="w-full h-full" fill="none">
         <defs>
           <linearGradient id="perceptron-grad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={colors.perceptronSecondary} />
@@ -348,7 +348,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         </defs>
 
         {/* Input Nodes */}
-        {[80, 110, 140, 170].map((y, i) => (
+        {[70, 95, 120, 145].map((y, i) => (
           <g key={`input-${i}`}>
             <motion.circle
               cx={60}
@@ -376,13 +376,13 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         ))}
 
         {/* Weights on connections */}
-        {[80, 110, 140, 170].map((y, i) => (
+        {[70, 95, 120, 145].map((y, i) => (
           <g key={`weight-${i}`}>
             <motion.line
               x1={68}
               y1={y}
               x2={152}
-              y2={125}
+              y2={107}
               stroke={colors.perceptronSecondary}
               strokeWidth={2}
               opacity={0.6}
@@ -392,7 +392,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
             />
             <motion.rect
               x={100}
-              y={y + (125 - y) * 0.4 - 10}
+              y={y + (107 - y) * 0.4 - 10}
               width={24}
               height={16}
               rx={3}
@@ -405,7 +405,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
             />
             <motion.text
               x={112}
-              y={y + (125 - y) * 0.4 - 1}
+              y={y + (107 - y) * 0.4 - 1}
               fill={colors.text}
               fontSize={9}
               textAnchor="middle"
@@ -422,7 +422,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         {/* Summation Node */}
         <motion.circle
           cx={160}
-          cy={125}
+          cy={107}
           r={20}
           fill="url(#perceptron-grad)"
           filter="url(#perceptron-glow)"
@@ -432,7 +432,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         />
         <motion.text
           x={160}
-          y={131}
+          y={113}
           fill={colors.bg}
           fontSize={24}
           fontWeight="bold"
@@ -458,7 +458,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
             x1={66}
             y1={45}
             x2={140}
-            y2={105}
+            y2={90}
             stroke={colors.accent}
             strokeWidth={1.5}
             strokeDasharray="3 2"
@@ -475,15 +475,15 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 1 }}
         >
-          <rect x={220} y={105} width={50} height={40} rx={8} fill={colors.perceptronPrimary} opacity={0.2} />
-          <rect x={225} y={110} width={40} height={30} rx={6} fill={colors.bg} stroke={colors.perceptronPrimary} strokeWidth={2} />
+          <rect x={220} y={87} width={50} height={40} rx={8} fill={colors.perceptronPrimary} opacity={0.2} />
+          <rect x={225} y={92} width={40} height={30} rx={6} fill={colors.bg} stroke={colors.perceptronPrimary} strokeWidth={2} />
           <path
-            d="M 235 130 Q 245 115 255 130"
+            d="M 235 112 Q 245 97 255 112"
             stroke={colors.perceptronPrimary}
             strokeWidth={2}
             fill="none"
           />
-          <text x={245} y={100} fill={colors.text} fontSize={10} textAnchor="middle" fontWeight="500">
+          <text x={245} y={82} fill={colors.text} fontSize={10} textAnchor="middle" fontWeight="500">
             σ(z)
           </text>
         </motion.g>
@@ -491,9 +491,9 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         {/* Connection from sum to activation */}
         <motion.line
           x1={180}
-          y1={125}
+          y1={107}
           x2={220}
-          y2={125}
+          y2={107}
           stroke={colors.perceptronPrimary}
           strokeWidth={3}
           initial={{ pathLength: 0 }}
@@ -507,8 +507,8 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
           animate={{ scale: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 1.3 }}
         >
-          <circle cx={320} cy={125} r={12} fill={colors.accent} filter="url(#perceptron-glow)" />
-          <text x={345} y={129} fill={colors.text} fontSize={12} textAnchor="middle" fontWeight="500">
+          <circle cx={320} cy={107} r={12} fill={colors.accent} filter="url(#perceptron-glow)" />
+          <text x={345} y={111} fill={colors.text} fontSize={12} textAnchor="middle" fontWeight="500">
             y
           </text>
         </motion.g>
@@ -516,9 +516,9 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         {/* Connection from activation to output */}
         <motion.line
           x1={270}
-          y1={125}
+          y1={107}
           x2={308}
-          y2={125}
+          y2={107}
           stroke={colors.accent}
           strokeWidth={3}
           initial={{ pathLength: 0 }}
@@ -533,7 +533,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
           transition={{ duration: 0.5, delay: 1.6 }}
         >
           <polygon
-            points="305,120 315,125 305,130"
+            points="305,102 315,107 305,112"
             fill={colors.accent}
           />
         </motion.g>
@@ -547,32 +547,32 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
               transition={{ delay: 1.8 }}
             >
               {/* Inputs Label */}
-              <rect x={10} y={200} width={80} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={50} y={212} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={10} y={165} width={80} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={50} y={176} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[0]}
               </text>
-              <line x1={50} y1={200} x2={55} y2={180} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={50} y1={165} x2={55} y2={145} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Weighted Sum Label */}
-              <rect x={120} y={160} width={80} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={160} y={172} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={120} y={135} width={80} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={160} y={146} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[1]}
               </text>
-              <line x1={160} y1={160} x2={160} y2={145} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={160} y1={135} x2={160} y2={127} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Activation Function Label */}
-              <rect x={205} y={160} width={100} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={255} y={172} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={205} y={135} width={100} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={255} y={146} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[2]}
               </text>
-              <line x1={245} y1={160} x2={245} y2={145} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={245} y1={135} x2={245} y2={127} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Output Label */}
-              <rect x={295} y={85} width={50} height={18} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={320} y={97} fill={colors.text} textAnchor="middle" fontSize={10} fontWeight="500">
+              <rect x={295} y={70} width={50} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
+              <text x={320} y={81} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
                 {labels[3]}
               </text>
-              <line x1={320} y1={103} x2={320} y2={113} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={320} y1={86} x2={320} y2={95} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
             </motion.g>
           </g>
         )}
@@ -586,7 +586,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
           animate={{
             opacity: [0, 1, 1, 1, 0],
             cx: [60, 110, 160, 245, 320],
-            cy: [110, 115, 125, 125, 125],
+            cy: [95, 100, 107, 107, 107],
           }}
           transition={{
             duration: 2,
@@ -602,7 +602,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
   if (!mounted) {
     return (
       <div className={`w-full ${className}`}>
-        <div className="relative overflow-hidden rounded-2xl border bg-white" style={{ height: '24rem' }}>
+        <div className="relative overflow-hidden rounded-2xl border bg-white" style={{ height: '14rem' }}>
           {/* Loading placeholder */}
         </div>
       </div>
@@ -619,73 +619,93 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         }}
       >
         {side === 'split' && (
-          <div className="flex h-96">
+          <div className="flex h-56">
             {/* Biological Neuron Side */}
-            <div className="flex-1 relative border-r" style={{ borderColor: colors.border }}>
-              <div className="absolute top-4 left-4 z-10">
+            <div className="flex-1 relative" style={{
+              background: `linear-gradient(135deg, ${colors.bg} 0%, ${isDark ? '#0f0f0f' : '#fafafa'} 100%)`
+            }}>
+              <div className="absolute top-2 left-3 z-10">
                 <span
-                  className="text-sm font-semibold px-3 py-1 rounded-full"
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
                   style={{
-                    backgroundColor: `${colors.neuronPrimary}20`,
+                    backgroundColor: `${colors.neuronPrimary}15`,
                     color: colors.neuronPrimary,
+                    border: `1px solid ${colors.neuronPrimary}30`
                   }}
                 >
                   Biological Neuron
                 </span>
               </div>
-              <div className="h-full flex items-center justify-center p-8">
+              <div className="h-full flex items-center justify-center p-2">
                 <BiologicalNeuron showLabels={showLabels} labels={neuronLabels} />
               </div>
             </div>
 
-            {/* Arrow/Connection in the middle */}
-            <div
-              className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
-              style={{ width: '60px' }}
-            >
+            {/* Sophisticated divider */}
+            <div className="relative flex items-center justify-center" style={{ width: '40px' }}>
+              <div className="absolute inset-y-0" style={{
+                width: '1px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: `linear-gradient(180deg, transparent 0%, ${colors.border}50 25%, ${colors.border}50 75%, transparent 100%)`
+              }} />
               <motion.div
-                className="text-center"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 2 }}
+                className="absolute rounded-full blur-md"
+                style={{
+                  background: `radial-gradient(circle, ${colors.accent}25 0%, transparent 60%)`,
+                  width: '50px',
+                  height: '50px'
+                }}
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.5, 0.3]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <div
+                className="relative bg-white dark:bg-gray-900 rounded-full p-1 shadow-sm z-10"
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  width: '20px',
+                  height: '20px'
+                }}
               >
-                <div
-                  className="bg-white dark:bg-gray-900 rounded-full p-3 shadow-lg border-2"
-                  style={{ borderColor: colors.accent }}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M5 12h14m0 0l-7-7m7 7l-7 7"
-                      stroke={colors.accent}
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div
-                  className="text-xs mt-2 font-medium"
-                  style={{ color: colors.textMuted }}
-                >
-                  maps to
-                </div>
-              </motion.div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <motion.path
+                    d="M13 5l7 7-7 7M4 12h16"
+                    stroke={colors.accent}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.7 }}
+                    transition={{ duration: 1.5, delay: 0.5 }}
+                  />
+                </svg>
+              </div>
             </div>
 
             {/* Perceptron Side */}
-            <div className="flex-1 relative">
-              <div className="absolute top-4 right-4 z-10">
+            <div className="flex-1 relative" style={{
+              background: `linear-gradient(225deg, ${colors.bg} 0%, ${isDark ? '#0f0f0f' : '#fafafa'} 100%)`
+            }}>
+              <div className="absolute top-2 right-3 z-10">
                 <span
-                  className="text-sm font-semibold px-3 py-1 rounded-full"
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
                   style={{
-                    backgroundColor: `${colors.perceptronPrimary}20`,
+                    backgroundColor: `${colors.perceptronPrimary}15`,
                     color: colors.perceptronPrimary,
+                    border: `1px solid ${colors.perceptronPrimary}30`
                   }}
                 >
                   Artificial Perceptron
                 </span>
               </div>
-              <div className="h-full flex items-center justify-center p-8">
+              <div className="h-full flex items-center justify-center p-2">
                 <PerceptronDiagram showLabels={showLabels} labels={perceptronLabels} />
               </div>
             </div>
@@ -693,7 +713,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         )}
 
         {side === 'toggle' && (
-          <div className="h-96 relative">
+          <div className="h-56 relative">
             <AnimatePresence mode="wait">
               {showPerceptron ? (
                 <motion.div
@@ -767,7 +787,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
         )}
 
         {side === 'overlay' && (
-          <div className="h-96 relative">
+          <div className="h-56 relative">
             <div className="absolute inset-0 flex items-center justify-center p-8">
               <motion.div
                 className="absolute inset-0 flex items-center justify-center"
@@ -801,10 +821,11 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
         {/* Bottom info bar */}
         <div
-          className="px-6 py-3 border-t flex items-center justify-between text-xs"
+          className="px-4 py-1.5 border-t flex items-center justify-between"
           style={{
             borderColor: colors.border,
             color: colors.textMuted,
+            fontSize: '10px'
           }}
         >
           <div>
