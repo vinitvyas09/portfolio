@@ -15,8 +15,17 @@ Here's the thing: the perceptron isn't a stepping stone to neural networks. It *
 
 That origin story matters because it reveals the core insight that makes everything else click. When you understand where the perceptron came from, suddenly the math isn't just formulas to memorize. The code isn't just syntax to copy. The limitations and breakthroughs that followed become inevitable, obvious even.
 
-<PerceptronContinuum className="mt-12" />
-<br />
+<NeuronVsPerceptron
+  config={{
+    side: "vertical",
+    animateTransition: true,
+    showLabels: true,
+    neuronLabels: ["Dendrites", "Cell Body", "Axon", "Chemical Signals"],
+    perceptronLabels: ["Inputs (x₁, x₂...)", "Weighted Sum", "Activation Function", "Output"],
+    transitionMs: 2000,
+  }}
+/>
+
 So we're starting at the real beginning. Not with equations or Python classes, but with the moment a psychologist in 1958 looked at a brain cell and thought, "I can build that with wires and motors."
 
 ## First, Let's Peek Inside The Brain
@@ -37,42 +46,69 @@ A biological neuron is basically nature's tiny decision-maker. It sits there, re
 
 That's it. That's the magic. Input → weighted sum → threshold → output. This ridiculously simple mechanism, chained together 86 billion times in your brain, somehow produces consciousness, creativity, and your ability to understand this sentence.
 
-## Enter the Perceptron: The "Hold My Beer" Moment of AI
+## 1943: The "What If We Built One?" Moment
 
-Picture this: it's 1958. The Space Race is heating up, and computers are room-sized monsters that need punch cards to think. Into this world, Frank Rosenblatt (a psychologist, not a computer scientist) announces he's built a machine that can learn. Not just compute, learn. The New York Times called it "the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence."
+Before we get to Rosenblatt and his perceptron, we need to talk about two guys who had an even crazier idea fifteen years earlier.
 
-Rosenblatt looked at the biological process above and had an audacious thought: "What if I rebuilt this in hardware?" Not metaphorically. He literally built a machine called the Mark 1 Perceptron with motors, wheels, and photocells that could learn to recognize letters. It weighed a ton (literally) and looked like a telephone switchboard had a baby with a camera.
+Warren McCulloch (a neurophysiologist) and Walter Pitts (a homeless teenager who taught himself logic) published a paper in 1943 that basically said: "Hey, neurons are just logic gates made of meat." They created the first mathematical model of a neuron, super simple, almost cartoonishly basic. As Wikipedia (diplomatically) puts it, these were "caricature models" that captured one key idea while ignoring basically everything else about real neurons.
+
+But that one idea was enough. If neurons were just biological switches that turned on when enough input arrived, then maybe, just maybe, you could build thinking machines.
+
+## 1958: Enter the Perceptron—The "Hold My Beer" Moment of AI
+
+Fast forward to 1958. The Space Race is in full swing, computers still use punch cards, and Frank Rosenblatt (a psychologist at Cornell Aeronautical Laboratory) announces something that makes headlines worldwide. He hasn't just modeled a neuron mathematically. He's built one. In hardware. With actual wires and motors.
+
+It allowed The New York Times to be absolutely dramatic, calling it "the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence.".
 
 <img src="/Mark1.jpg" alt="The Mark 1 Perceptron - Frank Rosenblatt's original hardware implementation from 1958" className="w-full max-w-2xl mx-auto my-8 rounded-lg shadow-lg" />
 <p className="text-sm text-gray-600 text-center mt-2 italic">The Mark 1 Perceptron - Frank Rosenblatt's original hardware implementation from 1958</p>
 
-But here's where it gets beautiful, once you strip away the motors and wires, the perceptron is just math doing exactly what your neurons do:
+The Mark 1 Perceptron looked like what would happen if a telephone switchboard and a camera had a baby, then that baby grew up and got really into bodybuilding. It weighed a ton (literally), had 400 photocells as "eyes," and used motors to physically adjust potentiometers that represented the weights. It was magnificently absurd.
 
-<NeuronVsPerceptron
-  config={{
-    side: "vertical",
-    animateTransition: true,
-    showLabels: true,
-    neuronLabels: ["Dendrites", "Cell Body", "Axon", "Chemical Signals"],
-    perceptronLabels: ["Inputs (x₁, x₂...)", "Weighted Sum", "Activation Function", "Output"],
-    transitionMs: 2000,
-  }}
-/>
+But here's the kicker: it could learn. Show it enough examples of letters, and it would learn to recognize them. Not because someone programmed it with rules about what makes an "A" different from a "B," but because it figured it out by adjusting those motorized 'weights'.
 
-Look at that comparison. On the left: millions of years of evolution. On the right: some math we can code in 10 lines of Python. Same exact principle. The perceptron takes inputs, multiplies each by a weight (importance), adds them up, and decides whether to "fire" (output 1) or stay quiet (output 0).
+## The Parallel:
+### Biology → Circuit → Math → Code → LLM
+
+Now let's check this out. Strip away all the motors and wires, and the perceptron is just math doing exactly what neurons do:
+
+<PerceptronContinuum className="mt-12" />
+<br />
+
+Look at that progression:
+
+*Biological*: Dendrites receive signals → synaptic strengths modulate them → cell body accumulates → threshold determines firing
+
+*Conceptual*: Inputs arrive → weights scale them → everything sums → activation function decides output
+
+*Mathematical*: y = f(Σ(wi × xi) + b) where f is typically a step function
+
+It's the same exact principle, just expressed in different languages. The perceptron takes inputs, multiplies each by a weight (importance), adds them up with a bias term, and decides whether to "fire" (output 1) or stay quiet (output 0).
 
 ```python
-# A neuron in code:
+# A biological neuron, translated to code (expanded from above animation):
 def perceptron(inputs, weights, bias):
+    # Dendrites receive signals, synapses weight them
     weighted_sum = sum(x * w for x, w in zip(inputs, weights))
-    return 1 if weighted_sum + bias > 0 else 0
-
-# That's it. Four lines.
+    # Cell body accumulates charge
+    total_input = weighted_sum + bias
+    # Fire if threshold exceeded
+    return 1 if total_input > 0 else 0
 ```
+That's it. A brain cell in 4 lines of Python.
 
-The parallels aren't superficial. Each component has a direct counterpart: synaptic strengths map to weights, activation thresholds become bias values, and the binary firing pattern translates to outputting either 0 or 1. It's a surprisingly faithful translation of biology into math.
-
-You can think of it as a simple decision maker. It takes multiple inputs, considers how important each one is (the weights), adds them all up with a bias, and makes a yes/no call. No ambiguity, no probability—just a binary decision based on whether the total exceeds a threshold. This straightforward approach, borrowed from how neurons work, ended up being the starting point for much of modern machine learning.
+/*
+<InteractivePerceptronPlayground
+config={{
+inputs: ["coffee_consumed", "hours_slept", "deadline_proximity"],
+outputLabel: "Should I panic?",
+adjustableWeights: true,
+showMath: true,
+preset: "anxiety_detector"
+}}
+/>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the weights to create your own "decision neuron"</p>
+*/
 
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
