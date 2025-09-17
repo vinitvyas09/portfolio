@@ -181,7 +181,7 @@ const NeuronScene = ({ colors }: { colors: ColorScheme }) => {
       nucleus: withAlpha(blendColors(blendColors(primary, '#1d4ed8', 0.4), accentElectric, 0.2), 'f8'),
       nucleolus: withAlpha(blendColors(lightenColor(secondary, 0.3), accentGold, 0.3), 'ff'),
     };
-  }, [colors.neuronPrimary, colors.neuronSecondary]);
+  }, [colors.neuronPrimary, colors.neuronSecondary, blendColors, darkenColor, lightenColor]);
 
   const numMainBranches = 8;
 
