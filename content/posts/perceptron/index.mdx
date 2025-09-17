@@ -559,7 +559,61 @@ examples: [
 />
 */
 
+## The Complete Training Algorithm
 
+Let's put it all together in actual code:
+
+```python
+def train_perceptron(data_points, labels, max_iterations=100):
+    """
+    The world's simplest learning algorithm.
+    data_points: List of [x, y] coordinates
+    labels: List of -1 (cat) or 1 (dog) for each point
+    """
+    # Step 1: Random initialization
+    weights = [random.uniform(-1, 1) for _ in range(2)]  # [A, B]
+    bias = random.uniform(-1, 1)                          # C
+    
+    for iteration in range(max_iterations):
+        errors = 0
+        
+        for point, true_label in zip(data_points, labels):
+            # Step 2: Make a prediction
+            weighted_sum = weights[0] * point[0] + weights[1] * point[1] + bias
+            prediction = 1 if weighted_sum > 0 else -1
+            
+            # Step 3: Check if we're wrong
+            if prediction != true_label:
+                errors += 1
+                
+                # Step 4: Update weights (the learning!)
+                weights[0] += true_label * point[0]  # Update A
+                weights[1] += true_label * point[1]  # Update B
+                bias += true_label                    # Update C
+        
+        # If no errors, we've found the perfect line!
+        if errors == 0:
+            print(f"Converged after {iteration} iterations!")
+            break
+    
+    return weights, bias
+
+# That's it!
+```
+
+/*
+<TrainingProgressVisualization
+config={{
+showEpochs: true,
+showErrorRate: true,
+showLineEvolution: true,
+dataset: "cats_vs_dogs",
+compareToModernMethods: false  // We'll save this comparison for later
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">From chaos to order: watch the error rate drop as the line finds its place</p>
 
 
 
