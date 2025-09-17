@@ -291,5 +291,78 @@ allowEquationEdit: true
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">The plane divided into three regions: the line itself (= 0) and the two sides (> 0 and < 0)</p>
 
+## Making Predictions: The Sign Function
+
+So our perceptron's job boils down to this embarrassingly simple task:
+
+Take a point (x, y)
+Calculate Ax + By + C
+Check the sign:
+
+Positive? → Class 1 (dog)
+Negative? → Class 0 (cat)
+Zero? → Uh... flip a coin? (In practice, we usually pick one side)
+
+In math notation, we write this as:
+prediction = sign(Ax + By + C)
+Where sign() is just:
+
+sign(positive number) = +1
+sign(negative number) = -1
+sign(0) = 0 (or we pick a side)
+
+```python
+def predict(x, y, A, B, C):
+    """The world's simplest classifier"""
+    value = A * x + B * y + C
+    
+    if value > 0:
+        return 1  # Dog
+    else:
+        return 0  # Cat (includes the boundary case)
+```
+
+### But Wait, This Is Starting to Look Familiar...
+
+Remember our perceptron function from earlier?
+
+```python
+def perceptron(inputs, weights, bias):
+    weighted_sum = sum(x * w for x, w in zip(inputs, weights))
+    total = weighted_sum + bias
+    return 1 if total > 0 else 0
+```
+
+And our line classification:
+
+```python
+def classify(x, y, A, B, C):
+    total = A * x + B * y + C
+    return 1 if total > 0 else 0
+```
+
+Look at that! They're the same thing!
+
+Our inputs are [x, y] (the coordinates)
+Our weights are [A, B] (the line's coefficients)
+Our bias is C (the constant term)
+
+The perceptron isn't doing something magical. It's just finding the right values for A, B, and C (the right line) to separate our data. The "learning" is just adjusting these numbers until the line is in the right place.
+
+/*
+<PerceptronLineConnection
+config={{
+mode: "split-screen",
+leftPanel: "geometric",  // Shows the line moving
+rightPanel: "algebraic", // Shows A, B, C values changing
+syncPanels: true,
+showLearningSteps: true,
+dataset: "cats_vs_dogs"
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line move as the perceptron adjusts its weights (A, B) and bias (C)</p>
+
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
