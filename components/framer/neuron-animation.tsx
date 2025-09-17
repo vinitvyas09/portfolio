@@ -599,7 +599,6 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
               for (let i = 0; i < points.length; i++) {
                 const current = points[i];
                 const next = points[(i + 1) % points.length];
-                const nextNext = points[(i + 2) % points.length];
                 
                 // Control points for smooth curves
                 const cp1x = current.x + Math.cos(current.angle + Math.PI/2) * 8;
