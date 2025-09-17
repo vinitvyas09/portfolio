@@ -469,6 +469,38 @@ C = random.uniform(-1, 1)  # Maybe 0.22
 
 These numbers (A, B, and C) are our parameters (also called weights and bias). They completely define our line. Change them, and the line moves. The entire "learning" process is just finding the right values for these three numbers.
 
+## The Training Loop: Nudge, Check, Repeat
+
+Training a perceptron is beautifully dumb. Here's the entire algorithm:
+
+Start with a random line
+Show it a data point
+If it gets it right: do nothing (good job, line!)
+If it gets it wrong: nudge the line toward the correct answer
+Repeat until the line stops being wrong
+
+That's it. No calculus, no complex optimization, just: "Wrong? Move a bit. Wrong again? Move a bit more."
+
+/*
+<PerceptronTrainingLoop
+config={{
+dataset: "cats_vs_dogs",
+showSteps: true,
+animateLineAdjustment: true,
+highlightCurrentPoint: true,
+showErrorCount: true,
+speed: "adjustable"
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line stumble its way toward perfection, one mistake at a time</p>
+
+But wait—how exactly do we "nudge" the line? This is where it gets clever.
+
+
+
+
 
 
 # References
