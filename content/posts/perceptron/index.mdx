@@ -97,7 +97,7 @@ def perceptron(inputs, weights, bias):
 ```
 That's it. A brain cell in 4 lines of Python.
 
-/* TODO: IMPLEMENT LATER
+{{/* TODO: IMPLEMENT LATER
 <InteractivePerceptronPlayground
 config={{
 inputs: ["coffee_consumed", "hours_slept", "deadline_proximity"],
@@ -108,7 +108,7 @@ preset: "anxiety_detector"
 }}
 />
 <p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the weights to create your own "decision neuron"</p>
-*/
+*/}}
 
 Now that we have gotten a high level intuition for what a perceptron is, let's now dive deeper!
 
@@ -121,7 +121,7 @@ Running speed in mph (y-axis)
 
 Cats sleep more and run slower. Dogs sleep less and zoom around like caffeinated toddlers. Plot a bunch of examples, and something very interesting happens:
 
-/*
+{{/*
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
@@ -134,13 +134,13 @@ showLegend: true,
 interactive: false
 }}
 />
-*/
+*/}}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Each point represents one animal. Notice how they naturally cluster into two groups?</p>
 
 Now watch what happens when we draw a single line:
 
-/*
+{{/*
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
@@ -154,7 +154,7 @@ regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
 interactive: false
 }}
 />
-*/
+*/}}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">One line. Perfect separation. This is what "linearly separable" means.</p>
 
@@ -164,7 +164,7 @@ This is what we're asking the perceptron to do: find that line. Given a new anim
 
 You might be thinking: "I can literally see where to draw that line. Why do we need a fancy algorithm?" Fair point! In 2D, with data this clean, you could absolutely eyeball it. But here's where it gets interesting:
 
-/*
+{{/*
 <DimensionScalingViz
 config={{
 startDimension: 2,
@@ -180,7 +180,7 @@ animationMs: 4000,
 showHumanLimit: true
 }}
 />
-*/
+*/}}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Good luck "eyeballing" a separating hyperplane in 100 dimensions!</p>
 Real-world data doesn't come in neat 2D packages. When you're classifying:
@@ -191,15 +191,15 @@ Medical diagnoses: Dozens of test results, symptoms, and patient history
 
 Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care—the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
 
-/*
+{/*
 <InfoBox type="insight" title="The Hyperplane Pattern">
 **Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern? 
 To separate data in n dimensions, you need an (n-1) dimensional hyperplane.
 It's like how a piece of paper (2D) can divide a room (3D) into two halves, or how a line (1D) divides a paper (2D). The perceptron is just finding the right orientation for that dividing surface, regardless of how many dimensions we're working in.
 </InfoBox>
-*/
+*/}
 
-/*
+{/*
 <InfoBox type="warning" title="The Perceptron's Kryptonite">
 
 **Spoiler alert:** The perceptron is amazing at finding these linear separations, but it has one fatal weakness that almost killed AI research for decades. It can't handle data that isn't linearly separable—imagine trying to separate a bullseye pattern with a straight line. 
@@ -207,7 +207,7 @@ It's like how a piece of paper (2D) can divide a room (3D) into two halves, or h
 There's a famous example called XOR that's so simple a toddler could solve it, but it stumped the perceptron and caused what we now call the "first AI winter." We'll dive into that drama later.
 
 </InfoBox>
-*/
+*/}
 
 ## The Math: Which Side Are You On?
 
@@ -225,7 +225,7 @@ But what about points that are NOT on the line?
 
 Here's the interesting part: if you plug any point's coordinates into that equation, the result tells you everything:
 
-/*
+{/*
 <LineEquationInteractive
 config={{
 equation: "2x + 3y - 6 = 0",
@@ -239,7 +239,7 @@ animateCalculation: true,
 showDistanceFormula: false
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag points around to see how the equation's value changes. Notice the pattern?</p>
 The trick is stupidly simple:
@@ -250,7 +250,7 @@ Ax + By + C < 0: Point is on the other side ("cats")
 
 Let me show you why this works with a concrete example:
 
-/*
+{/*
 <StepByStepLineCheck
 config={{
 line: "2x + 3y - 6 = 0",
@@ -263,7 +263,7 @@ showCalculations: true,
 highlightPattern: true
 }}
 />
-*/
+*/}
 
 See the pattern? We have three points with the same x-coordinate (0) but different y-coordinates:
 
@@ -273,7 +273,7 @@ Point at (0, 1): Plugging in gives 2(0) + 3(1) - 6 = -3 → Negative, below the 
 
 The y-coordinate increased from 1 to 3, and our equation's result went from negative to positive. That's not a coincidence: it's exactly how the math works!
 
-/*
+{/*
 <ThreeRegionViz
 config={{
 equation: "Ax + By + C",
@@ -287,7 +287,7 @@ interactive: true,
 allowEquationEdit: true
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">The plane divided into three regions: the line itself (= 0) and the two sides (> 0 and < 0)</p>
 
@@ -349,7 +349,7 @@ Our bias is C (the constant term)
 
 The perceptron isn't doing something magical. It's just finding the right values for A, B, and C (the right line) to separate our data. The "learning" is just adjusting these numbers until the line is in the right place.
 
-/*
+{/*
 <PerceptronLineConnection
 config={{
 mode: "split-screen",
@@ -360,7 +360,7 @@ showLearningSteps: true,
 dataset: "cats_vs_dogs"
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line move as the perceptron adjusts its weights (A, B) and bias (C)</p>
 
@@ -372,7 +372,7 @@ The exact signed distance from point (x₀, y₀) to line Ax + By + C = 0 is:
 d = (Ax₀ + By₀ + C) / √(A² + B²)
 Since √(A² + B²) is always positive, it doesn't affect the sign. That's why we can ignore it for classification and just use Ax + By + C.
 
-/*
+{/*
 <SignedDistanceViz
 config={{
 showFormula: true,
@@ -381,7 +381,7 @@ colorByDistance: true,
 interactive: true
 }}
 />
-*/
+*/}
 
 Points far from the line have large absolute values (very positive or very negative), while points near the line have values close to zero. This becomes important later when we talk about "confidence" in predictions!
 </InfoBox>
@@ -394,7 +394,7 @@ Remember our basic flow: inputs → weighted sum → ??? → output.
 
 That ??? is the activation function, and it determines how our artificial neuron responds to its inputs.
 
-/*
+{/*
 <ActivationFunctionGallery
 config={{
 functions: [
@@ -409,7 +409,7 @@ animateTransitions: true,
 highlightCurrent: "Sign"
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Different activation functions give neurons different "personalities"—decisive, probabilistic, or selective</p>
 
@@ -439,7 +439,7 @@ Dead simple. No probabilities, no gradients, just a hard decision. This binary n
 
 Here's where the magic happens. We don't start with the perfect line that separates cats from dogs. We start with absolute chaos: a random line that's probably wrong about everything.
 
-/*
+{/*
 <RandomLineInitialization
 config={{
 dataset: "cats_vs_dogs",
@@ -449,7 +449,7 @@ numberOfAttempts: 3,
 displayAccuracy: true
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Random initialization: Your perceptron starts life as a terrible classifier</p>
 
@@ -481,7 +481,7 @@ Repeat until the line stops being wrong
 
 That's it. No calculus, no complex optimization, just: "Wrong? Move a bit. Wrong again? Move a bit more."
 
-/*
+{/*
 <PerceptronTrainingLoop
 config={{
 dataset: "cats_vs_dogs",
@@ -492,7 +492,7 @@ showErrorCount: true,
 speed: "adjustable"
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line stumble its way toward perfection, one mistake at a time</p>
 
@@ -510,7 +510,7 @@ We're wrong. The point is actually a cat (-1) but we predicted dog (1). How do w
 
 The perceptron's learning rule is surprisingly elegant:
 
-/*
+{/*
 <UpdateRuleVisualizer
 config={{
 example: {
@@ -524,7 +524,7 @@ animateUpdate: true,
 showGeometrically: true
 }}
 />
-*/
+*/}
 
 Here's the rule in all its glory:
 
@@ -546,7 +546,7 @@ Why does this work? Because we're literally pushing the line away from misclassi
 If we said "dog" but it's a "cat", we make the line produce a more negative value for that point
 If we said "cat" but it's a "dog", we make the line produce a more positive value
 
-/*
+{/*
 <IntuitionBuilder
 config={{
 mode: "step-through",
@@ -557,7 +557,7 @@ examples: [
 ]
 }}
 />
-*/
+*/}
 
 ## The Complete Training Algorithm
 
@@ -601,7 +601,7 @@ def train_perceptron(data_points, labels, max_iterations=100):
 # That's it!
 ```
 
-/*
+{/*
 <TrainingProgressVisualization
 config={{
 showEpochs: true,
@@ -611,7 +611,7 @@ dataset: "cats_vs_dogs",
 compareToModernMethods: false  // We'll save this comparison for later
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">From chaos to order: watch the error rate drop as the line finds its place</p>
 
@@ -632,7 +632,7 @@ The product is positive when we're right, negative when we're wrong. Elegant!
 
 Here's something magical: when we update our weights after a mistake, we're guaranteed to do better on that same point next time. Not necessarily correct, but better. Let me show you why.
 
-/*
+{/*
 <MathProofVisualization
 config={{
 mode: "step-by-step",
@@ -643,7 +643,7 @@ oldActivation: -0.5,
 animateImprovement: true
 }}
 />
-*/
+*/}
 
 Let's say we see a positive example (y = +1) but our activation is negative (a < 0). We're wrong! So we update:
 
@@ -665,7 +665,7 @@ Since x₁² and x₂² are always positive, the new activation is always at lea
 
 Here's something that might blow your mind: the order you show examples to your perceptron can make the difference between learning in seconds or never learning at all.
 
-/*
+{/*
 <OrderMattersDemo
 config={{
 scenarios: [
@@ -684,7 +684,7 @@ showConvergenceRate: true,
 animateTraining: true
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Same data, different order: disaster vs success</p>
 
@@ -717,7 +717,7 @@ for epoch in range(num_epochs):
 
 A hyperparameter is a setting you choose before training starts (as opposed to parameters like weights, which the algorithm learns). The most important one? How many times to loop through your data—called epochs.
 
-/*
+{/*
 <EpochGoldilocksZone
 config={{
 showThreeScenarios: true,
@@ -747,9 +747,9 @@ testError: "High"
 animateComparison: true
 }}
 />
-*/
+*/}
 
-/*
+{/*
 <TrainTestErrorCurves
 config={{
 showOptimalPoint: true,
@@ -761,7 +761,7 @@ annotations: [
 ]
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">The classic curves: training error always drops, but test error has a sweet spot</p>
 How do you find the magic number? Experimentally! Plot training vs test error and look for:
@@ -774,7 +774,7 @@ Both errors low and stable: Just right!
 
 So far, when we make a mistake, we've been adding the full input values to our weights. But what if we only added a fraction? Enter the learning rate (α).
 
-/*
+{/*
 <LearningRateComparison
 config={{
 rates: [
@@ -787,7 +787,7 @@ showConvergence: true,
 dataset: "spiral_data"
 }}
 />
-*/
+*/}
 
 With learning rate, our update rule becomes:
 
@@ -806,7 +806,7 @@ Low learning rate: Tiny adjustments after each miss (might take forever to impro
 
 ## Time to Train! Interactive Perceptron Playground
 
-/*
+{/*
 <InteractivePerceptronTrainer
 config={{
 datasets: [
@@ -825,7 +825,7 @@ allowManualPoints: true,
 visualizeDecisionBoundary: true
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Try different datasets, add your own points, and watch the perceptron learn!</p>
 
@@ -833,7 +833,7 @@ visualizeDecisionBoundary: true
 
 So far we've been working in 2D—easy to visualize, easy to understand. But what about 3D data? Instead of a line, we get a plane: Ax + By + Cz + D = 0
 
-/*
+{/*
 <ThreeDPerceptronViz
 config={{
 dataset: "3d_classification",
@@ -843,7 +843,7 @@ animatePlaneAdjustment: true,
 features: ["Height", "Weight", "Age"]
 }}
 />
-*/
+*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag to rotate: In 3D, we separate with a plane instead of a line</p>
 The awesome part? The math stays exactly the same! Just add another weight:
@@ -897,7 +897,7 @@ def train_perceptron_any_dimension(data_points, labels, learning_rate=1.0):
 
 Whether you're classifying images (784 dimensions for MNIST), text (thousands of word frequencies), or cat videos (millions of pixels), the perceptron uses the exact same algorithm. The only difference is the loop runs longer.
 
-/*
+{/*
 <DimensionScalingFinal
 config={{
 examples: [
@@ -910,7 +910,7 @@ examples: [
 emphasize: "Same algorithm, just more loops"
 }}
 />
-*/
+*/}
 
 And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature. 
 
