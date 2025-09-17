@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
 interface NeuronVsPerceptronConfig {
-  side?: 'split' | 'toggle' | 'overlay';
+  side?: 'split' | 'toggle' | 'overlay' | 'vertical';
   animateTransition?: boolean;
   showLabels?: boolean;
   neuronLabels?: string[];
@@ -96,7 +96,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
     const somaRadius = 30;
 
     return (
-      <svg viewBox="0 50 400 140" className="w-full h-full" fill="none">
+      <svg viewBox="0 60 400 120" className="w-full h-full" fill="none">
         <defs>
           <radialGradient id="neuron-soma-grad" cx="50%" cy="50%" r="85%">
             <stop offset="0%" stopColor={`${colors.neuronPrimary}30`} />
@@ -332,7 +332,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
   const PerceptronDiagram = ({ showLabels: showL = true, labels = perceptronLabels }) => {
     return (
-      <svg viewBox="0 50 400 140" className="w-full h-full" fill="none">
+      <svg viewBox="0 60 400 120" className="w-full h-full" fill="none">
         <defs>
           <linearGradient id="perceptron-grad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={colors.perceptronSecondary} />
@@ -816,6 +816,82 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
             >
               {showPerceptron ? 'Show Neuron' : 'Show Perceptron'}
             </button>
+          </div>
+        )}
+
+        {side === 'vertical' && (
+          <div className="space-y-2">
+            {/* Biological Neuron */}
+            <div className="relative rounded-lg overflow-hidden" style={{
+              background: `linear-gradient(135deg, ${colors.bg} 0%, ${isDark ? '#0a0a0a' : '#fcfcfc'} 100%)`
+            }}>
+              <div className="absolute top-2 left-3 z-10">
+                <span
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: `${colors.neuronPrimary}15`,
+                    color: colors.neuronPrimary,
+                    border: `1px solid ${colors.neuronPrimary}30`
+                  }}
+                >
+                  Biological Neuron
+                </span>
+              </div>
+              <div className="h-32 flex items-center justify-center">
+                <BiologicalNeuron showLabels={showLabels} labels={neuronLabels} />
+              </div>
+            </div>
+
+            {/* Divider with arrow */}
+            <div className="relative flex items-center justify-center" style={{ height: '20px' }}>
+              <div className="absolute inset-x-8" style={{
+                height: '1px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: `linear-gradient(90deg, transparent 0%, ${colors.border}40 30%, ${colors.border}40 70%, transparent 100%)`
+              }} />
+              <motion.div
+                className="relative bg-white dark:bg-gray-900 rounded-full shadow-sm z-10 flex items-center justify-center"
+                style={{
+                  border: `1px solid ${colors.border}`,
+                  width: '20px',
+                  height: '20px',
+                  transform: 'rotate(90deg)'
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M13 5l7 7-7 7M4 12h16"
+                    stroke={colors.accent}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity={0.6}
+                  />
+                </svg>
+              </motion.div>
+            </div>
+
+            {/* Artificial Perceptron */}
+            <div className="relative rounded-lg overflow-hidden" style={{
+              background: `linear-gradient(225deg, ${colors.bg} 0%, ${isDark ? '#0a0a0a' : '#fcfcfc'} 100%)`
+            }}>
+              <div className="absolute top-2 right-3 z-10">
+                <span
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: `${colors.perceptronPrimary}15`,
+                    color: colors.perceptronPrimary,
+                    border: `1px solid ${colors.perceptronPrimary}30`
+                  }}
+                >
+                  Artificial Perceptron
+                </span>
+              </div>
+              <div className="h-32 flex items-center justify-center">
+                <PerceptronDiagram showLabels={showLabels} labels={perceptronLabels} />
+              </div>
+            </div>
           </div>
         )}
 
