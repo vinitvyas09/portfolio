@@ -62,17 +62,17 @@ But here's where it gets beautiful, once you strip away the motors and wires, th
 Look at that comparison. On the left: millions of years of evolution. On the right: some math we can code in 10 lines of Python. Same exact principle. The perceptron takes inputs, multiplies each by a weight (importance), adds them up, and decides whether to "fire" (output 1) or stay quiet (output 0).
 
 ```python
-# This is literally a neuron in code:
+# A neuron in code:
 def perceptron(inputs, weights, bias):
     weighted_sum = sum(x * w for x, w in zip(inputs, weights))
     return 1 if weighted_sum + bias > 0 else 0
 
-# That's it. That's the thing that started AI.
+# That's it. Four lines.
 ```
 
-This isn't just a cute analogy, it's a direct translation. Where neurons have synaptic strengths, perceptrons have weights. Where neurons have activation thresholds, perceptrons have bias terms. Where neurons fire or don't fire, perceptrons output 1 or 0.
+The parallels aren't superficial. Each component has a direct counterpart: synaptic strengths map to weights, activation thresholds become bias values, and the binary firing pattern translates to outputting either 0 or 1. It's a surprisingly faithful translation of biology into math.
 
-Think of the perceptron like a bouncer at an exclusive club. It gets a bunch of information about you (age, dress code, attitude, who you know), weighs each factor based on how much it cares about it, adds everything up, and makes a binary decision: you're in or you're out. No maybes, no "come back in an hour", just yes or no.
+You can think of it as a simple decision maker. It takes multiple inputs, considers how important each one is (the weights), adds them all up with a bias, and makes a yes/no call. No ambiguity, no probability—just a binary decision based on whether the total exceeds a threshold. This straightforward approach, borrowed from how neurons work, ended up being the starting point for much of modern machine learning.
 
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
