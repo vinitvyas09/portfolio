@@ -110,5 +110,56 @@ preset: "anxiety_detector"
 <p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the weights to create your own "decision neuron"</p>
 */
 
+Now that we have gotten a high level intuition for what a perceptron is, let's now dive deeper!
+
+## Perceptron: A Geometric intuition
+
+Imagine you're a veterinarian with a very specific (and slightly ridiculous) diagnostic tool. You've discovered that you can tell cats from dogs using just two measurements:
+
+Hours of sleep per day (x-axis)
+Running speed in mph (y-axis)
+
+Cats sleep more and run slower. Dogs sleep less and zoom around like caffeinated toddlers. Plot a bunch of examples, and something very interesting happens:
+
+/*
+<LinearSeparableDataViz
+config={{
+dataset: "cats_vs_dogs",
+xAxis: "Hours of Sleep (per day)",
+yAxis: "Running Speed (mph)",
+showSeparatingLine: false,
+animateDataPoints: true,
+pointAppearanceMs: 100,
+showLegend: true,
+interactive: false
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Each point represents one animal. Notice how they naturally cluster into two groups?</p>
+
+Now watch what happens when we draw a single line:
+
+/*
+<LinearSeparableDataViz
+config={{
+dataset: "cats_vs_dogs",
+xAxis: "Hours of Sleep (per day)",
+yAxis: "Running Speed (mph)",
+showSeparatingLine: true,
+animateLineDrawing: true,
+lineAnimationMs: 2000,
+highlightRegions: true,
+regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
+interactive: false
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">One line. Perfect separation. This is what "linearly separable" means.</p>
+
+This is what we're asking the perceptron to do: find that line. Given a new animal's sleep hours and running speed, tell us which side of the line it falls on. Cat or dog. That's it.
+
+
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
