@@ -713,6 +713,62 @@ for epoch in range(num_epochs):
         train_step(data_points[i], labels[i])
 ```
 
+### Critical Nuance #2: How Many Times Should We Loop? (The Epochs Dilemma)
+
+A hyperparameter is a setting you choose before training starts (as opposed to parameters like weights, which the algorithm learns). The most important one? How many times to loop through your data—called epochs.
+
+/*
+<EpochGoldilocksZone
+config={{
+showThreeScenarios: true,
+scenarios: [
+{
+name: "Too Few (Underfitting)",
+epochs: 1,
+analogy: "Reading a textbook once before the exam",
+trainError: "High",
+testError: "High"
+},
+{
+name: "Just Right",
+epochs: 10,
+analogy: "Understanding the concepts",
+trainError: "Low",
+testError: "Low"
+},
+{
+name: "Too Many (Overfitting)",
+epochs: 100,
+analogy: "Memorizing page numbers instead of learning",
+trainError: "Near zero",
+testError: "High"
+}
+],
+animateComparison: true
+}}
+/>
+*/
+
+/*
+<TrainTestErrorCurves
+config={{
+showOptimalPoint: true,
+interactive: true,
+annotations: [
+{ point: "early", text: "Underfitting: Haven't learned enough" },
+{ point: "optimal", text: "Sweet spot: Good generalization" },
+{ point: "late", text: "Overfitting: Memorized training data" }
+]
+}}
+/>
+*/
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">The classic curves: training error always drops, but test error has a sweet spot</p>
+How do you find the magic number? Experimentally! Plot training vs test error and look for:
+
+Both errors high: Underfitting (need more epochs)
+Training error near zero, test error high: Overfitting (too many epochs)
+Both errors low and stable: Just right!
 
 
 
