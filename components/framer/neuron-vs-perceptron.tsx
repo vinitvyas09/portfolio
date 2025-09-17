@@ -96,7 +96,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
     const somaRadius = 30;
 
     return (
-      <svg viewBox="0 30 400 220" className="w-full h-full" fill="none">
+      <svg viewBox="0 50 400 140" className="w-full h-full" fill="none">
         <defs>
           <radialGradient id="neuron-soma-grad" cx="50%" cy="50%" r="85%">
             <stop offset="0%" stopColor={`${colors.neuronPrimary}30`} />
@@ -297,32 +297,32 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
               transition={{ delay: 1.5 }}
             >
               {/* Dendrites Label */}
-              <rect x={45} y={60} width={55} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={72} y={71} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={25} y={165} width={52} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={51} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[0]}
               </text>
-              <line x1={100} y1={68} x2={110} y2={85} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={77} y1={165} x2={100} y2={95} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Cell Body Label */}
-              <rect x={125} y={155} width={50} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={150} y={166} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={100} y={165} width={45} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={122} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[1]}
               </text>
-              <line x1={150} y1={155} x2={150} y2={150} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={122} y1={165} x2={150} y2={150} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Axon Label */}
-              <rect x={225} y={95} width={35} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={242} y={106} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={168} y={165} width={32} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={184} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[2]}
               </text>
-              <line x1={225} y1={103} x2={215} y2={112} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={184} y1={165} x2={235} y2={130} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Chemical Signals Label */}
-              <rect x={290} y={110} width={85} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={332} y={121} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={223} y={165} width={75} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={260} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[3]}
               </text>
-              <line x1={290} y1={118} x2={280} y2={120} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={298} y1={165} x2={310} y2={150} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
             </motion.g>
           </g>
         )}
@@ -332,7 +332,7 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
   const PerceptronDiagram = ({ showLabels: showL = true, labels = perceptronLabels }) => {
     return (
-      <svg viewBox="0 30 400 220" className="w-full h-full" fill="none">
+      <svg viewBox="0 50 400 140" className="w-full h-full" fill="none">
         <defs>
           <linearGradient id="perceptron-grad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={colors.perceptronSecondary} />
@@ -547,32 +547,32 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
               transition={{ delay: 1.8 }}
             >
               {/* Inputs Label */}
-              <rect x={10} y={165} width={80} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={50} y={176} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={10} y={165} width={70} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={45} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[0]}
               </text>
-              <line x1={50} y1={165} x2={55} y2={145} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={80} y1={165} x2={60} y2={145} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Weighted Sum Label */}
-              <rect x={120} y={135} width={80} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={160} y={146} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={95} y={165} width={70} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={130} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[1]}
               </text>
-              <line x1={160} y1={135} x2={160} y2={127} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={130} y1={165} x2={160} y2={127} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Activation Function Label */}
-              <rect x={205} y={135} width={100} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={255} y={146} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={180} y={165} width={90} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={225} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[2]}
               </text>
-              <line x1={245} y1={135} x2={245} y2={127} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={225} y1={165} x2={245} y2={127} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
 
               {/* Output Label */}
-              <rect x={295} y={70} width={50} height={16} fill={colors.labelBg} rx={3} opacity={0.9} />
-              <text x={320} y={81} fill={colors.text} textAnchor="middle" fontSize={9} fontWeight="500">
+              <rect x={285} y={165} width={40} height={12} fill={colors.labelBg} rx={2} opacity={0.9} />
+              <text x={305} y={173} fill={colors.text} textAnchor="middle" fontSize={7} fontWeight="500">
                 {labels[3]}
               </text>
-              <line x1={320} y1={86} x2={320} y2={95} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
+              <line x1={305} y1={165} x2={320} y2={119} stroke={colors.textMuted} strokeWidth={0.5} opacity={0.5} />
             </motion.g>
           </g>
         )}
