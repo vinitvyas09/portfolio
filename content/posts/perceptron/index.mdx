@@ -97,18 +97,15 @@ def perceptron(inputs, weights, bias):
 ```
 That's it. A brain cell in 4 lines of Python.
 
-{/* TODO: Implement InteractivePerceptronPlayground component
 <InteractivePerceptronPlayground
-config={{
-inputs: ["coffee_consumed", "hours_slept", "deadline_proximity"],
-outputLabel: "Should I panic?",
-adjustableWeights: true,
-showMath: true,
-preset: "anxiety_detector"
-}}
+  config={{
+    numInputs: 3,
+    showMath: true,
+    activationFunction: "step",
+    threshold: 0
+  }}
 />
-<p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the weights to create your own "decision neuron"</p>
-*/}
+<p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the inputs and weights to see how the perceptron makes decisions in real-time</p>
 
 Now that we have gotten a high level intuition for what a perceptron is, let's now dive deeper!
 
