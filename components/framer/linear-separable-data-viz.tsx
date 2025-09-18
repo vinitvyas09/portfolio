@@ -374,7 +374,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         intercept: normalizedIntercept
       }
     };
-  }, [width, height, pointCount, dataset, animateDataPoints, pointAppearanceMs]);
+  }, [width, height, pointCount, animateDataPoints, pointAppearanceMs, currentDataset]);
 
   // Initialize points only once when mounted
   useEffect(() => {
