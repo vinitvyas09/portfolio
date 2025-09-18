@@ -14,6 +14,21 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   // Pin tracing root to this project to avoid monorepo root inference
   outputFileTracingRoot: path.join(__dirname),
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      if (Array.isArray(config.externals)) {
+        config.externals.push('esprima')
+      } else if (typeof config.externals === 'function') {
+        config.externals = [config.externals, 'esprima']
+      } else if (config.externals) {
+        config.externals = [...config.externals, 'esprima']
+      } else {
+        config.externals = ['esprima']
+      }
+    }
+
+    return config
+  },
 }
 
 const withMDX = createMDX({
