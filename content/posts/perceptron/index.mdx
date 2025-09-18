@@ -26,6 +26,7 @@ That origin story matters because it reveals the core insight that makes everyth
   }}
 />
 
+
 So we're starting at the real beginning. Not with equations or Python classes, but with the moment a psychologist in 1958 looked at a brain cell and thought, "I can build that with wires and motors."
 
 ## First, Let's Peek Inside The Brain
@@ -118,7 +119,7 @@ Running speed in mph (y-axis)
 
 Cats sleep more and run slower. Dogs sleep less and zoom around like caffeinated toddlers. Plot a bunch of examples, and something very interesting happens:
 
-<LinearSeparableDataViz
+{/* <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
 xAxis: "Hours of Sleep (per day)",
@@ -129,13 +130,13 @@ pointAppearanceMs: 100,
 showLegend: true,
 interactive: false
 }}
-/>
+/> */}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Each point represents one animal. Notice how they naturally cluster into two groups?</p>
 
 Now watch what happens when we draw a single line:
 
-<LinearSeparableDataViz
+{/* <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
 xAxis: "Hours of Sleep (per day)",
@@ -147,7 +148,7 @@ highlightRegions: true,
 regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
 interactive: true
 }}
-/>
+/> */}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Click "🧠 Train Perceptron" to watch it learn the decision boundary using the actual perceptron learning algorithm!</p>
 
