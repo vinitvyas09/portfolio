@@ -3,6 +3,64 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 
+// Nice number helpers for grid/tick generation on dynamic scales.
+const niceNumber = (range: number, round: boolean) => {
+  if (range === 0) return 0;
+
+  const exponent = Math.floor(Math.log10(Math.abs(range)));
+  const fraction = Math.abs(range) / Math.pow(10, exponent);
+  let niceFraction;
+
+  if (round) {
+    if (fraction < 1.5) {
+      niceFraction = 1;
+    } else if (fraction < 3) {
+      niceFraction = 2;
+    } else if (fraction < 7) {
+      niceFraction = 5;
+    } else {
+      niceFraction = 10;
+    }
+  } else {
+    if (fraction <= 1) {
+      niceFraction = 1;
+    } else if (fraction <= 2) {
+      niceFraction = 2;
+    } else if (fraction <= 5) {
+      niceFraction = 5;
+    } else {
+      niceFraction = 10;
+    }
+  }
+
+  return Math.sign(range) * niceFraction * Math.pow(10, exponent);
+};
+
+const generateTicks = (min: number, max: number, desiredCount = 5) => {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [];
+  if (min === max) return [min];
+
+  const span = max - min;
+  const niceSpan = niceNumber(span, false);
+  const step = niceNumber(niceSpan / Math.max(desiredCount - 1, 1), true) || 1;
+  const niceMin = Math.floor(min / step) * step;
+  const niceMax = Math.ceil(max / step) * step;
+  const ticks: number[] = [];
+
+  for (let tick = niceMin; tick <= niceMax + step / 2; tick += step) {
+    ticks.push(parseFloat((Math.abs(tick) < 1e-6 ? 0 : tick).toFixed(5)));
+  }
+
+  return ticks;
+};
+
+const formatTick = (value: number) => {
+  const abs = Math.abs(value);
+  const decimals = abs < 10 ? 1 : abs < 100 ? 0 : 0;
+  const rounded = Number(value.toFixed(decimals));
+  return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(decimals);
+};
+
 interface DataPoint {
   x: number;
   y: number;
@@ -236,13 +294,56 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const innerWidth = chartWidth - 2 * padding;
   const innerHeight = chartHeight - 2 * padding;
 
-  // Data bounds
-  const xMin = 6, xMax = 20;
-  const yMin = 5, yMax = 30;
+  const defaultBounds = useMemo(
+    () => ({ xMin: 6, xMax: 20, yMin: 5, yMax: 30 }),
+    []
+  );
+
+  const { xMin, xMax, yMin, yMax } = useMemo(() => {
+    if (!dataPoints.length) {
+      return defaultBounds;
+    }
+
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    for (const point of dataPoints) {
+      if (point.x < minX) minX = point.x;
+      if (point.x > maxX) maxX = point.x;
+      if (point.y < minY) minY = point.y;
+      if (point.y > maxY) maxY = point.y;
+    }
+
+    const rangeX = maxX - minX || 1;
+    const rangeY = maxY - minY || 1;
+    const paddingFactor = 0.15;
+    const padX = rangeX * paddingFactor;
+    const padY = rangeY * paddingFactor;
+
+    const computedMinX = minX - padX;
+    const computedMaxX = maxX + padX;
+    const computedMinY = minY >= 0 ? Math.max(0, minY - padY) : minY - padY;
+    const computedMaxY = maxY + padY;
+
+    return {
+      xMin: Number.isFinite(computedMinX) ? computedMinX : defaultBounds.xMin,
+      xMax: Number.isFinite(computedMaxX) ? computedMaxX : defaultBounds.xMax,
+      yMin: Number.isFinite(computedMinY) ? computedMinY : defaultBounds.yMin,
+      yMax: Number.isFinite(computedMaxY) ? computedMaxY : defaultBounds.yMax
+    };
+  }, [dataPoints, defaultBounds]);
+
+  const xRange = xMax - xMin || 1;
+  const yRange = yMax - yMin || 1;
 
   // Scale functions
-  const scaleX = (x: number) => padding + ((x - xMin) / (xMax - xMin)) * innerWidth;
-  const scaleY = (y: number) => chartHeight - padding - ((y - yMin) / (yMax - yMin)) * innerHeight;
+  const scaleX = (x: number) => padding + ((x - xMin) / xRange) * innerWidth;
+  const scaleY = (y: number) => chartHeight - padding - ((y - yMin) / yRange) * innerHeight;
+
+  const xTicks = useMemo(() => generateTicks(xMin, xMax, 6), [xMin, xMax]);
+  const yTicks = useMemo(() => generateTicks(yMin, yMax, 6), [yMin, yMax]);
 
   // Animate points appearing
   useEffect(() => {
@@ -553,37 +654,35 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         </defs>
 
         {/* Grid lines */}
-        {Array.from({ length: 8 }, (_, i) => {
-          const x = xMin + (i * (xMax - xMin)) / 7;
-          return (
+        {xTicks
+          .filter((tick) => tick >= xMin - 1e-6 && tick <= xMax + 1e-6)
+          .map((tick) => (
             <line
-              key={`vgrid-${i}`}
-              x1={scaleX(x)}
+              key={`vgrid-${tick}`}
+              x1={scaleX(tick)}
               y1={padding}
-              x2={scaleX(x)}
+              x2={scaleX(tick)}
               y2={chartHeight - padding}
               stroke={colors.gridColor}
               strokeWidth="1"
               opacity="0.5"
             />
-          );
-        })}
+          ))}
 
-        {Array.from({ length: 6 }, (_, i) => {
-          const y = yMin + (i * (yMax - yMin)) / 5;
-          return (
+        {yTicks
+          .filter((tick) => tick >= yMin - 1e-6 && tick <= yMax + 1e-6)
+          .map((tick) => (
             <line
-              key={`hgrid-${i}`}
+              key={`hgrid-${tick}`}
               x1={padding}
-              y1={scaleY(y)}
+              y1={scaleY(tick)}
               x2={chartWidth - padding}
-              y2={scaleY(y)}
+              y2={scaleY(tick)}
               stroke={colors.gridColor}
               strokeWidth="1"
               opacity="0.5"
             />
-          );
-        })}
+          ))}
 
         {/* Chart borders */}
         <rect
@@ -785,8 +884,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         {highlightRegions && (showLine || learnedWeights) && regionLabels && (
           <>
             <text
-              x={scaleX(10)}
-              y={scaleY(27)}
+              x={scaleX(xMin + xRange * 0.25)}
+              y={scaleY(yMin + yRange * 0.75)}
               textAnchor="middle"
               fontSize="16"
               fontWeight="bold"
@@ -796,8 +895,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               {regionLabels[0]}
             </text>
             <text
-              x={scaleX(16)}
-              y={scaleY(12)}
+              x={scaleX(xMin + xRange * 0.7)}
+              y={scaleY(yMin + yRange * 0.3)}
               textAnchor="middle"
               fontSize="16"
               fontWeight="bold"
@@ -834,32 +933,36 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         </text>
 
         {/* Axis tick labels */}
-        {[8, 10, 12, 14, 16, 18].map(x => (
-          <text
-            key={`x-tick-${x}`}
-            x={scaleX(x)}
-            y={chartHeight - padding + 20}
-            textAnchor="middle"
-            fontSize="12"
-            fill={colors.textSecondary}
-          >
-            {x}
-          </text>
-        ))}
+        {xTicks
+          .filter((tick) => tick >= xMin - 1e-6 && tick <= xMax + 1e-6)
+          .map((tick) => (
+            <text
+              key={`x-tick-${tick}`}
+              x={scaleX(tick)}
+              y={chartHeight - padding + 20}
+              textAnchor="middle"
+              fontSize="12"
+              fill={colors.textSecondary}
+            >
+              {formatTick(tick)}
+            </text>
+          ))}
 
-        {[10, 15, 20, 25].map(y => (
-          <text
-            key={`y-tick-${y}`}
-            x={padding - 10}
-            y={scaleY(y)}
-            textAnchor="end"
-            dy="0.35em"
-            fontSize="12"
-            fill={colors.textSecondary}
-          >
-            {y}
-          </text>
-        ))}
+        {yTicks
+          .filter((tick) => tick >= yMin - 1e-6 && tick <= yMax + 1e-6)
+          .map((tick) => (
+            <text
+              key={`y-tick-${tick}`}
+              x={padding - 10}
+              y={scaleY(tick)}
+              textAnchor="end"
+              dy="0.35em"
+              fontSize="12"
+              fill={colors.textSecondary}
+            >
+              {formatTick(tick)}
+            </text>
+          ))}
       </svg>
 
       {/* Legend */}
