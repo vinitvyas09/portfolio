@@ -118,7 +118,6 @@ Running speed in mph (y-axis)
 
 Cats sleep more and run slower. Dogs sleep less and zoom around like caffeinated toddlers. Plot a bunch of examples, and something very interesting happens:
 
-{/*
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
@@ -131,13 +130,11 @@ showLegend: true,
 interactive: false
 }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Each point represents one animal. Notice how they naturally cluster into two groups?</p>
 
 Now watch what happens when we draw a single line:
 
-{/*
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
@@ -148,12 +145,11 @@ animateLineDrawing: true,
 lineAnimationMs: 2000,
 highlightRegions: true,
 regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
-interactive: false
+interactive: true
 }}
 />
-*/}
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">One line. Perfect separation. This is what "linearly separable" means.</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Click "🧠 Train Perceptron" to watch it learn the decision boundary using the actual perceptron learning algorithm!</p>
 
 This is what we're asking the perceptron to do: find that line. Given a new animal's sleep hours and running speed, tell us which side of the line it falls on. Cat or dog. That's it.
 
@@ -161,7 +157,6 @@ This is what we're asking the perceptron to do: find that line. Given a new anim
 
 You might be thinking: "I can literally see where to draw that line. Why do we need a fancy algorithm?" Fair point! In 2D, with data this clean, you could absolutely eyeball it. But here's where it gets interesting:
 
-{/*
 <DimensionScalingViz
 config={{
 startDimension: 2,
@@ -177,7 +172,6 @@ animationMs: 4000,
 showHumanLimit: true
 }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Good luck "eyeballing" a separating hyperplane in 100 dimensions!</p>
 Real-world data doesn't come in neat 2D packages. When you're classifying:
