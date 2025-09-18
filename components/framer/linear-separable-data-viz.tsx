@@ -125,6 +125,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     regionLabels = ["Team Dog 🐕", "Team Cat 🐈"]
   } = config;
 
+  const dogRegionLabel = regionLabels?.[0] ?? "Dogs (Active & Fast)";
+  const catRegionLabel = regionLabels?.[1] ?? "Cats (Sleepy & Slow)";
+
   // Animation states
   const [visiblePoints, setVisiblePoints] = useState<number>(0);
   const [showLine, setShowLine] = useState(false);
@@ -368,6 +371,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   // Animate line drawing
   useEffect(() => {
+    if (interactive) {
+      setShowLine(false);
+      return;
+    }
+
     if (showSeparatingLine && animateLineDrawing) {
       setShowLine(false);
       const timeout = setTimeout(() => {
@@ -379,7 +387,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     } else {
       setShowLine(false);
     }
-  }, [showSeparatingLine, animateLineDrawing]);
+  }, [showSeparatingLine, animateLineDrawing, interactive]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -731,7 +739,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         {/* All lines clipped to chart area */}
         <g clipPath="url(#chartClip)">
           {/* True separating line (ground truth) */}
-          {(showSeparatingLine || showLine) && !currentWeights && !learnedWeights && (
+          {((showSeparatingLine && !interactive) || showLine) && !currentWeights && !learnedWeights && (
             <g>
               {(() => {
                 const { x1, y1, x2, y2 } = getLinePoints(trueLine);
@@ -881,33 +889,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         })}
 
         {/* Region labels */}
-        {highlightRegions && (showLine || learnedWeights) && regionLabels && (
-          <>
-            <text
-              x={scaleX(xMin + xRange * 0.25)}
-              y={scaleY(yMin + yRange * 0.75)}
-              textAnchor="middle"
-              fontSize="16"
-              fontWeight="bold"
-              fill={colors.dogColor}
-              opacity="0.8"
-            >
-              {regionLabels[0]}
-            </text>
-            <text
-              x={scaleX(xMin + xRange * 0.7)}
-              y={scaleY(yMin + yRange * 0.3)}
-              textAnchor="middle"
-              fontSize="16"
-              fontWeight="bold"
-              fill={colors.catColor}
-              opacity="0.8"
-            >
-              {regionLabels[1]}
-            </text>
-          </>
-        )}
-
         {/* Axis labels */}
         <text
           x={chartWidth / 2}
@@ -986,7 +967,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               border: `2px solid ${colors.catColor}`
             }} />
             <span style={{ color: colors.textPrimary, fontSize: '14px', fontWeight: '500' }}>
-              🐱 Cats (Sleepy & Slow)
+              🐱 {catRegionLabel}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -998,7 +979,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               border: `2px solid ${colors.dogColor}`
             }} />
             <span style={{ color: colors.textPrimary, fontSize: '14px', fontWeight: '500' }}>
-              🐕 Dogs (Active & Fast)
+              🐕 {dogRegionLabel}
             </span>
           </div>
         </div>
