@@ -9,10 +9,6 @@ interface DimensionExample {
   example: string;
   features: string[];
   equationTerms: string[];
-  pythonArrays: {
-    weights: string;
-    inputs: string;
-  };
   visualizable: boolean;
 }
 
@@ -35,7 +31,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   const [mounted, setMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [showEquation, setShowEquation] = useState(true);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
@@ -46,11 +42,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       title: "2D: Cats vs Dogs",
       example: "Sleep hours, Running speed",
       features: ["sleep_hours", "running_speed"],
-      equationTerms: ["w₁×sleep", "w₂×speed", "bias"],
-      pythonArrays: {
-        weights: "[w₁, w₂]",
-        inputs: "[sleep, speed]"
-      },
+      equationTerms: ["w₁×sleep", "w₂×speed"],
       visualizable: true
     },
     {
@@ -58,11 +50,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       title: "3D: Add Bark Frequency",
       example: "Sleep, Speed, Bark frequency",
       features: ["sleep_hours", "running_speed", "bark_freq"],
-      equationTerms: ["w₁×sleep", "w₂×speed", "w₃×bark", "bias"],
-      pythonArrays: {
-        weights: "[w₁, w₂, w₃]",
-        inputs: "[sleep, speed, bark]"
-      },
+      equationTerms: ["w₁×sleep", "w₂×speed", "w₃×bark"],
       visualizable: true
     },
     {
@@ -70,11 +58,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       title: "10D: Real Dog Features",
       example: "Weight, age, tail wag rate, ear position...",
       features: ["weight", "age", "tail_wag", "ear_pos", "fur_len", "bark_vol", "energy", "size", "treat_love", "fetch_skill"],
-      equationTerms: ["w₁×weight", "w₂×age", "w₃×tail", "w₄×ear", "w₅×fur", "w₆×bark", "w₇×energy", "w₈×size", "w₉×treat", "w₁₀×fetch", "bias"],
-      pythonArrays: {
-        weights: "[w₁, w₂, w₃, w₄, w₅, w₆, w₇, w₈, w₉, w₁₀]",
-        inputs: "[weight, age, tail, ear, fur, bark, energy, size, treat, fetch]"
-      },
+      equationTerms: ["w₁×weight", "w₂×age", "w₃×tail", "w₄×ear", "w₅×fur", "w₆×bark", "w₇×energy", "w₈×size", "w₉×treat", "w₁₀×fetch"],
       visualizable: false
     },
     {
@@ -82,11 +66,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       title: "784D: Handwritten Digits",
       example: "Each pixel in 28×28 image",
       features: Array.from({length: 784}, (_, i) => `pixel_${i+1}`),
-      equationTerms: ["w₁×px₁", "w₂×px₂", "w₃×px₃", "...", "w₇₈₄×px₇₈₄", "bias"],
-      pythonArrays: {
-        weights: "[w₁, w₂, w₃, ..., w₇₈₄]",
-        inputs: "[px₁, px₂, px₃, ..., px₇₈₄]"
-      },
+      equationTerms: ["w₁×px₁", "w₂×px₂", "w₃×px₃", "...", "w₇₈₄×px₇₈₄"],
       visualizable: false
     },
     {
@@ -94,11 +74,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       title: "50,000D: Text Classification",
       example: "Word frequencies in vocabulary",
       features: Array.from({length: 50000}, (_, i) => `word_${i+1}_freq`),
-      equationTerms: ["w₁×freq₁", "w₂×freq₂", "...", "w₅₀₀₀₀×freq₅₀₀₀₀", "bias"],
-      pythonArrays: {
-        weights: "[w₁, w₂, ..., w₅₀₀₀₀]",
-        inputs: "[freq₁, freq₂, ..., freq₅₀₀₀₀]"
-      },
+      equationTerms: ["w₁×freq₁", "w₂×freq₂", "...", "w₅₀₀₀₀×freq₅₀₀₀₀"],
       visualizable: false
     }
   ];
@@ -144,6 +120,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   const nextExample = () => {
     if (currentIndex < examples.length - 1) {
       setIsAnimating(true);
+      setProgress(0); // Reset progress on manual navigation
       setTimeout(() => {
         setCurrentIndex(currentIndex + 1);
         setIsAnimating(false);
@@ -154,6 +131,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   const prevExample = () => {
     if (currentIndex > 0) {
       setIsAnimating(true);
+      setProgress(0); // Reset progress on manual navigation
       setTimeout(() => {
         setCurrentIndex(currentIndex - 1);
         setIsAnimating(false);
@@ -163,18 +141,26 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
 
   const reset = () => {
     setCurrentIndex(0);
+    setProgress(0); // Reset progress
     setIsAnimating(false);
   };
 
-  // Auto-advance animation
+  // Auto-advance animation with progress bar
   useEffect(() => {
-    if (config.autoPlay && !isAnimating) {
-      const timer = setInterval(() => {
-        setCurrentIndex(prev => (prev + 1) % examples.length);
-      }, config.animationSpeed);
-      return () => clearInterval(timer);
-    }
-  }, [config.autoPlay, config.animationSpeed, isAnimating]);
+    if (!mounted) return;
+
+    const progressTimer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          setCurrentIndex(prevIndex => (prevIndex + 1) % examples.length);
+          return 0; // Reset progress
+        }
+        return prev + (100 / (4000 / 100)); // 4 seconds = 4000ms, update every 100ms
+      });
+    }, 100);
+
+    return () => clearInterval(progressTimer);
+  }, [mounted, examples.length]);
 
   if (!mounted) {
     return (
@@ -219,6 +205,44 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         </p>
       </div>
 
+      {/* Progress indicator */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+        gap: '1rem'
+      }}>
+        <div style={{
+          fontSize: '0.8rem',
+          color: colors.textMuted
+        }}>
+          Auto-advancing in:
+        </div>
+        <div style={{
+          width: '150px',
+          height: '6px',
+          background: colors.borderColor,
+          borderRadius: '3px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: `${progress}%`,
+            height: '100%',
+            background: colors.accentPrimary,
+            transition: 'width 0.1s ease',
+            borderRadius: '3px'
+          }} />
+        </div>
+        <div style={{
+          fontSize: '0.8rem',
+          color: colors.textSecondary,
+          minWidth: '30px'
+        }}>
+          {Math.ceil((100 - progress) / 25)}s
+        </div>
+      </div>
+
       {/* Main content area */}
       <div style={{
         display: 'grid',
@@ -235,7 +259,11 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           position: 'relative',
           opacity: isAnimating ? 0.5 : 1,
           transform: isAnimating ? 'scale(0.95)' : 'scale(1)',
-          transition: 'all 0.3s ease'
+          transition: 'all 0.3s ease',
+          height: '220px', // Fixed height for all boxes
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
         }}>
           <div style={{
             fontSize: '3rem',
@@ -268,7 +296,8 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             borderRadius: '20px',
             fontSize: '0.8rem',
             fontWeight: 'bold',
-            display: 'inline-block'
+            display: 'inline-block',
+            marginBottom: '1.5rem' // Add more space below the badge
           }}>
             {currentExample.visualizable ? 'Human Visualizable' : 'Beyond Human Vision'}
           </div>
@@ -281,7 +310,10 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           padding: '1.5rem',
           opacity: isAnimating ? 0.5 : 1,
           transform: isAnimating ? 'scale(0.95)' : 'scale(1)',
-          transition: 'all 0.3s ease'
+          transition: 'all 0.3s ease',
+          height: '220px', // Fixed height to match left box
+          display: 'flex',
+          flexDirection: 'column'
         }}>
           <h4 style={{
             fontSize: '1rem',
@@ -293,56 +325,53 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             The Math (Always the Same!)
           </h4>
 
-          {showEquation && (
-            <div style={{
-              background: colors.codeBackground,
-              border: `1px solid ${colors.borderColor}`,
-              borderRadius: '6px',
-              padding: '1rem',
-              marginBottom: '1rem',
-              fontFamily: 'monospace',
-              fontSize: '0.8rem',
-              color: colors.mathColor,
-              lineHeight: '1.6',
-              overflowX: 'auto'
-            }}>
-              <div style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                Activation = {currentExample.equationTerms.slice(0, Math.min(3, currentExample.equationTerms.length - 1)).join(' + ')}
-                {currentExample.equationTerms.length > 4 && <span style={{ color: colors.textMuted }}> + ...</span>}
-                {currentExample.equationTerms.length > 4 && (
-                  <span> + {currentExample.equationTerms[currentExample.equationTerms.length - 2]} + bias</span>
-                )}
-                {currentExample.equationTerms.length <= 4 && ` + bias`}
-              </div>
-
-              <div style={{ color: colors.textMuted, fontSize: '0.7rem' }}>
-                = Σ(wᵢ × xᵢ) + b  for i = 1 to {currentExample.dim}
-              </div>
+          <div style={{
+            background: colors.codeBackground,
+            border: `1px solid ${colors.borderColor}`,
+            borderRadius: '6px',
+            padding: '1rem',
+            fontFamily: 'monospace',
+            fontSize: '0.75rem',
+            color: colors.mathColor,
+            lineHeight: '1.8',
+            overflowX: 'auto',
+            flex: 1, // Take remaining space
+            overflow: 'auto' // Scroll if content is too long
+          }}>
+            <div style={{ marginBottom: '0.5rem', fontWeight: 'bold', color: colors.textPrimary }}>
+              Activation =
             </div>
-          )}
 
-          {config.showCode && (
-            <div style={{
-              background: colors.codeBackground,
-              border: `1px solid ${colors.borderColor}`,
-              borderRadius: '6px',
-              padding: '1rem',
-              fontFamily: 'monospace',
-              fontSize: '0.75rem',
-              lineHeight: '1.5'
-            }}>
-              <div style={{ color: colors.textMuted, marginBottom: '0.5rem' }}># Python (works for any dimension!)</div>
-              <div style={{ color: colors.textPrimary }}>
-                <span style={{ color: colors.accentPrimary }}>weights</span> = {currentExample.pythonArrays.weights}
+            {/* Show first few terms on separate lines */}
+            {currentExample.equationTerms.slice(0, Math.min(4, currentExample.equationTerms.length - 1)).map((term, index) => (
+              <div key={index} style={{ marginLeft: '1rem', color: colors.mathColor }}>
+                {index === 0 ? '' : '+ '}{term}
               </div>
-              <div style={{ color: colors.textPrimary, marginBottom: '0.5rem' }}>
-                <span style={{ color: colors.accentPrimary }}>inputs</span> = {currentExample.pythonArrays.inputs}
+            ))}
+
+            {/* Show ellipsis if there are many terms */}
+            {currentExample.equationTerms.length > 5 && (
+              <div style={{ marginLeft: '1rem', color: colors.textMuted, fontStyle: 'italic' }}>
+                + ... ({currentExample.dim - 4} more terms)
               </div>
-              <div style={{ color: colors.loopColor, fontWeight: 'bold' }}>
-                activation = <span style={{ color: colors.accentSecondary }}>sum</span>(w * x <span style={{ color: colors.textMuted }}>for</span> w, x <span style={{ color: colors.textMuted }}>in</span> <span style={{ color: colors.accentSecondary }}>zip</span>(weights, inputs))
+            )}
+
+            {/* Show last term if there are many, otherwise show bias */}
+            {currentExample.equationTerms.length > 5 && (
+              <div style={{ marginLeft: '1rem', color: colors.mathColor }}>
+                + {currentExample.equationTerms[currentExample.equationTerms.length - 2]}
               </div>
+            )}
+
+            <div style={{ marginLeft: '1rem', color: colors.mathColor }}>
+              + bias
             </div>
-          )}
+
+            <div style={{ color: colors.textMuted, fontSize: '0.65rem', marginTop: '0.5rem', fontStyle: 'italic' }}>
+              = Σ(wᵢ × xᵢ) + b  for i = 1 to {currentExample.dim}
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -365,7 +394,12 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         <div style={{
           fontSize: '0.9rem',
           color: colors.textMuted,
-          maxWidth: '200px'
+          maxWidth: '200px',
+          height: '3.6rem', // Fixed height for 3 lines of text
+          lineHeight: '1.2',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center'
         }}>
           {currentExample.dim <= 3 ?
             "You can visualize this!" :
@@ -384,7 +418,10 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         {examples.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => {
+              setCurrentIndex(index);
+              setProgress(0); // Reset progress on manual navigation
+            }}
             style={{
               width: '12px',
               height: '12px',
@@ -422,21 +459,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           ← Previous
         </button>
 
-        <button
-          onClick={() => setShowEquation(!showEquation)}
-          style={{
-            padding: '0.5rem 1rem',
-            background: colors.codeBackground,
-            color: colors.textPrimary,
-            border: `1px solid ${colors.borderColor}`,
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500'
-          }}
-        >
-          {showEquation ? '🧮 Hide Math' : '🧮 Show Math'}
-        </button>
 
         <button
           onClick={reset}
