@@ -46,7 +46,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   // Theme handling
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isDark = mounted && resolvedTheme === "dark";
 
   const {
@@ -69,6 +73,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const [isTraining, setIsTraining] = useState(false);
   const [trainingStep, setTrainingStep] = useState(0);
   const [dataGeneration, setDataGeneration] = useState(0);
+
+  // Ref to store timeout IDs for cleanup
+  const trainingTimeoutsRef = React.useRef<NodeJS.Timeout[]>([]);
 
   // Perceptron training state
   const [learnedWeights, setLearnedWeights] = useState<{ a: number; b: number; c: number } | null>(null);
@@ -143,8 +150,10 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         dogX = 10 + seededRandom(i * 2 + 100) * 4; // Safer range
         dogY = 18 + seededRandom(i * 2 + 101) * 8;
         // Ensure it's well in the dog region
-        while (a * dogX + b * dogY + c > -minMargin) {
-          dogY += 0.5; // Move up to ensure it's in dog region
+        let safeguard = 0;
+        while (a * dogX + b * dogY + c > -minMargin && safeguard < 200) {
+          dogY -= 0.5; // Move deeper into the dog region (below the boundary)
+          safeguard++;
         }
       }
 
@@ -161,6 +170,10 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   // Generate new random data
   const generateNewData = useCallback(() => {
+    // Clear any ongoing training timeouts
+    trainingTimeoutsRef.current.forEach(clearTimeout);
+    trainingTimeoutsRef.current = [];
+
     setDataGeneration(prev => prev + 1);
     setLearnedWeights(null);
     setCurrentWeights(null);
@@ -250,7 +263,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     return () => {
       timeouts.forEach(clearTimeout);
     };
-  }, [dataPoints.length, animateDataPoints, pointAppearanceMs, dataGeneration]);
+  }, [dataPoints.length, animateDataPoints, pointAppearanceMs]);
 
   // Animate line drawing
   useEffect(() => {
@@ -267,9 +280,21 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     }
   }, [showSeparatingLine, animateLineDrawing]);
 
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      trainingTimeoutsRef.current.forEach(clearTimeout);
+      trainingTimeoutsRef.current = [];
+    };
+  }, []);
+
   // Perceptron training algorithm with real-time weight updates
   const startTraining = useCallback(() => {
     if (isTraining) return;
+
+    // Clear any existing timeouts first
+    trainingTimeoutsRef.current.forEach(clearTimeout);
+    trainingTimeoutsRef.current = [];
 
     setIsTraining(true);
     setTrainingStep(0);
@@ -291,9 +316,12 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     let epoch = 0;
     let converged = false;
     let pointIndex = 0;
+    let lastEpochError = -1;
 
+    // Capture current dataPoints to avoid stale closure
+    const currentDataPoints = dataPoints;
     // Shuffle data points for this training session
-    const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
+    const shuffledPoints = [...currentDataPoints].sort(() => Math.random() - 0.5);
 
     const trainSinglePoint = () => {
       if (epoch >= maxEpochs || converged) {
@@ -309,7 +337,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         epoch++;
 
         // Check if we had zero errors in the last epoch (converged)
-        if (trainingHistory.length > 0 && trainingHistory[trainingHistory.length - 1].error === 0) {
+        if (lastEpochError === 0) {
           converged = true;
           setIsTraining(false);
           setLearnedWeights(weights);
@@ -323,7 +351,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       }
 
       const point = shuffledPoints[pointIndex];
-      const originalPointIndex = dataPoints.findIndex(p => p.id === point.id);
+      const originalPointIndex = currentDataPoints.findIndex(p => p.id === point.id);
       setCurrentTrainingPoint(originalPointIndex);
 
       // Calculate prediction
@@ -354,6 +382,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         }
 
         setTrainingHistory(prev => [...prev, { ...weights, error: epochErrors }]);
+        lastEpochError = epochErrors;
 
         if (epochErrors === 0) {
           converged = true;
@@ -363,12 +392,14 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       pointIndex++;
 
       // Continue to next point
-      setTimeout(trainSinglePoint, weightChanged ? 400 : 150); // Slower if weight changed
+      const timeoutId = setTimeout(trainSinglePoint, weightChanged ? 400 : 150); // Slower if weight changed
+      trainingTimeoutsRef.current.push(timeoutId);
     };
 
     // Start training
-    setTimeout(trainSinglePoint, 500); // Initial delay to show starting weights
-  }, [isTraining, dataPoints, trainingHistory]);
+    const initialTimeoutId = setTimeout(trainSinglePoint, 500); // Initial delay to show starting weights
+    trainingTimeoutsRef.current.push(initialTimeoutId);
+  }, [isTraining]);
 
   // Calculate line points for SVG with proper clipping
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
