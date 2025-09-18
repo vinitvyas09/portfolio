@@ -1,16 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from 'next-themes';
-
-interface DimensionExample {
-  dim: number;
-  title: string;
-  example: string;
-  features: string[];
-  equationTerms: string[];
-  visualizable: boolean;
-}
 
 interface DimensionScalingVizProps {
   config?: {
@@ -22,153 +13,176 @@ interface DimensionScalingVizProps {
 
 const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   config = {
-    animationSpeed: 3000,
+    animationSpeed: 4000,
     showCode: true,
-    autoPlay: false
+    autoPlay: true
   }
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentDimension, setCurrentDimension] = useState(2);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [showMath, setShowMath] = useState(false);
+  const [particles, setParticles] = useState<Array<{x: number, y: number, z: number, opacity: number}>>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
 
-  const examples: DimensionExample[] = [
-    {
-      dim: 2,
-      title: "2D: Cats vs Dogs",
-      example: "Sleep hours, Running speed",
-      features: ["sleep_hours", "running_speed"],
-      equationTerms: ["w₁×sleep", "w₂×speed"],
-      visualizable: true
-    },
-    {
-      dim: 3,
-      title: "3D: Add Bark Frequency",
-      example: "Sleep, Speed, Bark frequency",
-      features: ["sleep_hours", "running_speed", "bark_freq"],
-      equationTerms: ["w₁×sleep", "w₂×speed", "w₃×bark"],
-      visualizable: true
-    },
-    {
-      dim: 10,
-      title: "10D: Real Dog Features",
-      example: "Weight, age, tail wag rate, ear position...",
-      features: ["weight", "age", "tail_wag", "ear_pos", "fur_len", "bark_vol", "energy", "size", "treat_love", "fetch_skill"],
-      equationTerms: ["w₁×weight", "w₂×age", "w₃×tail", "w₄×ear", "w₅×fur", "w₆×bark", "w₇×energy", "w₈×size", "w₉×treat", "w₁₀×fetch"],
-      visualizable: false
-    },
-    {
-      dim: 784,
-      title: "784D: Handwritten Digits",
-      example: "Each pixel in 28×28 image",
-      features: Array.from({length: 784}, (_, i) => `pixel_${i+1}`),
-      equationTerms: ["w₁×px₁", "w₂×px₂", "w₃×px₃", "...", "w₇₈₄×px₇₈₄"],
-      visualizable: false
-    },
-    {
-      dim: 50000,
-      title: "50,000D: Text Classification",
-      example: "Word frequencies in vocabulary",
-      features: Array.from({length: 50000}, (_, i) => `word_${i+1}_freq`),
-      equationTerms: ["w₁×freq₁", "w₂×freq₂", "...", "w₅₀₀₀₀×freq₅₀₀₀₀"],
-      visualizable: false
+  // Initialize showMath to true after a short delay
+  useEffect(() => {
+    if (mounted) {
+      setTimeout(() => setShowMath(true), 500);
     }
+  }, [mounted]);
+
+  const dimensions = [
+    { value: 2, label: "2D", description: "A simple line separates cats from dogs", visual: "line" },
+    { value: 3, label: "3D", description: "A plane cuts through 3D space", visual: "plane" },
+    { value: 10, label: "10D", description: "A 9D hyperplane in 10D space", visual: "hypercube" },
+    { value: 784, label: "784D", description: "Each pixel in a 28×28 image", visual: "pixels" },
+    { value: 50000, label: "50K D", description: "Word frequencies in text", visual: "network" }
   ];
 
   const colors = useMemo(() => {
     if (!mounted) return {};
 
     return isDark ? {
-      bgGradient1: "#0a0a0a",
-      bgGradient2: "#171717",
+      bg: "#0a0a0a",
       textPrimary: "#f3f4f6",
-      textSecondary: "#d1d5db",
-      textMuted: "#9ca3af",
+      textSecondary: "#9ca3af",
       borderColor: "#404040",
       accentPrimary: "#a78bfa",
       accentSecondary: "#34d399",
-      codeBackground: "#1a1a1a",
-      equationBg: "#262626",
-      visualBg: "#374151",
-      nonVisualBg: "#ef4444",
-      loopColor: "#fbbf24",
-      mathColor: "#60a5fa"
+      particleColor: "#8b5cf6",
+      mathColor: "#60a5fa",
+      shadowColor: "rgba(139, 92, 246, 0.3)"
     } : {
-      bgGradient1: "#ffffff",
-      bgGradient2: "#fafafa",
+      bg: "#ffffff",
       textPrimary: "#1e293b",
       textSecondary: "#64748b",
-      textMuted: "#94a3b8",
       borderColor: "#e2e8f0",
       accentPrimary: "#6366f1",
       accentSecondary: "#10b981",
-      codeBackground: "#f8fafc",
-      equationBg: "#f1f5f9",
-      visualBg: "#dcfce7",
-      nonVisualBg: "#fecaca",
-      loopColor: "#f59e0b",
-      mathColor: "#3b82f6"
+      particleColor: "#6366f1",
+      mathColor: "#3b82f6",
+      shadowColor: "rgba(99, 102, 241, 0.2)"
     };
   }, [isDark, mounted]);
 
-  const currentExample = examples[currentIndex];
-
-  const nextExample = () => {
-    if (currentIndex < examples.length - 1) {
-      setIsAnimating(true);
-      setProgress(0); // Reset progress on manual navigation
-      setTimeout(() => {
-        setCurrentIndex(currentIndex + 1);
-        setIsAnimating(false);
-      }, 200);
-    }
-  };
-
-  const prevExample = () => {
-    if (currentIndex > 0) {
-      setIsAnimating(true);
-      setProgress(0); // Reset progress on manual navigation
-      setTimeout(() => {
-        setCurrentIndex(currentIndex - 1);
-        setIsAnimating(false);
-      }, 200);
-    }
-  };
-
-  const reset = () => {
-    setCurrentIndex(0);
-    setProgress(0); // Reset progress
-    setIsAnimating(false);
-  };
-
-  // Auto-advance animation with progress bar
+  // Initialize particles based on dimension
   useEffect(() => {
-    if (!mounted) return;
+    const numParticles = Math.min(currentDimension * 2, 100);
+    const newParticles = Array.from({ length: numParticles }, () => ({
+      x: Math.random() * 2 - 1,
+      y: Math.random() * 2 - 1,
+      z: Math.random() * 2 - 1,
+      opacity: Math.random() * 0.8 + 0.2
+    }));
+    setParticles(newParticles);
+  }, [currentDimension]);
 
-    const progressTimer = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          setCurrentIndex(prevIndex => (prevIndex + 1) % examples.length);
-          return 0; // Reset progress
+  // Canvas animation for particles
+  useEffect(() => {
+    if (!mounted || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let frameCount = 0;
+
+    const animate = () => {
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Auto-rotate
+      const autoRotationY = frameCount * 0.005;
+      const autoRotationX = Math.sin(frameCount * 0.003) * 0.2;
+
+      // Draw particles with 3D projection
+      particles.forEach((particle, i) => {
+        // Apply rotation
+        const rotatedX = particle.x * Math.cos(autoRotationY) - particle.z * Math.sin(autoRotationY);
+        const rotatedZ = particle.x * Math.sin(autoRotationY) + particle.z * Math.cos(autoRotationY);
+        const rotatedY = particle.y * Math.cos(autoRotationX) - rotatedZ * Math.sin(autoRotationX);
+
+        // Simple 3D to 2D projection
+        const scale = 2 / (2 + rotatedZ);
+        const projectedX = rotatedX * scale * 100 + canvas.width / 2;
+        const projectedY = rotatedY * scale * 100 + canvas.height / 2;
+        const size = scale * (currentDimension > 100 ? 2 : 4);
+
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(projectedX, projectedY, size, 0, Math.PI * 2);
+        ctx.fillStyle = colors.particleColor + Math.floor(particle.opacity * 255).toString(16).padStart(2, '0');
+        ctx.fill();
+
+        // Draw connections for low dimensions
+        if (currentDimension <= 10 && i < particles.length - 1) {
+          ctx.beginPath();
+          const nextParticle = particles[i + 1];
+          const nextRotatedX = nextParticle.x * Math.cos(autoRotationY) - nextParticle.z * Math.sin(autoRotationY);
+          const nextRotatedZ = nextParticle.x * Math.sin(autoRotationY) + nextParticle.z * Math.cos(autoRotationY);
+          const nextRotatedY = nextParticle.y * Math.cos(autoRotationX) - nextRotatedZ * Math.sin(autoRotationX);
+          const nextScale = 2 / (2 + nextRotatedZ);
+          const nextProjectedX = nextRotatedX * nextScale * 100 + canvas.width / 2;
+          const nextProjectedY = nextRotatedY * nextScale * 100 + canvas.height / 2;
+
+          ctx.moveTo(projectedX, projectedY);
+          ctx.lineTo(nextProjectedX, nextProjectedY);
+          ctx.strokeStyle = colors.particleColor + '20';
+          ctx.lineWidth = scale;
+          ctx.stroke();
         }
-        return prev + (100 / (4000 / 100)); // 4 seconds = 4000ms, update every 100ms
       });
-    }, 100);
 
-    return () => clearInterval(progressTimer);
-  }, [mounted, examples.length]);
+      // Draw dimension indicator
+      if (currentDimension > 3) {
+        ctx.font = `bold ${Math.min(60, 300 / Math.log10(currentDimension + 1))}px system-ui`;
+        ctx.fillStyle = colors.particleColor + '40';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${currentDimension}D`, canvas.width / 2, canvas.height / 2);
+      }
+
+      frameCount++;
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [mounted, particles, currentDimension, colors]);
+
+  const transitionToDimension = (newDim: number) => {
+    setIsAnimating(true);
+    setShowMath(false);
+
+    setTimeout(() => {
+      setCurrentDimension(newDim);
+      setTimeout(() => {
+        setIsAnimating(false);
+        setShowMath(true);
+      }, 500);
+    }, 300);
+  };
 
   if (!mounted) {
     return (
       <div style={{
         padding: '2rem',
-        borderRadius: '12px',
+        borderRadius: '16px',
         margin: '2rem 0',
-        height: '600px',
+        height: '500px',
         background: 'transparent'
       }} />
     );
@@ -177,340 +191,265 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   return (
     <div style={{
       padding: '2rem',
-      background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
+      background: colors.bg,
       border: `1px solid ${colors.borderColor}`,
-      borderRadius: '12px',
+      borderRadius: '16px',
       margin: '2rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      boxShadow: isDark
-        ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
-        : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      boxShadow: `0 10px 40px ${colors.shadowColor}`,
       transition: 'all 0.3s ease'
     }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         <h3 style={{
-          fontSize: '1.5rem',
+          fontSize: '1.8rem',
           fontWeight: 'bold',
           color: colors.textPrimary,
-          marginBottom: '0.5rem'
+          marginBottom: '0.5rem',
+          letterSpacing: '-0.02em'
         }}>
-          The Algorithm Doesn't Care About Dimensions
+          Scaling to Higher Dimensions
         </h3>
         <p style={{
           color: colors.textSecondary,
-          fontSize: '0.9rem'
+          fontSize: '0.95rem',
+          opacity: 0.9
         }}>
-          Same math, same code, same logic—whether it's 2 features or 50,000
+          Watch how the perceptron effortlessly handles any number of dimensions
         </p>
       </div>
 
-      {/* Progress indicator */}
+      {/* Main Visualization Area */}
       <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        position: 'relative',
+        height: '350px',
         marginBottom: '1.5rem',
-        gap: '1rem'
+        background: `radial-gradient(ellipse at center, ${colors.shadowColor}, transparent)`,
+        borderRadius: '12px',
+        overflow: 'hidden'
       }}>
-        <div style={{
-          fontSize: '0.8rem',
-          color: colors.textMuted
-        }}>
-          Auto-advancing in:
-        </div>
-        <div style={{
-          width: '150px',
-          height: '6px',
-          background: colors.borderColor,
-          borderRadius: '3px',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            width: `${progress}%`,
+        {/* 3D Canvas */}
+        <canvas
+          ref={canvasRef}
+          width={800}
+          height={350}
+          style={{
+            width: '100%',
             height: '100%',
-            background: colors.accentPrimary,
-            transition: 'width 0.1s ease',
-            borderRadius: '3px'
-          }} />
-        </div>
-        <div style={{
-          fontSize: '0.8rem',
-          color: colors.textSecondary,
-          minWidth: '30px'
-        }}>
-          {Math.ceil((100 - progress) / 25)}s
-        </div>
-      </div>
+            opacity: isAnimating ? 0.3 : 1,
+            transition: 'opacity 0.3s ease'
+          }}
+        />
 
-      {/* Main content area */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '2rem',
-        marginBottom: '2rem'
-      }}>
-        {/* Left: Visual/Concept */}
+        {/* Floating Info Panel */}
         <div style={{
-          background: currentExample.visualizable ? colors.visualBg : colors.nonVisualBg,
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          background: colors.bg + 'ee',
+          backdropFilter: 'blur(10px)',
+          border: `1px solid ${colors.borderColor}`,
           borderRadius: '8px',
-          padding: '1.5rem',
-          textAlign: 'center',
-          position: 'relative',
-          opacity: isAnimating ? 0.5 : 1,
-          transform: isAnimating ? 'scale(0.95)' : 'scale(1)',
-          transition: 'all 0.3s ease',
-          height: '220px', // Fixed height for all boxes
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
+          padding: '1rem',
+          maxWidth: '220px',
+          opacity: showMath ? 1 : 0,
+          transform: showMath ? 'translateY(0)' : 'translateY(-10px)',
+          transition: 'all 0.5s ease 0.2s'
         }}>
           <div style={{
-            fontSize: '3rem',
-            marginBottom: '1rem'
-          }}>
-            {currentExample.visualizable ? '👁️' : '🤖'}
-          </div>
-
-          <h4 style={{
-            fontSize: '1.2rem',
+            fontSize: '2.5rem',
             fontWeight: 'bold',
-            color: colors.textPrimary,
+            color: colors.accentPrimary,
             marginBottom: '0.5rem'
           }}>
-            {currentExample.title}
-          </h4>
-
-          <p style={{
+            {currentDimension.toLocaleString()}D
+          </div>
+          <div style={{
+            fontSize: '0.85rem',
             color: colors.textSecondary,
-            fontSize: '0.9rem',
-            marginBottom: '1rem'
+            marginBottom: '0.5rem'
           }}>
-            {currentExample.example}
-          </p>
-
-          <div style={{
-            background: currentExample.visualizable ? colors.accentSecondary : colors.nonVisualBg,
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '20px',
-            fontSize: '0.8rem',
-            fontWeight: 'bold',
-            display: 'inline-block',
-            marginBottom: '1.5rem' // Add more space below the badge
-          }}>
-            {currentExample.visualizable ? 'Human Visualizable' : 'Beyond Human Vision'}
+            {dimensions.find(d => d.value === currentDimension)?.description || 'High-dimensional space'}
           </div>
-        </div>
-
-        {/* Right: The Math */}
-        <div style={{
-          background: colors.equationBg,
-          borderRadius: '8px',
-          padding: '1.5rem',
-          opacity: isAnimating ? 0.5 : 1,
-          transform: isAnimating ? 'scale(0.95)' : 'scale(1)',
-          transition: 'all 0.3s ease',
-          height: '220px', // Fixed height to match left box
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <h4 style={{
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            color: colors.textPrimary,
-            marginBottom: '1rem',
-            textAlign: 'center'
-          }}>
-            The Math (Always the Same!)
-          </h4>
-
           <div style={{
-            background: colors.codeBackground,
-            border: `1px solid ${colors.borderColor}`,
-            borderRadius: '6px',
-            padding: '1rem',
-            fontFamily: 'monospace',
             fontSize: '0.75rem',
-            color: colors.mathColor,
-            lineHeight: '1.8',
-            overflowX: 'auto',
-            flex: 1, // Take remaining space
-            overflow: 'auto' // Scroll if content is too long
+            color: colors.textSecondary,
+            opacity: 0.8,
+            fontStyle: 'italic'
           }}>
-            <div style={{ marginBottom: '0.5rem', fontWeight: 'bold', color: colors.textPrimary }}>
-              Activation =
-            </div>
-
-            {/* Show first few terms on separate lines */}
-            {currentExample.equationTerms.slice(0, Math.min(4, currentExample.equationTerms.length - 1)).map((term, index) => (
-              <div key={index} style={{ marginLeft: '1rem', color: colors.mathColor }}>
-                {index === 0 ? '' : '+ '}{term}
-              </div>
-            ))}
-
-            {/* Show ellipsis if there are many terms */}
-            {currentExample.equationTerms.length > 5 && (
-              <div style={{ marginLeft: '1rem', color: colors.textMuted, fontStyle: 'italic' }}>
-                + ... ({currentExample.dim - 4} more terms)
-              </div>
-            )}
-
-            {/* Show last term if there are many, otherwise show bias */}
-            {currentExample.equationTerms.length > 5 && (
-              <div style={{ marginLeft: '1rem', color: colors.mathColor }}>
-                + {currentExample.equationTerms[currentExample.equationTerms.length - 2]}
-              </div>
-            )}
-
-            <div style={{ marginLeft: '1rem', color: colors.mathColor }}>
-              + bias
-            </div>
-
-            <div style={{ color: colors.textMuted, fontSize: '0.65rem', marginTop: '0.5rem', fontStyle: 'italic' }}>
-              = Σ(wᵢ × xᵢ) + b  for i = 1 to {currentExample.dim}
-            </div>
+            {currentDimension <= 3 ? '✨ Human visualizable' : '🤖 Beyond human perception'}
           </div>
+        </div>
 
+        {/* Equation Panel */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          background: colors.bg + 'ee',
+          backdropFilter: 'blur(10px)',
+          border: `1px solid ${colors.borderColor}`,
+          borderRadius: '8px',
+          padding: '0.75rem 1rem',
+          fontFamily: 'monospace',
+          fontSize: '0.8rem',
+          color: colors.mathColor,
+          opacity: showMath ? 1 : 0,
+          transform: showMath ? 'translateY(0)' : 'translateY(10px)',
+          transition: 'all 0.5s ease 0.4s'
+        }}>
+          <div style={{ marginBottom: '0.25rem' }}>
+            y = sign(
+            {currentDimension <= 3 ? (
+              <span>w₁x₁ + w₂x₂{currentDimension === 3 ? ' + w₃x₃' : ''} + b</span>
+            ) : (
+              <span>Σ(wᵢxᵢ) + b</span>
+            )}
+            )
+          </div>
+          <div style={{
+            fontSize: '0.7rem',
+            color: colors.textSecondary,
+            opacity: 0.7
+          }}>
+            {currentDimension <= 10 ? `${currentDimension} weights` : `${currentDimension.toLocaleString()} weights to learn!`}
+          </div>
         </div>
       </div>
 
-      {/* Dimension indicator */}
+      {/* Dimension Selector */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: '2rem',
-        gap: '1rem'
+        gap: '0.75rem',
+        marginBottom: '1.5rem',
+        flexWrap: 'wrap'
       }}>
-        <div style={{
-          fontSize: '2rem',
-          fontWeight: 'bold',
-          color: colors.accentPrimary,
-          textAlign: 'center'
-        }}>
-          {currentExample.dim}D
-        </div>
-        <div style={{
-          fontSize: '0.9rem',
-          color: colors.textMuted,
-          maxWidth: '200px',
-          height: '3.6rem', // Fixed height for 3 lines of text
-          lineHeight: '1.2',
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          {currentExample.dim <= 3 ?
-            "You can visualize this!" :
-            `${currentExample.dim.toLocaleString()} dimensions - impossible to visualize, but math doesn't care!`
-          }
-        </div>
-      </div>
-
-      {/* Progress dots */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '0.5rem',
-        marginBottom: '2rem'
-      }}>
-        {examples.map((_, index) => (
+        {dimensions.map((dim) => (
           <button
-            key={index}
-            onClick={() => {
-              setCurrentIndex(index);
-              setProgress(0); // Reset progress on manual navigation
-            }}
+            key={dim.value}
+            onClick={() => transitionToDimension(dim.value)}
             style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              border: 'none',
-              background: index === currentIndex ? colors.accentPrimary : colors.borderColor,
+              padding: '0.6rem 1.2rem',
+              background: currentDimension === dim.value ? colors.accentPrimary : colors.bg,
+              color: currentDimension === dim.value ? 'white' : colors.textPrimary,
+              border: `2px solid ${currentDimension === dim.value ? colors.accentPrimary : colors.borderColor}`,
+              borderRadius: '8px',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              fontSize: '0.9rem',
+              fontWeight: currentDimension === dim.value ? 'bold' : 'normal',
+              transition: 'all 0.2s ease',
+              transform: currentDimension === dim.value ? 'scale(1.05)' : 'scale(1)',
+              boxShadow: currentDimension === dim.value ? `0 4px 12px ${colors.shadowColor}` : 'none'
             }}
-          />
+          >
+            <div>{dim.label}</div>
+            {dim.value > 100 && (
+              <div style={{
+                fontSize: '0.7rem',
+                opacity: 0.8,
+                marginTop: '2px'
+              }}>
+                {dim.visual}
+              </div>
+            )}
+          </button>
         ))}
       </div>
 
-      {/* Controls */}
+      {/* Bottom Insight */}
       <div style={{
-        display: 'flex',
-        justifyContent: 'center',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
         gap: '1rem',
-        flexWrap: 'wrap'
+        marginTop: '2rem'
       }}>
-        <button
-          onClick={prevExample}
-          disabled={currentIndex === 0}
-          style={{
-            padding: '0.5rem 1rem',
-            background: currentIndex === 0 ? colors.borderColor : colors.accentPrimary,
-            color: currentIndex === 0 ? colors.textMuted : 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500'
-          }}
-        >
-          ← Previous
-        </button>
-
-
-        <button
-          onClick={reset}
-          style={{
-            padding: '0.5rem 1rem',
-            background: colors.codeBackground,
-            color: colors.textPrimary,
-            border: `1px solid ${colors.borderColor}`,
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500'
-          }}
-        >
-          🔄 Reset
-        </button>
-
-        <button
-          onClick={nextExample}
-          disabled={currentIndex === examples.length - 1}
-          style={{
-            padding: '0.5rem 1rem',
-            background: currentIndex === examples.length - 1 ? colors.borderColor : colors.accentPrimary,
-            color: currentIndex === examples.length - 1 ? colors.textMuted : 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: currentIndex === examples.length - 1 ? 'not-allowed' : 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500'
-          }}
-        >
-          Next →
-        </button>
-      </div>
-
-      {/* Key insight */}
-      <div style={{
-        marginTop: '2rem',
-        padding: '1rem',
-        background: colors.accentPrimary,
-        color: 'white',
-        borderRadius: '8px',
-        textAlign: 'center'
-      }}>
-        <p style={{
-          fontSize: '0.9rem',
-          fontWeight: '500',
-          margin: '0'
+        <div style={{
+          textAlign: 'center',
+          padding: '1rem',
+          background: colors.bg,
+          border: `1px solid ${colors.borderColor}`,
+          borderRadius: '8px'
         }}>
-          💡 Key Insight: The perceptron algorithm is <strong>dimension-agnostic</strong>.
-          The same `sum(w * x)` operation works whether you have 2 features or 50,000!
-        </p>
+          <div style={{
+            fontSize: '2rem',
+            marginBottom: '0.5rem'
+          }}>
+            📊
+          </div>
+          <div style={{
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: '0.25rem'
+          }}>
+            Same Algorithm
+          </div>
+          <div style={{
+            fontSize: '0.75rem',
+            color: colors.textSecondary
+          }}>
+            One update rule for all dimensions
+          </div>
+        </div>
+
+        <div style={{
+          textAlign: 'center',
+          padding: '1rem',
+          background: colors.bg,
+          border: `1px solid ${colors.borderColor}`,
+          borderRadius: '8px'
+        }}>
+          <div style={{
+            fontSize: '2rem',
+            marginBottom: '0.5rem'
+          }}>
+            ⚡
+          </div>
+          <div style={{
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: '0.25rem'
+          }}>
+            Linear Scaling
+          </div>
+          <div style={{
+            fontSize: '0.75rem',
+            color: colors.textSecondary
+          }}>
+            O(n) complexity for n dimensions
+          </div>
+        </div>
+
+        <div style={{
+          textAlign: 'center',
+          padding: '1rem',
+          background: colors.bg,
+          border: `1px solid ${colors.borderColor}`,
+          borderRadius: '8px'
+        }}>
+          <div style={{
+            fontSize: '2rem',
+            marginBottom: '0.5rem'
+          }}>
+            🎯
+          </div>
+          <div style={{
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: '0.25rem'
+          }}>
+            Convergence Guaranteed
+          </div>
+          <div style={{
+            fontSize: '0.75rem',
+            color: colors.textSecondary
+          }}>
+            If linearly separable
+          </div>
+        </div>
       </div>
     </div>
   );
