@@ -61,6 +61,8 @@ const formatTick = (value: number) => {
   return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(decimals);
 };
 
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
 interface DataPoint {
   x: number;
   y: number;
@@ -160,7 +162,10 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     const points: DataPoint[] = [];
     const { a, b, c } = trueLine;
 
-    // Seed for consistent randomness per generation
+    if (Math.abs(b) < 1e-6) {
+      return points;
+    }
+
     const seed = dataGeneration * 1000;
     const seededRandom = (index: number) => {
       const x = Math.sin(seed + index) * 10000;
@@ -168,27 +173,20 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     };
 
     const pointsPerClass = 25;
+    const minMargin = 2;
+    const catXRange = { min: 12, max: 18 };
+    const dogXRange = { min: 8, max: 16 };
+    const catYOffsetRange = 8;
+    const dogYOffsetRange = 8;
 
     for (let i = 0; i < pointsPerClass; i++) {
-      // Generate cats (Ax + By + C >= margin region) - well above the line
-      let catX, catY;
-      let attempts = 0;
-      const minMargin = 2; // Minimum distance from separating line
-      do {
-        catX = 12 + seededRandom(i * 2) * 6; // 12-18 hours sleep
-        catY = 8 + seededRandom(i * 2 + 1) * 10;  // 8-18 mph speed
-        attempts++;
-      } while ((a * catX + b * catY + c < minMargin) && attempts < 100);
-
-      // If we couldn't find a good point, force it into the correct region
-      if (attempts >= 100) {
-        catX = 15 + seededRandom(i * 2) * 3; // Safer range
-        catY = 8 + seededRandom(i * 2 + 1) * 6;
-        // Ensure it's well in the cat region
-        while (a * catX + b * catY + c < minMargin) {
-          catY += 0.5; // Move up to ensure it's in cat region
-        }
-      }
+      const rawCatX = catXRange.min + seededRandom(i * 4) * (catXRange.max - catXRange.min);
+      const catXJitter = (seededRandom(i * 4 + 1) - 0.5) * 1.2;
+      const catX = clamp(rawCatX + catXJitter, catXRange.min, catXRange.max);
+      const boundaryCatY = -(a * catX + c) / b;
+      const catOffset = minMargin + seededRandom(i * 4 + 2) * catYOffsetRange;
+      const catYJitter = (seededRandom(i * 4 + 3) - 0.5) * 1.5;
+      const catY = boundaryCatY + catOffset + catYJitter;
 
       points.push({
         x: catX,
@@ -197,26 +195,13 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         id: `cat-${i}-${dataGeneration}`
       });
 
-      // Generate dogs (Ax + By + C <= -margin region) - well below the line
-      let dogX, dogY;
-      attempts = 0;
-      do {
-        dogX = 8 + seededRandom(i * 2 + 100) * 8;   // 8-16 hours sleep
-        dogY = 15 + seededRandom(i * 2 + 101) * 12; // 15-27 mph speed
-        attempts++;
-      } while ((a * dogX + b * dogY + c > -minMargin) && attempts < 100);
-
-      // If we couldn't find a good point, force it into the correct region
-      if (attempts >= 100) {
-        dogX = 10 + seededRandom(i * 2 + 100) * 4; // Safer range
-        dogY = 18 + seededRandom(i * 2 + 101) * 8;
-        // Ensure it's well in the dog region
-        let safeguard = 0;
-        while (a * dogX + b * dogY + c > -minMargin && safeguard < 200) {
-          dogY -= 0.5; // Move deeper into the dog region (below the boundary)
-          safeguard++;
-        }
-      }
+      const rawDogX = dogXRange.min + seededRandom(i * 4 + 100) * (dogXRange.max - dogXRange.min);
+      const dogXJitter = (seededRandom(i * 4 + 101) - 0.5) * 1.5;
+      const dogX = clamp(rawDogX + dogXJitter, dogXRange.min, dogXRange.max);
+      const boundaryDogY = -(a * dogX + c) / b;
+      const dogOffset = minMargin + seededRandom(i * 4 + 102) * dogYOffsetRange;
+      const dogYJitter = (seededRandom(i * 4 + 103) - 0.5) * 2;
+      const dogY = boundaryDogY - dogOffset + dogYJitter;
 
       points.push({
         x: dogX,
@@ -451,7 +436,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       return { a: actualA, b: actualB, c: actualC };
     };
 
-    let weights = {
+    const weights = {
       a: Math.random() * 2 - 1,
       b: Math.random() * 2 - 1,
       c: Math.random() * 2 - 1
