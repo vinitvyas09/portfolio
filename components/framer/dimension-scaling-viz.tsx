@@ -3,66 +3,108 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 
-interface FeatureConfig {
+interface DimensionExample {
   dim: number;
-  labels: string[];
-  visual: "2d-plane" | "3d-space" | "tesseract-hint" | "abstract" | "matrix-rain";
+  title: string;
+  example: string;
+  features: string[];
+  equationTerms: string[];
+  pythonArrays: {
+    weights: string;
+    inputs: string;
+  };
+  visualizable: boolean;
 }
 
 interface DimensionScalingVizProps {
   config?: {
-    startDimension?: number;
-    endDimension?: number;
-    features?: FeatureConfig[];
-    animationMs?: number;
-    showHumanLimit?: boolean;
+    animationSpeed?: number;
+    showCode?: boolean;
+    autoPlay?: boolean;
   };
 }
 
 const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   config = {
-    startDimension: 2,
-    endDimension: 100,
-    features: [
-      { dim: 2, labels: ["Sleep hours", "Speed"], visual: "2d-plane" },
-      { dim: 3, labels: ["Sleep hours", "Speed", "Bark frequency"], visual: "3d-space" },
-      { dim: 4, labels: ["+ Tail wag rate"], visual: "tesseract-hint" },
-      { dim: 10, labels: ["+ 6 more features..."], visual: "abstract" },
-      { dim: 100, labels: ["+ 96 more features..."], visual: "matrix-rain" }
-    ],
-    animationMs: 4000,
-    showHumanLimit: true
+    animationSpeed: 3000,
+    showCode: true,
+    autoPlay: false
   }
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [currentFeatureIndex, setCurrentFeatureIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showEquation, setShowEquation] = useState(true);
 
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
 
-  const { features = [], showHumanLimit = true } = config;
+  const examples: DimensionExample[] = [
+    {
+      dim: 2,
+      title: "2D: Cats vs Dogs",
+      example: "Sleep hours, Running speed",
+      features: ["sleep_hours", "running_speed"],
+      equationTerms: ["w₁×sleep", "w₂×speed", "bias"],
+      pythonArrays: {
+        weights: "[w₁, w₂]",
+        inputs: "[sleep, speed]"
+      },
+      visualizable: true
+    },
+    {
+      dim: 3,
+      title: "3D: Add Bark Frequency",
+      example: "Sleep, Speed, Bark frequency",
+      features: ["sleep_hours", "running_speed", "bark_freq"],
+      equationTerms: ["w₁×sleep", "w₂×speed", "w₃×bark", "bias"],
+      pythonArrays: {
+        weights: "[w₁, w₂, w₃]",
+        inputs: "[sleep, speed, bark]"
+      },
+      visualizable: true
+    },
+    {
+      dim: 10,
+      title: "10D: Real Dog Features",
+      example: "Weight, age, tail wag rate, ear position...",
+      features: ["weight", "age", "tail_wag", "ear_pos", "fur_len", "bark_vol", "energy", "size", "treat_love", "fetch_skill"],
+      equationTerms: ["w₁×weight", "w₂×age", "w₃×tail", "w₄×ear", "w₅×fur", "w₆×bark", "w₇×energy", "w₈×size", "w₉×treat", "w₁₀×fetch", "bias"],
+      pythonArrays: {
+        weights: "[w₁, w₂, w₃, w₄, w₅, w₆, w₇, w₈, w₉, w₁₀]",
+        inputs: "[weight, age, tail, ear, fur, bark, energy, size, treat, fetch]"
+      },
+      visualizable: false
+    },
+    {
+      dim: 784,
+      title: "784D: Handwritten Digits",
+      example: "Each pixel in 28×28 image",
+      features: Array.from({length: 784}, (_, i) => `pixel_${i+1}`),
+      equationTerms: ["w₁×px₁", "w₂×px₂", "w₃×px₃", "...", "w₇₈₄×px₇₈₄", "bias"],
+      pythonArrays: {
+        weights: "[w₁, w₂, w₃, ..., w₇₈₄]",
+        inputs: "[px₁, px₂, px₃, ..., px₇₈₄]"
+      },
+      visualizable: false
+    },
+    {
+      dim: 50000,
+      title: "50,000D: Text Classification",
+      example: "Word frequencies in vocabulary",
+      features: Array.from({length: 50000}, (_, i) => `word_${i+1}_freq`),
+      equationTerms: ["w₁×freq₁", "w₂×freq₂", "...", "w₅₀₀₀₀×freq₅₀₀₀₀", "bias"],
+      pythonArrays: {
+        weights: "[w₁, w₂, ..., w₅₀₀₀₀]",
+        inputs: "[freq₁, freq₂, ..., freq₅₀₀₀₀]"
+      },
+      visualizable: false
+    }
+  ];
 
   const colors = useMemo(() => {
-    if (!mounted) {
-      return {
-        bgGradient1: "#fafafa",
-        bgGradient2: "#f3f4f6",
-        textPrimary: "#1e293b",
-        textSecondary: "#64748b",
-        textMuted: "#94a3b8",
-        borderColor: "#e2e8f0",
-        accentPrimary: "#6366f1",
-        accentSecondary: "#10b981",
-        humanLimitBg: "#fef3c7",
-        humanLimitBorder: "#f59e0b",
-        dimensionBg: "rgba(99, 102, 241, 0.1)",
-        progressBarBg: "rgba(148, 163, 184, 0.2)",
-        progressBarFill: "#6366f1",
-        matrixGreen: "#10b981",
-        warningRed: "#ef4444"
-      };
-    }
+    if (!mounted) return {};
 
     return isDark ? {
       bgGradient1: "#0a0a0a",
@@ -73,13 +115,12 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       borderColor: "#404040",
       accentPrimary: "#a78bfa",
       accentSecondary: "#34d399",
-      humanLimitBg: "#451a03",
-      humanLimitBorder: "#f59e0b",
-      dimensionBg: "rgba(167, 139, 250, 0.2)",
-      progressBarBg: "rgba(64, 64, 64, 0.5)",
-      progressBarFill: "#a78bfa",
-      matrixGreen: "#34d399",
-      warningRed: "#f87171"
+      codeBackground: "#1a1a1a",
+      equationBg: "#262626",
+      visualBg: "#374151",
+      nonVisualBg: "#ef4444",
+      loopColor: "#fbbf24",
+      mathColor: "#60a5fa"
     } : {
       bgGradient1: "#ffffff",
       bgGradient2: "#fafafa",
@@ -89,298 +130,61 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       borderColor: "#e2e8f0",
       accentPrimary: "#6366f1",
       accentSecondary: "#10b981",
-      humanLimitBg: "#fef3c7",
-      humanLimitBorder: "#f59e0b",
-      dimensionBg: "rgba(99, 102, 241, 0.1)",
-      progressBarBg: "rgba(148, 163, 184, 0.2)",
-      progressBarFill: "#6366f1",
-      matrixGreen: "#10b981",
-      warningRed: "#ef4444"
+      codeBackground: "#f8fafc",
+      equationBg: "#f1f5f9",
+      visualBg: "#dcfce7",
+      nonVisualBg: "#fecaca",
+      loopColor: "#f59e0b",
+      mathColor: "#3b82f6"
     };
   }, [isDark, mounted]);
 
-  const resetVisualization = () => {
-    setCurrentFeatureIndex(0);
-  };
+  const currentExample = examples[currentIndex];
 
-  const currentFeature = features[currentFeatureIndex] || features[0];
-  const isHumanLimit = currentFeature.dim <= 3;
-
-  const renderVisualization = (feature: FeatureConfig) => {
-    const baseOpacity = 1;
-
-    switch (feature.visual) {
-      case "2d-plane":
-        return (
-          <svg width="300" height="200" viewBox="0 0 300 200">
-            <defs>
-              <linearGradient id="planeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={colors.accentPrimary} stopOpacity="0.3" />
-                <stop offset="100%" stopColor={colors.accentSecondary} stopOpacity="0.1" />
-              </linearGradient>
-            </defs>
-
-            {/* Grid lines */}
-            {Array.from({ length: 12 }).map((_, i) => (
-              <g key={i} opacity={baseOpacity * 0.3}>
-                <line x1={i * 25} y1="0" x2={i * 25} y2="200" stroke={colors.borderColor} strokeWidth="0.5" />
-                <line x1="0" y1={i * 20} x2="300" y2={i * 20} stroke={colors.borderColor} strokeWidth="0.5" />
-              </g>
-            ))}
-
-            {/* Data points */}
-            {[
-              { x: 60, y: 160, color: colors.accentSecondary, label: "🐱" },
-              { x: 90, y: 150, color: colors.accentSecondary, label: "🐱" },
-              { x: 75, y: 140, color: colors.accentSecondary, label: "🐱" },
-              { x: 210, y: 60, color: colors.accentPrimary, label: "🐕" },
-              { x: 240, y: 70, color: colors.accentPrimary, label: "🐕" },
-              { x: 225, y: 50, color: colors.accentPrimary, label: "🐕" },
-            ].map((point, i) => (
-              <g key={i} opacity={baseOpacity}>
-                <circle cx={point.x} cy={point.y} r="6" fill={point.color} />
-                <text x={point.x} y={point.y + 2} textAnchor="middle" fontSize="8" fill="white">
-                  {point.label}
-                </text>
-              </g>
-            ))}
-
-            {/* Separating line */}
-            <line
-              x1="120" y1="30" x2="180" y2="170"
-              stroke={colors.warningRed}
-              strokeWidth="2"
-              opacity={baseOpacity}
-              strokeDasharray="5,5"
-            />
-
-            {/* Axes labels */}
-            <text x="150" y="190" textAnchor="middle" fontSize="10" fill={colors.textMuted} opacity={baseOpacity}>
-              X₁ (Sleep)
-            </text>
-            <text x="15" y="100" textAnchor="middle" fontSize="10" fill={colors.textMuted} transform="rotate(-90 15 100)" opacity={baseOpacity}>
-              X₂ (Speed)
-            </text>
-          </svg>
-        );
-
-      case "3d-space":
-        return (
-          <svg width="300" height="200" viewBox="0 0 300 200">
-            <defs>
-              <linearGradient id="planeGradient3d" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={colors.accentPrimary} stopOpacity="0.4" />
-                <stop offset="100%" stopColor={colors.accentSecondary} stopOpacity="0.2" />
-              </linearGradient>
-            </defs>
-
-            {/* 3D cube wireframe */}
-            <g opacity={baseOpacity * 0.4} stroke={colors.borderColor} strokeWidth="1" fill="none">
-              {/* Back face */}
-              <rect x="90" y="60" width="120" height="80" />
-              {/* Front face */}
-              <rect x="110" y="80" width="120" height="80" />
-              {/* Connecting lines */}
-              <line x1="90" y1="60" x2="110" y2="80" />
-              <line x1="210" y1="60" x2="230" y2="80" />
-              <line x1="210" y1="140" x2="230" y2="160" />
-              <line x1="90" y1="140" x2="110" y2="160" />
-            </g>
-
-            {/* 3D data points */}
-            {[
-              { x: 100, y: 150, z: 0.3, color: colors.accentSecondary, label: "🐱" },
-              { x: 110, y: 145, z: 0.6, color: colors.accentSecondary, label: "🐱" },
-              { x: 200, y: 110, z: 0.2, color: colors.accentPrimary, label: "🐕" },
-              { x: 210, y: 115, z: 0.8, color: colors.accentPrimary, label: "🐕" },
-            ].map((point, i) => {
-              const zOffset = point.z * 20;
-              return (
-                <g key={i} opacity={baseOpacity}>
-                  <circle
-                    cx={point.x + zOffset}
-                    cy={point.y - zOffset}
-                    r={4 + point.z * 2}
-                    fill={point.color}
-                  />
-                  <text
-                    x={point.x + zOffset}
-                    y={point.y - zOffset + 2}
-                    textAnchor="middle"
-                    fontSize="6"
-                    fill="white"
-                  >
-                    {point.label}
-                  </text>
-                </g>
-              );
-            })}
-
-            {/* Separating plane */}
-            <polygon
-              points="120,80 160,75 180,135 140,140"
-              fill="url(#planeGradient3d)"
-              stroke={colors.warningRed}
-              strokeWidth="1"
-              opacity={baseOpacity}
-            />
-
-            {/* 3D Axes labels */}
-            <text x="150" y="190" textAnchor="middle" fontSize="9" fill={colors.textMuted} opacity={baseOpacity}>
-              X₁, X₂, X₃
-            </text>
-          </svg>
-        );
-
-      case "tesseract-hint":
-        return (
-          <svg width="300" height="200" viewBox="0 0 300 200">
-            {/* Tesseract wireframe approximation */}
-            <g opacity={baseOpacity * 0.6} stroke={colors.accentPrimary} strokeWidth="1" fill="none">
-              {/* Inner cube */}
-              <rect x="110" y="70" width="60" height="60" />
-              {/* Outer cube */}
-              <rect x="130" y="50" width="60" height="60" />
-              {/* Connecting lines */}
-              <line x1="110" y1="70" x2="130" y2="50" />
-              <line x1="170" y1="70" x2="190" y2="50" />
-              <line x1="170" y1="130" x2="190" y2="110" />
-              <line x1="110" y1="130" x2="130" y2="110" />
-
-              {/* Additional 4D hints */}
-              <circle cx="125" cy="85" r="20" strokeDasharray="3,3" opacity="0.5" />
-              <circle cx="175" cy="65" r="20" strokeDasharray="3,3" opacity="0.5" />
-            </g>
-
-            {/* Abstract data points */}
-            {Array.from({ length: 6 }).map((_, i) => {
-              const angle = (i / 6) * Math.PI * 2;
-              const radius = 40 + (i % 2) * 25;
-              const x = 150 + Math.cos(angle) * radius;
-              const y = 100 + Math.sin(angle) * radius;
-              return (
-                <circle
-                  key={i}
-                  cx={x}
-                  cy={y}
-                  r="3"
-                  fill={i % 2 === 0 ? colors.accentSecondary : colors.accentPrimary}
-                  opacity={baseOpacity}
-                />
-              );
-            })}
-
-            <text x="150" y="190" textAnchor="middle" fontSize="9" fill={colors.textMuted} opacity={baseOpacity}>
-              4D Hyperplane
-            </text>
-          </svg>
-        );
-
-      case "abstract":
-        return (
-          <svg width="300" height="200" viewBox="0 0 300 200">
-            {/* Network-like visualization */}
-            <g opacity={baseOpacity}>
-              {Array.from({ length: 20 }).map((_, i) => {
-                const x = 40 + (i % 5) * 50;
-                const y = 40 + Math.floor(i / 5) * 35;
-                const connected = Math.random() > 0.4;
-                return (
-                  <g key={i}>
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r="2"
-                      fill={connected ? colors.accentPrimary : colors.accentSecondary}
-                    />
-                    {connected && i < 15 && (
-                      <line
-                        x1={x}
-                        y1={y}
-                        x2={x + 50}
-                        y2={y + (Math.random() - 0.5) * 25}
-                        stroke={colors.borderColor}
-                        strokeWidth="0.5"
-                        opacity="0.6"
-                      />
-                    )}
-                  </g>
-                );
-              })}
-            </g>
-
-            <text x="150" y="190" textAnchor="middle" fontSize="9" fill={colors.textMuted} opacity={baseOpacity}>
-              High-Dimensional Space
-            </text>
-          </svg>
-        );
-
-      case "matrix-rain":
-        return (
-          <svg width="300" height="200" viewBox="0 0 300 200">
-            {/* Matrix-style falling numbers */}
-            <defs>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-
-            <g opacity={baseOpacity} filter="url(#glow)">
-              {Array.from({ length: 20 }).map((_, col) =>
-                Array.from({ length: 10 }).map((_, row) => {
-                  const x = col * 15;
-                  const y = row * 20;
-                  const char = Math.random() > 0.7 ? String(Math.floor(Math.random() * 10)) : '';
-                  const opacity = Math.random() * 0.8 + 0.2;
-
-                  return char ? (
-                    <text
-                      key={`${col}-${row}`}
-                      x={x}
-                      y={y}
-                      fontSize="8"
-                      fill={colors.matrixGreen}
-                      opacity={opacity}
-                      fontFamily="monospace"
-                    >
-                      {char}
-                    </text>
-                  ) : null;
-                })
-              )}
-            </g>
-
-            {/* Floating hyperplane symbol */}
-            <text x="150" y="120" textAnchor="middle" fontSize="20" fill={colors.warningRed} opacity={baseOpacity}>
-              ∥
-            </text>
-
-            <text x="150" y="190" textAnchor="middle" fontSize="9" fill={colors.textMuted} opacity={baseOpacity}>
-              100+ Dimensions
-            </text>
-          </svg>
-        );
-
-      default:
-        return <div>Unknown visualization type</div>;
+  const nextExample = () => {
+    if (currentIndex < examples.length - 1) {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentIndex(currentIndex + 1);
+        setIsAnimating(false);
+      }, 200);
     }
   };
 
+  const prevExample = () => {
+    if (currentIndex > 0) {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentIndex(currentIndex - 1);
+        setIsAnimating(false);
+      }, 200);
+    }
+  };
+
+  const reset = () => {
+    setCurrentIndex(0);
+    setIsAnimating(false);
+  };
+
+  // Auto-advance animation
+  useEffect(() => {
+    if (config.autoPlay && !isAnimating) {
+      const timer = setInterval(() => {
+        setCurrentIndex(prev => (prev + 1) % examples.length);
+      }, config.animationSpeed);
+      return () => clearInterval(timer);
+    }
+  }, [config.autoPlay, config.animationSpeed, isAnimating]);
+
   if (!mounted) {
     return (
-      <div
-        style={{
-          padding: '2rem',
-          borderRadius: '12px',
-          margin: '2rem 0',
-          height: '500px',
-          background: 'transparent',
-        }}
-      />
+      <div style={{
+        padding: '2rem',
+        borderRadius: '12px',
+        margin: '2rem 0',
+        height: '600px',
+        background: 'transparent'
+      }} />
     );
   }
 
@@ -398,131 +202,199 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       transition: 'all 0.3s ease'
     }}>
       {/* Header */}
-      <div style={{
-        textAlign: 'center',
-        marginBottom: '2rem'
-      }}>
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <h3 style={{
           fontSize: '1.5rem',
           fontWeight: 'bold',
           color: colors.textPrimary,
           marginBottom: '0.5rem'
         }}>
-          Scaling to Higher Dimensions
+          The Algorithm Doesn't Care About Dimensions
         </h3>
         <p style={{
           color: colors.textSecondary,
           fontSize: '0.9rem'
         }}>
-          Watch classification complexity grow from simple 2D to impossible-to-visualize 100D
+          Same math, same code, same logic—whether it's 2 features or 50,000
         </p>
       </div>
 
-      {/* Main visualization area */}
+      {/* Main content area */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '2rem',
+        marginBottom: '2rem'
+      }}>
+        {/* Left: Visual/Concept */}
+        <div style={{
+          background: currentExample.visualizable ? colors.visualBg : colors.nonVisualBg,
+          borderRadius: '8px',
+          padding: '1.5rem',
+          textAlign: 'center',
+          position: 'relative',
+          opacity: isAnimating ? 0.5 : 1,
+          transform: isAnimating ? 'scale(0.95)' : 'scale(1)',
+          transition: 'all 0.3s ease'
+        }}>
+          <div style={{
+            fontSize: '3rem',
+            marginBottom: '1rem'
+          }}>
+            {currentExample.visualizable ? '👁️' : '🤖'}
+          </div>
+
+          <h4 style={{
+            fontSize: '1.2rem',
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: '0.5rem'
+          }}>
+            {currentExample.title}
+          </h4>
+
+          <p style={{
+            color: colors.textSecondary,
+            fontSize: '0.9rem',
+            marginBottom: '1rem'
+          }}>
+            {currentExample.example}
+          </p>
+
+          <div style={{
+            background: currentExample.visualizable ? colors.accentSecondary : colors.nonVisualBg,
+            color: 'white',
+            padding: '0.5rem 1rem',
+            borderRadius: '20px',
+            fontSize: '0.8rem',
+            fontWeight: 'bold',
+            display: 'inline-block'
+          }}>
+            {currentExample.visualizable ? 'Human Visualizable' : 'Beyond Human Vision'}
+          </div>
+        </div>
+
+        {/* Right: The Math */}
+        <div style={{
+          background: colors.equationBg,
+          borderRadius: '8px',
+          padding: '1.5rem',
+          opacity: isAnimating ? 0.5 : 1,
+          transform: isAnimating ? 'scale(0.95)' : 'scale(1)',
+          transition: 'all 0.3s ease'
+        }}>
+          <h4 style={{
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: '1rem',
+            textAlign: 'center'
+          }}>
+            The Math (Always the Same!)
+          </h4>
+
+          {showEquation && (
+            <div style={{
+              background: colors.codeBackground,
+              border: `1px solid ${colors.borderColor}`,
+              borderRadius: '6px',
+              padding: '1rem',
+              marginBottom: '1rem',
+              fontFamily: 'monospace',
+              fontSize: '0.8rem',
+              color: colors.mathColor,
+              lineHeight: '1.6',
+              overflowX: 'auto'
+            }}>
+              <div style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                Activation = {currentExample.equationTerms.slice(0, Math.min(3, currentExample.equationTerms.length - 1)).join(' + ')}
+                {currentExample.equationTerms.length > 4 && <span style={{ color: colors.textMuted }}> + ...</span>}
+                {currentExample.equationTerms.length > 4 && (
+                  <span> + {currentExample.equationTerms[currentExample.equationTerms.length - 2]} + bias</span>
+                )}
+                {currentExample.equationTerms.length <= 4 && ` + bias`}
+              </div>
+
+              <div style={{ color: colors.textMuted, fontSize: '0.7rem' }}>
+                = Σ(wᵢ × xᵢ) + b  for i = 1 to {currentExample.dim}
+              </div>
+            </div>
+          )}
+
+          {config.showCode && (
+            <div style={{
+              background: colors.codeBackground,
+              border: `1px solid ${colors.borderColor}`,
+              borderRadius: '6px',
+              padding: '1rem',
+              fontFamily: 'monospace',
+              fontSize: '0.75rem',
+              lineHeight: '1.5'
+            }}>
+              <div style={{ color: colors.textMuted, marginBottom: '0.5rem' }}># Python (works for any dimension!)</div>
+              <div style={{ color: colors.textPrimary }}>
+                <span style={{ color: colors.accentPrimary }}>weights</span> = {currentExample.pythonArrays.weights}
+              </div>
+              <div style={{ color: colors.textPrimary, marginBottom: '0.5rem' }}>
+                <span style={{ color: colors.accentPrimary }}>inputs</span> = {currentExample.pythonArrays.inputs}
+              </div>
+              <div style={{ color: colors.loopColor, fontWeight: 'bold' }}>
+                activation = <span style={{ color: colors.accentSecondary }}>sum</span>(w * x <span style={{ color: colors.textMuted }}>for</span> w, x <span style={{ color: colors.textMuted }}>in</span> <span style={{ color: colors.accentSecondary }}>zip</span>(weights, inputs))
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dimension indicator */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '280px',
-        background: colors.dimensionBg,
-        borderRadius: '8px',
-        marginBottom: '1.5rem',
-        position: 'relative',
-        overflow: 'hidden'
+        marginBottom: '2rem',
+        gap: '1rem'
       }}>
-        {/* Current dimension display */}
         <div style={{
-          position: 'absolute',
-          top: '1rem',
-          left: '1rem',
-          background: isHumanLimit ? colors.humanLimitBg : colors.bgGradient1,
-          border: `2px solid ${isHumanLimit ? colors.humanLimitBorder : colors.borderColor}`,
-          borderRadius: '8px',
-          padding: '0.5rem 1rem',
-          fontSize: '1.2rem',
+          fontSize: '2rem',
           fontWeight: 'bold',
-          color: isHumanLimit ? colors.humanLimitBorder : colors.textPrimary
+          color: colors.accentPrimary,
+          textAlign: 'center'
         }}>
-          {currentFeature.dim}D
-          {showHumanLimit && isHumanLimit && (
-            <span style={{ fontSize: '0.7rem', marginLeft: '0.5rem' }}>👁️</span>
-          )}
+          {currentExample.dim}D
         </div>
-
-        {/* Human limit indicator */}
-        {showHumanLimit && currentFeature.dim > 3 && (
-          <div style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            background: colors.warningRed,
-            color: 'white',
-            borderRadius: '6px',
-            padding: '0.25rem 0.5rem',
-            fontSize: '0.8rem',
-            fontWeight: '500'
-          }}>
-            Beyond Human Vision 🚫👁️
-          </div>
-        )}
-
-        {/* Visualization */}
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '1rem'
+          fontSize: '0.9rem',
+          color: colors.textMuted,
+          maxWidth: '200px'
         }}>
-          {renderVisualization(currentFeature)}
-
-          {/* Feature labels */}
-          <div style={{
-            textAlign: 'center',
-            maxWidth: '250px'
-          }}>
-            {currentFeature.labels.map((label, index) => (
-              <div
-                key={index}
-                style={{
-                  fontSize: '0.85rem',
-                  color: colors.textSecondary,
-                  marginBottom: '0.25rem'
-                }}
-              >
-                {label}
-              </div>
-            ))}
-          </div>
+          {currentExample.dim <= 3 ?
+            "You can visualize this!" :
+            `${currentExample.dim.toLocaleString()} dimensions - impossible to visualize, but math doesn't care!`
+          }
         </div>
       </div>
 
-
-      {/* Dimension stepper */}
+      {/* Progress dots */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         gap: '0.5rem',
-        marginBottom: '1.5rem',
-        flexWrap: 'wrap'
+        marginBottom: '2rem'
       }}>
-        {features.map((feature, index) => (
+        {examples.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentFeatureIndex(index)}
+            onClick={() => setCurrentIndex(index)}
             style={{
-              padding: '0.5rem 1rem',
-              background: index === currentFeatureIndex ? colors.accentPrimary : colors.bgGradient1,
-              color: index === currentFeatureIndex ? 'white' : colors.textPrimary,
-              border: `1px solid ${colors.borderColor}`,
-              borderRadius: '6px',
+              width: '12px',
+              height: '12px',
+              borderRadius: '50%',
+              border: 'none',
+              background: index === currentIndex ? colors.accentPrimary : colors.borderColor,
               cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: '500',
               transition: 'all 0.2s ease'
             }}
-          >
-            {feature.dim}D
-          </button>
+          />
         ))}
       </div>
 
@@ -530,45 +402,92 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        gap: '1rem'
+        gap: '1rem',
+        flexWrap: 'wrap'
       }}>
         <button
-          onClick={resetVisualization}
+          onClick={prevExample}
+          disabled={currentIndex === 0}
           style={{
-            padding: '0.75rem 1.5rem',
-            background: colors.bgGradient1,
-            color: colors.textPrimary,
-            border: `1px solid ${colors.borderColor}`,
-            borderRadius: '8px',
-            cursor: 'pointer',
+            padding: '0.5rem 1rem',
+            background: currentIndex === 0 ? colors.borderColor : colors.accentPrimary,
+            color: currentIndex === 0 ? colors.textMuted : 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
             fontSize: '0.9rem',
-            fontWeight: '500',
-            transition: 'all 0.2s ease'
+            fontWeight: '500'
           }}
         >
-          🔄 Reset to 2D
+          ← Previous
+        </button>
+
+        <button
+          onClick={() => setShowEquation(!showEquation)}
+          style={{
+            padding: '0.5rem 1rem',
+            background: colors.codeBackground,
+            color: colors.textPrimary,
+            border: `1px solid ${colors.borderColor}`,
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}
+        >
+          {showEquation ? '🧮 Hide Math' : '🧮 Show Math'}
+        </button>
+
+        <button
+          onClick={reset}
+          style={{
+            padding: '0.5rem 1rem',
+            background: colors.codeBackground,
+            color: colors.textPrimary,
+            border: `1px solid ${colors.borderColor}`,
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}
+        >
+          🔄 Reset
+        </button>
+
+        <button
+          onClick={nextExample}
+          disabled={currentIndex === examples.length - 1}
+          style={{
+            padding: '0.5rem 1rem',
+            background: currentIndex === examples.length - 1 ? colors.borderColor : colors.accentPrimary,
+            color: currentIndex === examples.length - 1 ? colors.textMuted : 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: currentIndex === examples.length - 1 ? 'not-allowed' : 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: '500'
+          }}
+        >
+          Next →
         </button>
       </div>
 
-      {/* Footer explanation */}
+      {/* Key insight */}
       <div style={{
-        marginTop: '1.5rem',
+        marginTop: '2rem',
         padding: '1rem',
-        background: colors.bgGradient1,
+        background: colors.accentPrimary,
+        color: 'white',
         borderRadius: '8px',
         textAlign: 'center'
       }}>
         <p style={{
-          color: colors.textMuted,
-          fontSize: '0.8rem',
-          lineHeight: '1.4',
+          fontSize: '0.9rem',
+          fontWeight: '500',
           margin: '0'
         }}>
-          {isHumanLimit ? (
-            "👁️ Humans can visualize up to 3D. The perceptron doesn't care about dimensions!"
-          ) : (
-            "🤖 The perceptron algorithm works identically whether you have 2 features or 2,000!"
-          )}
+          💡 Key Insight: The perceptron algorithm is <strong>dimension-agnostic</strong>.
+          The same `sum(w * x)` operation works whether you have 2 features or 50,000!
         </p>
       </div>
     </div>
