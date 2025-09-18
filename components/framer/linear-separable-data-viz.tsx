@@ -251,7 +251,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       return;
     }
 
-    let timeouts: NodeJS.Timeout[] = [];
+    const timeouts: NodeJS.Timeout[] = [];
 
     for (let i = 0; i <= dataPoints.length; i++) {
       const timeout = setTimeout(() => {
@@ -263,7 +263,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     return () => {
       timeouts.forEach(clearTimeout);
     };
-  }, [dataPoints.length, animateDataPoints, pointAppearanceMs]);
+  }, [dataPoints, animateDataPoints, pointAppearanceMs]);
 
   // Animate line drawing
   useEffect(() => {
@@ -292,7 +292,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const startTraining = useCallback(() => {
     if (isTraining) return;
 
-    // Clear any existing timeouts first
     trainingTimeoutsRef.current.forEach(clearTimeout);
     trainingTimeoutsRef.current = [];
 
@@ -301,15 +300,53 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     setTrainingHistory([]);
     setCurrentTrainingPoint(-1);
 
-    // Initialize random weights
+    const currentDataPoints = dataPoints;
+    if (currentDataPoints.length === 0) {
+      setIsTraining(false);
+      return;
+    }
+
+    const totals = currentDataPoints.reduce(
+      (acc, point) => {
+        acc.sumX += point.x;
+        acc.sumY += point.y;
+        acc.sumX2 += point.x * point.x;
+        acc.sumY2 += point.y * point.y;
+        return acc;
+      },
+      { sumX: 0, sumY: 0, sumX2: 0, sumY2: 0 }
+    );
+
+    const pointCount = currentDataPoints.length;
+    const meanX = totals.sumX / pointCount;
+    const meanY = totals.sumY / pointCount;
+    const varianceX = Math.max(totals.sumX2 / pointCount - meanX * meanX, 1e-6);
+    const varianceY = Math.max(totals.sumY2 / pointCount - meanY * meanY, 1e-6);
+    const stdX = Math.sqrt(varianceX);
+    const stdY = Math.sqrt(varianceY);
+
+    // Normalize features so the perceptron sees a centred, unit-variance dataset (faster convergence).
+    const trainingSet = currentDataPoints.map((point, index) => ({
+      ...point,
+      normalizedX: (point.x - meanX) / stdX,
+      normalizedY: (point.y - meanY) / stdY,
+      originalIndex: index
+    }));
+
+    // Convert normalized weights back to chart coordinates for rendering.
+    const denormalizeWeights = (normalizedWeights: { a: number; b: number; c: number }) => {
+      const actualA = normalizedWeights.a / stdX;
+      const actualB = normalizedWeights.b / stdY;
+      const actualC =
+        normalizedWeights.c - (normalizedWeights.a * meanX) / stdX - (normalizedWeights.b * meanY) / stdY;
+      return { a: actualA, b: actualB, c: actualC };
+    };
+
     let weights = {
-      a: Math.random() * 2 - 1, // Random between -1 and 1
+      a: Math.random() * 2 - 1,
       b: Math.random() * 2 - 1,
       c: Math.random() * 2 - 1
     };
-
-    // Show initial random weights immediately
-    setCurrentWeights({ ...weights });
 
     const learningRate = 0.1;
     const maxEpochs = 50;
@@ -318,70 +355,68 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     let pointIndex = 0;
     let lastEpochError = -1;
 
-    // Capture current dataPoints to avoid stale closure
-    const currentDataPoints = dataPoints;
-    // Shuffle data points for this training session
-    const shuffledPoints = [...currentDataPoints].sort(() => Math.random() - 0.5);
+    const shuffledPoints = [...trainingSet].sort(() => Math.random() - 0.5);
+
+    const finalizeTraining = () => {
+      const finalWeights = denormalizeWeights(weights);
+      trainingTimeoutsRef.current.forEach(clearTimeout);
+      trainingTimeoutsRef.current = [];
+      setIsTraining(false);
+      setLearnedWeights(finalWeights);
+      setCurrentWeights(finalWeights);
+      setCurrentTrainingPoint(-1);
+    };
+
+    setCurrentWeights(denormalizeWeights(weights));
 
     const trainSinglePoint = () => {
       if (epoch >= maxEpochs || converged) {
-        setIsTraining(false);
-        setLearnedWeights(weights);
-        setCurrentTrainingPoint(-1);
+        finalizeTraining();
         return;
       }
 
-      // If we've gone through all points in this epoch, start new epoch
       if (pointIndex >= shuffledPoints.length) {
         pointIndex = 0;
         epoch++;
 
-        // Check if we had zero errors in the last epoch (converged)
         if (lastEpochError === 0) {
           converged = true;
-          setIsTraining(false);
-          setLearnedWeights(weights);
-          setCurrentTrainingPoint(-1);
+          finalizeTraining();
           return;
         }
 
-        // Reshuffle for next epoch
         shuffledPoints.sort(() => Math.random() - 0.5);
         setTrainingStep(epoch);
       }
 
       const point = shuffledPoints[pointIndex];
-      const originalPointIndex = currentDataPoints.findIndex(p => p.id === point.id);
-      setCurrentTrainingPoint(originalPointIndex);
+      setCurrentTrainingPoint(point.originalIndex);
 
-      // Calculate prediction
-      const activation = weights.a * point.x + weights.b * point.y + weights.c;
+      const activation = weights.a * point.normalizedX + weights.b * point.normalizedY + weights.c;
       const prediction = activation >= 0 ? 1 : -1;
       const trueLabel = point.label === 'cat' ? 1 : -1;
 
-      // Update weights if wrong
       let weightChanged = false;
       if (prediction !== trueLabel) {
         weightChanged = true;
-        weights.a += learningRate * trueLabel * point.x;
-        weights.b += learningRate * trueLabel * point.y;
+        weights.a += learningRate * trueLabel * point.normalizedX;
+        weights.b += learningRate * trueLabel * point.normalizedY;
         weights.c += learningRate * trueLabel;
 
-        // Update the current weights immediately for visual feedback
-        setCurrentWeights({ ...weights });
+        setCurrentWeights(denormalizeWeights(weights));
       }
 
-      // Count errors for this epoch when we complete it
       if (pointIndex === shuffledPoints.length - 1) {
         let epochErrors = 0;
         for (const p of shuffledPoints) {
-          const act = weights.a * p.x + weights.b * p.y + weights.c;
+          const act = weights.a * p.normalizedX + weights.b * p.normalizedY + weights.c;
           const pred = act >= 0 ? 1 : -1;
-          const trueL = p.label === 'cat' ? 1 : -1;
-          if (pred !== trueL) epochErrors++;
+          const labelVal = p.label === 'cat' ? 1 : -1;
+          if (pred !== labelVal) epochErrors++;
         }
 
-        setTrainingHistory(prev => [...prev, { ...weights, error: epochErrors }]);
+        const actualWeights = denormalizeWeights(weights);
+        setTrainingHistory(prev => [...prev, { ...actualWeights, error: epochErrors }]);
         lastEpochError = epochErrors;
 
         if (epochErrors === 0) {
@@ -391,15 +426,13 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
       pointIndex++;
 
-      // Continue to next point
-      const timeoutId = setTimeout(trainSinglePoint, weightChanged ? 400 : 150); // Slower if weight changed
+      const timeoutId = setTimeout(trainSinglePoint, weightChanged ? 400 : 150);
       trainingTimeoutsRef.current.push(timeoutId);
     };
 
-    // Start training
-    const initialTimeoutId = setTimeout(trainSinglePoint, 500); // Initial delay to show starting weights
+    const initialTimeoutId = setTimeout(trainSinglePoint, 500);
     trainingTimeoutsRef.current.push(initialTimeoutId);
-  }, [isTraining]);
+  }, [isTraining, dataPoints]);
 
   // Calculate line points for SVG with proper clipping
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
