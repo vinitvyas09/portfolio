@@ -72,7 +72,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   // Perceptron training state
   const [learnedWeights, setLearnedWeights] = useState<{ a: number; b: number; c: number } | null>(null);
+  const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
   const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number }>>([]);
+  const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
 
   // True separating line (ground truth) - changes when new data is generated
   const trueLine = useMemo(() => {
@@ -100,14 +102,25 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     const pointsPerClass = 25;
 
     for (let i = 0; i < pointsPerClass; i++) {
-      // Generate cats (Ax + By + C >= 0 region)
+      // Generate cats (Ax + By + C >= margin region) - well above the line
       let catX, catY;
       let attempts = 0;
+      const minMargin = 2; // Minimum distance from separating line
       do {
         catX = 12 + seededRandom(i * 2) * 6; // 12-18 hours sleep
         catY = 8 + seededRandom(i * 2 + 1) * 10;  // 8-18 mph speed
         attempts++;
-      } while ((a * catX + b * catY + c < 0) && attempts < 50);
+      } while ((a * catX + b * catY + c < minMargin) && attempts < 100);
+
+      // If we couldn't find a good point, force it into the correct region
+      if (attempts >= 100) {
+        catX = 15 + seededRandom(i * 2) * 3; // Safer range
+        catY = 8 + seededRandom(i * 2 + 1) * 6;
+        // Ensure it's well in the cat region
+        while (a * catX + b * catY + c < minMargin) {
+          catY += 0.5; // Move up to ensure it's in cat region
+        }
+      }
 
       points.push({
         x: catX,
@@ -116,14 +129,24 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         id: `cat-${i}-${dataGeneration}`
       });
 
-      // Generate dogs (Ax + By + C < 0 region)
+      // Generate dogs (Ax + By + C <= -margin region) - well below the line
       let dogX, dogY;
       attempts = 0;
       do {
         dogX = 8 + seededRandom(i * 2 + 100) * 8;   // 8-16 hours sleep
         dogY = 15 + seededRandom(i * 2 + 101) * 12; // 15-27 mph speed
         attempts++;
-      } while ((a * dogX + b * dogY + c >= 0) && attempts < 50);
+      } while ((a * dogX + b * dogY + c > -minMargin) && attempts < 100);
+
+      // If we couldn't find a good point, force it into the correct region
+      if (attempts >= 100) {
+        dogX = 10 + seededRandom(i * 2 + 100) * 4; // Safer range
+        dogY = 18 + seededRandom(i * 2 + 101) * 8;
+        // Ensure it's well in the dog region
+        while (a * dogX + b * dogY + c > -minMargin) {
+          dogY += 0.5; // Move up to ensure it's in dog region
+        }
+      }
 
       points.push({
         x: dogX,
@@ -140,10 +163,12 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const generateNewData = useCallback(() => {
     setDataGeneration(prev => prev + 1);
     setLearnedWeights(null);
+    setCurrentWeights(null);
     setTrainingHistory([]);
     setIsTraining(false);
     setShowLine(false);
     setVisiblePoints(0);
+    setCurrentTrainingPoint(-1);
   }, []);
 
   // Color palette
@@ -242,13 +267,14 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     }
   }, [showSeparatingLine, animateLineDrawing]);
 
-  // Perceptron training algorithm
+  // Perceptron training algorithm with real-time weight updates
   const startTraining = useCallback(() => {
     if (isTraining) return;
 
     setIsTraining(true);
     setTrainingStep(0);
     setTrainingHistory([]);
+    setCurrentTrainingPoint(-1);
 
     // Initialize random weights
     let weights = {
@@ -257,55 +283,94 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       c: Math.random() * 2 - 1
     };
 
+    // Show initial random weights immediately
+    setCurrentWeights({ ...weights });
+
     const learningRate = 0.1;
     const maxEpochs = 50;
     let epoch = 0;
     let converged = false;
+    let pointIndex = 0;
 
-    const trainStep = () => {
+    // Shuffle data points for this training session
+    const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
+
+    const trainSinglePoint = () => {
       if (epoch >= maxEpochs || converged) {
         setIsTraining(false);
         setLearnedWeights(weights);
+        setCurrentTrainingPoint(-1);
         return;
       }
 
-      let errors = 0;
+      // If we've gone through all points in this epoch, start new epoch
+      if (pointIndex >= shuffledPoints.length) {
+        pointIndex = 0;
+        epoch++;
 
-      // Shuffle data points for this epoch
-      const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
+        // Check if we had zero errors in the last epoch (converged)
+        if (trainingHistory.length > 0 && trainingHistory[trainingHistory.length - 1].error === 0) {
+          converged = true;
+          setIsTraining(false);
+          setLearnedWeights(weights);
+          setCurrentTrainingPoint(-1);
+          return;
+        }
 
-      for (const point of shuffledPoints) {
-        // Calculate prediction
-        const activation = weights.a * point.x + weights.b * point.y + weights.c;
-        const prediction = activation >= 0 ? 1 : -1;
-        const trueLabel = point.label === 'cat' ? 1 : -1;
+        // Reshuffle for next epoch
+        shuffledPoints.sort(() => Math.random() - 0.5);
+        setTrainingStep(epoch);
+      }
 
-        // Update weights if wrong
-        if (prediction !== trueLabel) {
-          errors++;
-          weights.a += learningRate * trueLabel * point.x;
-          weights.b += learningRate * trueLabel * point.y;
-          weights.c += learningRate * trueLabel;
+      const point = shuffledPoints[pointIndex];
+      const originalPointIndex = dataPoints.findIndex(p => p.id === point.id);
+      setCurrentTrainingPoint(originalPointIndex);
+
+      // Calculate prediction
+      const activation = weights.a * point.x + weights.b * point.y + weights.c;
+      const prediction = activation >= 0 ? 1 : -1;
+      const trueLabel = point.label === 'cat' ? 1 : -1;
+
+      // Update weights if wrong
+      let weightChanged = false;
+      if (prediction !== trueLabel) {
+        weightChanged = true;
+        weights.a += learningRate * trueLabel * point.x;
+        weights.b += learningRate * trueLabel * point.y;
+        weights.c += learningRate * trueLabel;
+
+        // Update the current weights immediately for visual feedback
+        setCurrentWeights({ ...weights });
+      }
+
+      // Count errors for this epoch when we complete it
+      if (pointIndex === shuffledPoints.length - 1) {
+        let epochErrors = 0;
+        for (const p of shuffledPoints) {
+          const act = weights.a * p.x + weights.b * p.y + weights.c;
+          const pred = act >= 0 ? 1 : -1;
+          const trueL = p.label === 'cat' ? 1 : -1;
+          if (pred !== trueL) epochErrors++;
+        }
+
+        setTrainingHistory(prev => [...prev, { ...weights, error: epochErrors }]);
+
+        if (epochErrors === 0) {
+          converged = true;
         }
       }
 
-      // Record training history
-      setTrainingHistory(prev => [...prev, { ...weights, error: errors }]);
+      pointIndex++;
 
-      if (errors === 0) {
-        converged = true;
-      }
-
-      setTrainingStep(epoch);
-      epoch++;
-
-      setTimeout(trainStep, 200); // Continue training
+      // Continue to next point
+      setTimeout(trainSinglePoint, weightChanged ? 400 : 150); // Slower if weight changed
     };
 
-    trainStep();
-  }, [isTraining, dataPoints]);
+    // Start training
+    setTimeout(trainSinglePoint, 500); // Initial delay to show starting weights
+  }, [isTraining, dataPoints, trainingHistory]);
 
-  // Calculate line points for SVG
+  // Calculate line points for SVG with proper clipping
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
     const line = lineParams || trueLine;
     const { a, b, c } = line;
@@ -315,21 +380,59 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       // Nearly vertical line
       const x = -c / a;
       return {
-        x1: scaleX(x),
+        x1: scaleX(Math.max(xMin, Math.min(xMax, x))),
         y1: scaleY(yMin),
-        x2: scaleX(x),
+        x2: scaleX(Math.max(xMin, Math.min(xMax, x))),
         y2: scaleY(yMax)
       };
     }
 
+    // Calculate potential intersection points with chart boundaries
+    const intersections = [];
+
+    // Left edge (x = xMin)
+    const yAtXMin = -(a * xMin + c) / b;
+    if (yAtXMin >= yMin && yAtXMin <= yMax) {
+      intersections.push({ x: xMin, y: yAtXMin });
+    }
+
+    // Right edge (x = xMax)
+    const yAtXMax = -(a * xMax + c) / b;
+    if (yAtXMax >= yMin && yAtXMax <= yMax) {
+      intersections.push({ x: xMax, y: yAtXMax });
+    }
+
+    // Top edge (y = yMax)
+    const xAtYMax = -(b * yMax + c) / a;
+    if (xAtYMax >= xMin && xAtYMax <= xMax) {
+      intersections.push({ x: xAtYMax, y: yMax });
+    }
+
+    // Bottom edge (y = yMin)
+    const xAtYMin = -(b * yMin + c) / a;
+    if (xAtYMin >= xMin && xAtYMin <= xMax) {
+      intersections.push({ x: xAtYMin, y: yMin });
+    }
+
+    // Use the first two valid intersections
+    if (intersections.length >= 2) {
+      return {
+        x1: scaleX(intersections[0].x),
+        y1: scaleY(intersections[0].y),
+        x2: scaleX(intersections[1].x),
+        y2: scaleY(intersections[1].y)
+      };
+    }
+
+    // Fallback to simple calculation if intersection method fails
     const y1 = -(a * xMin + c) / b;
     const y2 = -(a * xMax + c) / b;
 
     return {
       x1: scaleX(xMin),
-      y1: scaleY(y1),
+      y1: scaleY(Math.max(yMin, Math.min(yMax, y1))),
       x2: scaleX(xMax),
-      y2: scaleY(y2)
+      y2: scaleY(Math.max(yMin, Math.min(yMax, y2)))
     };
   };
 
@@ -462,66 +565,94 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           </>
         )}
 
-        {/* True separating line (ground truth) */}
-        {(showSeparatingLine || showLine) && !learnedWeights && (
-          <g>
-            {(() => {
-              const { x1, y1, x2, y2 } = getLinePoints(trueLine);
-              return (
-                <line
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={colors.lineColor}
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  filter="url(#glow)"
-                  opacity={animateLineDrawing ? 0 : 0.7}
-                  strokeDasharray="5,5"
-                >
-                  {animateLineDrawing && (
-                    <animate
-                      attributeName="opacity"
-                      from="0"
-                      to="0.7"
-                      dur={`${lineAnimationMs}ms`}
-                      fill="freeze"
-                    />
-                  )}
-                </line>
-              );
-            })()}
-          </g>
-        )}
+        {/* All lines clipped to chart area */}
+        <g clipPath="url(#chartClip)">
+          {/* True separating line (ground truth) */}
+          {(showSeparatingLine || showLine) && !currentWeights && !learnedWeights && (
+            <g>
+              {(() => {
+                const { x1, y1, x2, y2 } = getLinePoints(trueLine);
+                return (
+                  <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke={colors.lineColor}
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    filter="url(#glow)"
+                    opacity={animateLineDrawing ? 0 : 0.7}
+                    strokeDasharray="5,5"
+                  >
+                    {animateLineDrawing && (
+                      <animate
+                        attributeName="opacity"
+                        from="0"
+                        to="0.7"
+                        dur={`${lineAnimationMs}ms`}
+                        fill="freeze"
+                      />
+                    )}
+                  </line>
+                );
+              })()}
+            </g>
+          )}
 
-        {/* Learned line (from perceptron training) */}
-        {learnedWeights && (
-          <g>
-            {(() => {
-              const { x1, y1, x2, y2 } = getLinePoints(learnedWeights);
-              return (
-                <line
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={colors.lineColor}
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  filter="url(#glow)"
-                  opacity="1"
-                />
-              );
-            })()}
-          </g>
-        )}
+          {/* Current training line (real-time updates) */}
+          {currentWeights && isTraining && (
+            <g>
+              {(() => {
+                const { x1, y1, x2, y2 } = getLinePoints(currentWeights);
+                return (
+                  <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#f59e0b"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    filter="url(#glow)"
+                    opacity="0.9"
+                    style={{
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                );
+              })()}
+            </g>
+          )}
+
+          {/* Final learned line (from perceptron training) */}
+          {learnedWeights && !isTraining && (
+            <g>
+              {(() => {
+                const { x1, y1, x2, y2 } = getLinePoints(learnedWeights);
+                return (
+                  <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke={colors.lineColor}
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    filter="url(#glow)"
+                    opacity="1"
+                  />
+                );
+              })()}
+            </g>
+          )}
+        </g>
 
         {/* Data points */}
         {dataPoints.slice(0, visiblePoints).map((point, index) => {
-          const isTrainingPoint = isTraining && index === trainingStep % dataPoints.length;
+          const isCurrentTrainingPoint = isTraining && index === currentTrainingPoint;
           const color = point.label === 'cat' ? colors.catColor : colors.dogColor;
-          const radius = isTrainingPoint ? 8 : 6;
+          const radius = isCurrentTrainingPoint ? 9 : 6;
 
           return (
             <g key={point.id}>
@@ -542,7 +673,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                 stroke={color}
                 strokeWidth="2"
                 opacity={animateDataPoints ? 0 : 1}
-                filter={isTrainingPoint ? "url(#glow)" : ""}
+                filter={isCurrentTrainingPoint ? "url(#glow)" : ""}
                 style={{
                   cursor: interactive ? 'pointer' : 'default',
                   transition: 'all 0.3s ease'
@@ -559,7 +690,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                   />
                 )}
 
-                {isTrainingPoint && (
+                {isCurrentTrainingPoint && (
                   <animate
                     attributeName="r"
                     values={`${radius};${radius + 3};${radius}`}
@@ -776,8 +907,26 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               textAlign: 'center'
             }}>
               <div>Epoch: {trainingStep} / 50</div>
+              {currentWeights && (
+                <div style={{
+                  marginTop: '0.5rem',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  background: colors.bgGradient1,
+                  padding: '0.5rem',
+                  borderRadius: '4px',
+                  border: `1px solid ${colors.borderColor}`
+                }}>
+                  Current: {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
+                </div>
+              )}
+              {currentTrainingPoint >= 0 && (
+                <div style={{ marginTop: '0.25rem', fontSize: '11px' }}>
+                  Training on point {currentTrainingPoint + 1} ({dataPoints[currentTrainingPoint]?.label})
+                </div>
+              )}
               {trainingHistory.length > 0 && (
-                <div>Errors: {trainingHistory[trainingHistory.length - 1]?.error || 0}</div>
+                <div>Last epoch errors: {trainingHistory[trainingHistory.length - 1]?.error || 0}</div>
               )}
             </div>
           )}
@@ -817,15 +966,16 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           )}
 
           {/* Legend for lines */}
-          {(showSeparatingLine || learnedWeights) && (
+          {(showSeparatingLine || learnedWeights || currentWeights) && (
             <div style={{
               display: 'flex',
               justifyContent: 'center',
-              gap: '2rem',
+              gap: '1.5rem',
               fontSize: '12px',
-              color: colors.textSecondary
+              color: colors.textSecondary,
+              flexWrap: 'wrap'
             }}>
-              {showSeparatingLine && !learnedWeights && (
+              {showSeparatingLine && !currentWeights && !learnedWeights && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <div style={{
                     width: '20px',
@@ -838,7 +988,18 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                   <span>True boundary</span>
                 </div>
               )}
-              {learnedWeights && (
+              {currentWeights && isTraining && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{
+                    width: '20px',
+                    height: '3px',
+                    background: '#f59e0b',
+                    borderRadius: '1px'
+                  }} />
+                  <span>Learning...</span>
+                </div>
+              )}
+              {learnedWeights && !isTraining && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <div style={{
                     width: '20px',
