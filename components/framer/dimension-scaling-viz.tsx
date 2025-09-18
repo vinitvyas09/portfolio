@@ -247,24 +247,59 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
 
       } else {
         // Higher dimensions - show 2D projection
-        if (showProjection) {
+        if (showProjection || step.dims === 10) {
           // Draw projection explanation
           ctx.font = '14px system-ui';
           ctx.fillStyle = colors.textSecondary || '#9ca3af';
           ctx.textAlign = 'center';
           ctx.fillText('2D Projection of ' + step.dims + 'D space', centerX, 30);
 
-          // Project high-dimensional data to 2D using first 2 principal components
-          dataPoints.forEach(point => {
-            // Simple projection: just use first 2 dimensions
-            const x = centerX + (point.x[0] || 0) * 150;
-            const y = centerY - (point.x[1] || 0) * 150;
+          // Animated projection for 10D
+          if (step.dims === 10) {
+            // Create rotating projection matrix for smooth animation
+            const projAngle = frameCount * 0.02;
+            dataPoints.forEach((point, i) => {
+              // Project using rotating basis vectors
+              const projX = point.x[0] * Math.cos(projAngle) + (point.x[1] || 0) * Math.sin(projAngle);
+              const projY = (point.x[2] || 0) * Math.cos(projAngle + Math.PI/3) + (point.x[3] || 0) * Math.sin(projAngle + Math.PI/3);
 
-            ctx.fillStyle = point.label === 0 ? colors.accentSecondary + '80' : colors.accentPrimary + '80';
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fill();
-          });
+              const x = centerX + projX * 120;
+              const y = centerY - projY * 120;
+
+              // Pulsing effect to show dimension reduction
+              const pulse = Math.sin(frameCount * 0.05 + i * 0.2) * 0.3 + 0.7;
+              ctx.fillStyle = point.label === 0 ?
+                (colors.accentSecondary || '#34d399') + Math.floor(pulse * 255).toString(16).padStart(2, '0') :
+                (colors.accentPrimary || '#8b5cf6') + Math.floor(pulse * 255).toString(16).padStart(2, '0');
+              ctx.beginPath();
+              ctx.arc(x, y, 4 + pulse * 2, 0, Math.PI * 2);
+              ctx.fill();
+            });
+
+            // Draw dimension indicators
+            for (let d = 0; d < 10; d++) {
+              const angle = (d / 10) * Math.PI * 2;
+              const radius = 140;
+              const x = centerX + Math.cos(angle) * radius;
+              const y = centerY + Math.sin(angle) * radius;
+
+              ctx.fillStyle = (colors.textSecondary || '#9ca3af') + '40';
+              ctx.font = '10px system-ui';
+              ctx.textAlign = 'center';
+              ctx.fillText(`d${d+1}`, x, y);
+            }
+          } else {
+            // Simple static projection for higher dimensions
+            dataPoints.forEach(point => {
+              const x = centerX + (point.x[0] || 0) * 150;
+              const y = centerY - (point.x[1] || 0) * 150;
+
+              ctx.fillStyle = point.label === 0 ? (colors.accentSecondary || '#34d399') + '60' : (colors.accentPrimary || '#8b5cf6') + '60';
+              ctx.beginPath();
+              ctx.arc(x, y, 3, 0, Math.PI * 2);
+              ctx.fill();
+            });
+          }
 
           // Show that decision boundary still exists
           ctx.strokeStyle = colors.accentPrimary + '60';
@@ -349,7 +384,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
     setShowProjection(false);
 
     // Auto-show projection for high dimensions
-    if (steps[stepIndex].dims > 3) {
+    if (steps[stepIndex].dims >= 10) {
       setTimeout(() => setShowProjection(true), 500);
     }
 
@@ -396,7 +431,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
       transition: 'all 0.3s ease'
     }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <h3 style={{
           fontSize: '1.8rem',
           fontWeight: 'bold',
@@ -415,74 +450,138 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         </p>
       </div>
 
-      {/* Main Visualization Area */}
+      {/* Modern Progress Bar */}
       <div style={{
-        position: 'relative',
-        height: '350px',
-        marginBottom: '1.5rem',
-        background: `radial-gradient(ellipse at center, ${colors.shadowColor}, transparent)`,
-        borderRadius: '12px',
-        overflow: 'hidden'
+        marginBottom: '2rem',
+        padding: '0 2rem'
       }}>
-        {/* 3D Canvas */}
-        <canvas
-          ref={canvasRef}
-          width={800}
-          height={350}
-          style={{
-            width: '100%',
-            height: '100%',
-            opacity: isAnimating ? 0.3 : 1,
-            transition: 'opacity 0.3s ease'
-          }}
-        />
-
-        {/* Current Step Info */}
         <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          background: colors.bg + 'ee',
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${colors.borderColor}`,
-          borderRadius: '8px',
-          padding: '1rem',
-          maxWidth: '260px'
+          position: 'relative',
+          height: '4px',
+          background: colors.borderColor,
+          borderRadius: '2px',
+          overflow: 'hidden'
         }}>
           <div style={{
-            fontSize: '1.2rem',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            height: '100%',
+            width: `${((currentStep + 1) / steps.length) * 100}%`,
+            background: `linear-gradient(90deg, ${colors.accentSecondary}, ${colors.accentPrimary})`,
+            borderRadius: '2px',
+            transition: 'width 0.5s ease'
+          }} />
+
+          {/* Step dots */}
+          {steps.map((step, index) => {
+            const isActive = currentStep === index;
+            const isPast = currentStep > index;
+            const position = ((index + 0.5) / steps.length) * 100;
+
+            return (
+              <div
+                key={index}
+                onClick={() => handleStepChange(index)}
+                style={{
+                  position: 'absolute',
+                  left: `${position}%`,
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  cursor: 'pointer',
+                  zIndex: 2
+                }}
+              >
+                <div style={{
+                  width: isActive ? '20px' : '12px',
+                  height: isActive ? '20px' : '12px',
+                  borderRadius: '50%',
+                  background: isActive || isPast ? colors.accentPrimary : colors.bg,
+                  border: `2px solid ${isActive || isPast ? colors.accentPrimary : colors.borderColor}`,
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {isActive && (
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      background: 'white'
+                    }} />
+                  )}
+                </div>
+
+                {/* Dimension label below */}
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontSize: '0.75rem',
+                  color: isActive ? colors.textPrimary : colors.textSecondary,
+                  fontWeight: isActive ? 'bold' : 'normal',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {step.dims}{step.dims >= 1000 ? 'k' : ''}D
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Info and Math Panels Side by Side */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '1.5rem',
+        marginBottom: '1.5rem'
+      }}>
+        {/* Current Step Info */}
+        <div style={{
+          background: colors.bg,
+          border: `1px solid ${colors.borderColor}`,
+          borderRadius: '8px',
+          padding: '1.25rem'
+        }}>
+          <div style={{
+            fontSize: '1.3rem',
             fontWeight: 'bold',
             color: colors.accentPrimary,
-            marginBottom: '0.5rem'
+            marginBottom: '0.75rem'
           }}>
             {steps[currentStep]?.title}
           </div>
           <div style={{
-            fontSize: '0.85rem',
+            fontSize: '0.9rem',
             color: colors.textSecondary,
-            marginBottom: '0.75rem'
+            marginBottom: '0.75rem',
+            lineHeight: 1.5
           }}>
             {steps[currentStep]?.example}
           </div>
           <div style={{
-            fontSize: '0.8rem',
+            fontSize: '0.85rem',
             color: colors.textSecondary,
-            marginBottom: '0.5rem'
+            marginBottom: '1rem'
           }}>
-            Features: {steps[currentStep]?.features.slice(0, 3).join(', ')}
-            {steps[currentStep]?.dims > 3 && '...'}
+            <strong>Features:</strong> {steps[currentStep]?.features.slice(0, 3).join(', ')}
+            {steps[currentStep]?.dims > 3 && ` + ${steps[currentStep]?.dims - 3} more`}
           </div>
           {steps[currentStep]?.dims <= 3 && (
             <button
               onClick={simulateTraining}
               disabled={isTraining}
               style={{
-                padding: '0.4rem 0.8rem',
+                padding: '0.5rem 1rem',
                 background: isTraining ? colors.borderColor : colors.accentPrimary,
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
-                fontSize: '0.85rem',
+                fontSize: '0.9rem',
+                fontWeight: '600',
                 cursor: isTraining ? 'default' : 'pointer',
                 transition: 'all 0.2s'
               }}
@@ -494,37 +593,76 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
 
         {/* Math Panel */}
         <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          background: colors.bg + 'ee',
-          backdropFilter: 'blur(10px)',
+          background: isDark ? colors.bg : '#f8fafb',
           border: `1px solid ${colors.borderColor}`,
           borderRadius: '8px',
-          padding: '0.75rem 1rem',
-          fontFamily: 'monospace',
-          fontSize: '0.9rem',
-          color: colors.mathColor
+          padding: '1.25rem'
         }}>
-          <div style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            Same Update Rule:
+          <div style={{ marginBottom: '0.75rem', fontWeight: 'bold', color: colors.textPrimary }}>
+            🔢 The Math Stays Simple:
           </div>
-          <div style={{ fontSize: '0.8rem' }}>
-            if (wrong) {'{'}  <br />
-            {'  '}w = w + y·x<br />
+          <div style={{
+            fontFamily: 'monospace',
+            fontSize: '0.95rem',
+            color: colors.mathColor,
+            background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)',
+            padding: '0.75rem',
+            borderRadius: '6px',
+            marginBottom: '0.75rem'
+          }}>
+            <div>y = sign({steps[currentStep]?.dims <= 3 ? (
+              <span>w₁x₁ + w₂x₂{steps[currentStep]?.dims === 3 ? ' + w₃x₃' : ''} + b</span>
+            ) : (
+              <span>Σ(wᵢxᵢ) + b</span>
+            )})</div>
+          </div>
+          <div style={{
+            fontFamily: 'monospace',
+            fontSize: '0.85rem',
+            color: colors.textSecondary,
+            background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)',
+            padding: '0.5rem',
+            borderRadius: '4px'
+          }}>
+            if (prediction ≠ label) {'{'}<br />
+            {'  '}w = w + α·y·x<br />
             {'}'}
           </div>
           <div style={{
-            fontSize: '0.7rem',
+            fontSize: '0.8rem',
             color: colors.textSecondary,
-            marginTop: '0.5rem'
+            marginTop: '0.75rem',
+            fontStyle: 'italic'
           }}>
-            Works for {steps[currentStep]?.dims.toLocaleString()} dimensions!
+            {steps[currentStep]?.dims.toLocaleString()} weights to learn!
           </div>
         </div>
       </div>
 
-      {/* Step Navigation */}
+      {/* Main Visualization Area */}
+      <div style={{
+        position: 'relative',
+        height: '400px',
+        background: `radial-gradient(ellipse at center, ${colors.shadowColor}, transparent)`,
+        borderRadius: '12px',
+        overflow: 'hidden',
+        border: `1px solid ${colors.borderColor}`
+      }}>
+        {/* 3D Canvas */}
+        <canvas
+          ref={canvasRef}
+          width={800}
+          height={400}
+          style={{
+            width: '100%',
+            height: '100%',
+            opacity: isAnimating ? 0.3 : 1,
+            transition: 'opacity 0.3s ease'
+          }}
+        />
+      </div>
+
+      {/* Removed old step navigation - now using modern progress bar above */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
