@@ -423,7 +423,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '200px',
+        height: '280px',
         background: colors.dimensionBg,
         borderRadius: '8px',
         marginBottom: '1.5rem',
