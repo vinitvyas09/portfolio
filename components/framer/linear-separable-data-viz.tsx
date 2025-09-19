@@ -278,7 +278,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   // Chart dimensions and scales
   const chartWidth = 600;
   const chartHeight = 400;
-  const padding = 60;
+  const padding = 48;
   const innerWidth = chartWidth - 2 * padding;
   const innerHeight = chartHeight - 2 * padding;
 
@@ -611,7 +611,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   return (
     <div style={{
-      padding: '2rem',
+      padding: '1.5rem 1.5rem 1rem',
       background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
       border: `1px solid ${colors.borderColor}`,
       borderRadius: '12px',
@@ -624,8 +624,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     }}>
       <svg
         width="100%"
-        height={chartHeight + 100}
-        viewBox={`0 0 ${chartWidth} ${chartHeight + 100}`}
+        height={chartHeight + 70}
+        viewBox={`0 0 ${chartWidth} ${chartHeight + 70}`}
         style={{ maxWidth: '700px', margin: '0 auto', display: 'block' }}
       >
         <defs>
