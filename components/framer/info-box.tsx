@@ -568,10 +568,10 @@ const InfoBox: React.FC<InfoBoxProps> = ({
   const gradientStartVar = "var(--info-gradient-start)";
   const gradientEndVar = "var(--info-gradient-end)";
 
-  const proseStyle: React.CSSProperties = {
+  const proseStyle = {
     "--tw-prose-body": "var(--info-prose-body)",
     "--tw-prose-links": accentVar,
-  };
+  } as React.CSSProperties;
 
   const proseClasses = [
     "prose prose-sm max-w-none leading-relaxed",
