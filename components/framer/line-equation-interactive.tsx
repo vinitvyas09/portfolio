@@ -50,6 +50,8 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
   }
 }) => {
   const [mounted, setMounted] = useState(false);
+
+  // Use theme hook - this should work if ThemeProvider is properly set up
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
