@@ -208,21 +208,19 @@ But what about points that are NOT on the line?
 
 Here's the interesting part: if you plug any point's coordinates into that equation, the result tells you everything:
 
-{/*
 <LineEquationInteractive
 config={{
 equation: "2x + 3y - 6 = 0",
 showRegions: true,
 testPoints: [
-{ x: 1, y: 3, label: "Sleepy cat" },
-{ x: 3, y: 1, label: "Energetic dog" },
-{ x: 2, y: 0.67, label: "On the fence" }
+{ x: 1, y: 0.5, label: "Sleepy cat" },
+{ x: 2, y: 2.5, label: "Energetic dog" },
+{ x: 1.5, y: 1, label: "On the fence" }
 ],
 animateCalculation: true,
 showDistanceFormula: false
 }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag points around to see how the equation's value changes. Notice the pattern?</p>
 The trick is stupidly simple:
