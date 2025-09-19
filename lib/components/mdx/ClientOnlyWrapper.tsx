@@ -17,8 +17,3 @@ export const InfoBox = dynamic(
   () => import('../../../components/framer/info-box'),
   { ssr: false }
 );
-
-export const PerceptronLineConnection = dynamic(
-  () => import('../../../components/framer/perceptron-line-connection'),
-  { ssr: false }
-);
