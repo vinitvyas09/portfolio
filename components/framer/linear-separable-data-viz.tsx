@@ -277,8 +277,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   // Chart dimensions and scales
   const chartWidth = 600;
-  const chartHeight = 400;
-  const padding = 48;
+  const chartHeight = 360;
+  const padding = 40;
   const innerWidth = chartWidth - 2 * padding;
   const innerHeight = chartHeight - 2 * padding;
 
@@ -611,11 +611,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   return (
     <div style={{
-      padding: '1.5rem 1.5rem 1rem',
+      padding: '1rem 1.5rem 0.75rem',
       background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
       border: `1px solid ${colors.borderColor}`,
       borderRadius: '12px',
-      margin: '2rem 0',
+      margin: '1.5rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       boxShadow: isDark
         ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
@@ -624,8 +624,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     }}>
       <svg
         width="100%"
-        height={chartHeight + 70}
-        viewBox={`0 0 ${chartWidth} ${chartHeight + 70}`}
+        height={chartHeight + 40}
+        viewBox={`0 0 ${chartWidth} ${chartHeight + 40}`}
         style={{ maxWidth: '700px', margin: '0 auto', display: 'block' }}
       >
         <defs>
@@ -877,7 +877,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         {/* Axis labels */}
         <text
           x={chartWidth / 2}
-          y={chartHeight - 20}
+          y={chartHeight + 5}
           textAnchor="middle"
           fontSize="14"
           fontWeight="500"
@@ -887,13 +887,13 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         </text>
 
         <text
-          x={25}
+          x={20}
           y={chartHeight / 2}
           textAnchor="middle"
           fontSize="14"
           fontWeight="500"
           fill={colors.textPrimary}
-          transform={`rotate(-90, 25, ${chartHeight / 2})`}
+          transform={`rotate(-90, 20, ${chartHeight / 2})`}
         >
           {yAxis}
         </text>
@@ -937,8 +937,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           display: 'flex',
           justifyContent: 'center',
           gap: '2rem',
-          marginTop: '0.5rem',
-          padding: '1rem',
+          marginTop: '0.25rem',
+          padding: '0.75rem',
           background: colors.bgGradient1,
           borderRadius: '8px',
           border: `1px solid ${colors.borderColor}`
@@ -973,11 +973,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       {/* Interactive controls */}
       {interactive && (
         <div style={{
-          marginTop: '1.5rem',
+          marginTop: '1rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1rem'
+          gap: '0.75rem'
         }}>
           <div style={{
             display: 'flex',
