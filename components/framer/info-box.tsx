@@ -630,33 +630,42 @@ const InfoBox: React.FC<InfoBoxProps> = ({
         transition={{ duration: 5.6, repeat: Infinity, ease: "easeInOut" }}
       />
       <div className="relative z-10 p-6 md:p-7">
-        <div className="flex flex-col gap-6 md:flex-row md:items-stretch md:justify-between">
-          <div className="flex flex-1 items-start gap-4">
-            <div
-              className={`flex-shrink-0 rounded-xl p-2.5 shadow-inner ${scheme.iconBg}`}
+        <div className="flex items-start gap-4">
+          <div
+            className={`flex-shrink-0 rounded-xl p-2.5 shadow-inner ${scheme.iconBg}`}
+          >
+            <Icon className={`h-5 w-5 ${scheme.iconColor}`} strokeWidth={2.5} />
+          </div>
+          <div className="flex-1 space-y-3">
+            <h4
+              className={`text-base font-semibold tracking-tight ${scheme.titleColor}`}
             >
-              <Icon className={`h-5 w-5 ${scheme.iconColor}`} strokeWidth={2.5} />
-            </div>
-            <div className="flex-1 space-y-3">
-              <h4
-                className={`text-base font-semibold tracking-tight ${scheme.titleColor}`}
-              >
-                {title}
-              </h4>
+              {title}
+            </h4>
+            {visual === "hyperplane" ? (
+              <>
+                <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                  <div className={`${proseClasses} md:flex-1`} style={proseStyle}>
+                    {React.Children.toArray(children).slice(0, 2)}
+                  </div>
+                  <HyperplaneAnimation
+                    accent={accentVar}
+                    accentSoft={accentSoftVar}
+                    accentMuted={accentMutedVar}
+                    neutral={neutralVar}
+                    textClass={scheme.visualText}
+                  />
+                </div>
+                <div className={proseClasses} style={proseStyle}>
+                  {React.Children.toArray(children).slice(2)}
+                </div>
+              </>
+            ) : (
               <div className={proseClasses} style={proseStyle}>
                 {children}
               </div>
-            </div>
+            )}
           </div>
-          {visual === "hyperplane" && (
-            <HyperplaneAnimation
-              accent={accentVar}
-              accentSoft={accentSoftVar}
-              accentMuted={accentMutedVar}
-              neutral={neutralVar}
-              textClass={scheme.visualText}
-            />
-          )}
         </div>
       </div>
     </div>
