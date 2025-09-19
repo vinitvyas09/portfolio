@@ -441,21 +441,21 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
             );
           })}
 
-          {/* Equation label on the line */}
-          {linePoints.length === 2 && (
+          {/* Equation label */}
+          {config.equation && (
             <text
-              x={toSvgX((linePoints[0].x + linePoints[1].x) / 2)}
-              y={toSvgY((linePoints[0].y + linePoints[1].y) / 2) - 10}
+              x={padding - 10}
+              y={padding - 20}
               fill={colors.lineColor}
               fontSize="14"
               fontWeight="bold"
-              textAnchor="middle"
+              textAnchor="start"
               fontFamily="monospace"
               style={{
                 filter: `drop-shadow(0 0 4px ${colors.bgGradient1})`
               }}
             >
-              {config.equation?.replace('=0', '').replace(/\s/g, '')} = 0
+              {config.equation.replace('=0', '').replace(/\s/g, '')} = 0
             </text>
           )}
         </svg>
