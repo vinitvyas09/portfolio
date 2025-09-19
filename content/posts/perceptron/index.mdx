@@ -1281,52 +1281,6 @@ In practice, I'd always recommend the averaged perceptron. The extra code comple
 
 
 
-## Coming Next: Advanced Topics
-
-### The Convergence Theorem
-- **When will a perceptron converge?**
-  - Only if data is linearly separable
-  - Interactive examples of convergent vs non-convergent datasets
-- **The concept of margin (γ)**
-  - Distance from decision boundary to nearest point
-  - Large margins = easy problems
-  - Small margins = hard problems
-- **Proof of convergence**
-  - Upper bound on number of updates needed
-  - Relationship to margin size
-  - What the proof guarantees (and doesn't)
-
-### Modern Perceptron Variations
-- **The late-update problem**
-  - Why vanilla perceptron overweights recent examples
-- **Voted perceptron**
-  - Weight vectors vote proportional to survival time
-  - Better generalization, but impractical storage
-- **Averaged perceptron**
-  - Maintains running average of weight vectors
-  - Practical implementation with same efficiency
-  - Almost always better than vanilla perceptron
-
-### The XOR Problem: When Lines Aren't Enough
-- **Non-linearly separable data**
-  - Real-world XOR: sentiment with negation
-  - Visual demonstration of impossible separation
-- **Historical significance**
-  - The problem that caused the first AI winter
-  - Why it killed linear classifier research for decades
-- **Solutions and workarounds**
-  - Feature engineering (pairs, triples)
-  - Preview: Neural networks (Chapter 10)
-  - Preview: Kernel methods (Chapter 11)
-
-### The "Wait, That's It?" Moment
-- **The power of simplicity**
-  - Just a weighted sum with threshold
-  - Parallels: wheel, electricity, perceptron
-- **From simple beginnings to modern AI**
-  - Building block of deep learning
-  - The foundation that enabled GPTs and diffusion models
-
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
 https://towardsdatascience.com/explain-like-im-five-artificial-neurons-b7c475b56189/
