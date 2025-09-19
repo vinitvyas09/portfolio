@@ -342,6 +342,16 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
   const sliderMin = currentDomain.min;
   const sliderMax = currentDomain.max;
   const sliderStep = Math.max(0.01, Number.parseFloat(((sliderMax - sliderMin) / 200).toFixed(3)));
+  const xAxisY = currentFunction.range.min <= 0 && currentFunction.range.max >= 0
+    ? toSvgY(0)
+    : padding + graphHeight;
+  const yAxisX = currentDomain.min <= 0 && currentDomain.max >= 0
+    ? toSvgX(0)
+    : padding;
+  const tickLength = 4;
+  const xTickLabelY = xAxisY > padding + graphHeight * 0.6
+    ? xAxisY + tickLength + 10
+    : xAxisY - tickLength - 6;
 
   useEffect(() => {
     const domain = currentFunction.domain ?? DEFAULT_DOMAIN;
@@ -496,6 +506,17 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
                 {/* Axes */}
                 <g>
+                  {!(currentDomain.min <= 0 && currentDomain.max >= 0) && (
+                    <line
+                      x1={padding}
+                      y1={padding}
+                      x2={padding}
+                      y2={svgHeight - padding}
+                      stroke={colors.axisLine}
+                      strokeWidth="1.5"
+                      opacity="0.7"
+                    />
+                  )}
                   {currentDomain.min <= 0 && currentDomain.max >= 0 && (
                     <line
                       x1={toSvgX(0)}
@@ -504,6 +525,17 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       y2={svgHeight - padding}
                       stroke={colors.axisLine}
                       strokeWidth="2"
+                    />
+                  )}
+                  {!(currentFunction.range.min <= 0 && currentFunction.range.max >= 0) && (
+                    <line
+                      x1={padding}
+                      y1={padding + graphHeight}
+                      x2={svgWidth - padding}
+                      y2={padding + graphHeight}
+                      stroke={colors.axisLine}
+                      strokeWidth="1.5"
+                      opacity="0.7"
                     />
                   )}
                   {currentFunction.range.min <= 0 && currentFunction.range.max >= 0 && (
@@ -540,6 +572,74 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       y
                     </text>
                   )}
+                </g>
+
+                {/* Tick marks & labels */}
+                <g>
+                  {xTicks.map((x) => {
+                    const xPos = toSvgX(x);
+                    const formatted = formatTick(x);
+                    if (!formatted) {
+                      return null;
+                    }
+
+                    return (
+                      <g key={`xtick-${x}`}>
+                        <line
+                          x1={xPos}
+                          y1={xAxisY - tickLength}
+                          x2={xPos}
+                          y2={xAxisY + tickLength}
+                          stroke={colors.axisLine}
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={xPos}
+                          y={xTickLabelY}
+                          fill={colors.textSecondary}
+                          fontSize="10"
+                          fontFamily="monospace"
+                          textAnchor="middle"
+                        >
+                          {formatted}
+                        </text>
+                      </g>
+                    );
+                  })}
+                  {yTicks.map((y) => {
+                    const yPos = toSvgY(y);
+                    if (!Number.isFinite(yPos)) {
+                      return null;
+                    }
+
+                    const formatted = formatTick(y);
+                    if (!formatted) {
+                      return null;
+                    }
+
+                    return (
+                      <g key={`ytick-${y}`}>
+                        <line
+                          x1={yAxisX - tickLength}
+                          y1={yPos}
+                          x2={yAxisX + tickLength}
+                          y2={yPos}
+                          stroke={colors.axisLine}
+                          strokeWidth="1"
+                        />
+                        <text
+                          x={yAxisX - tickLength - 4}
+                          y={yPos + 3}
+                          fill={colors.textSecondary}
+                          fontSize="10"
+                          fontFamily="monospace"
+                          textAnchor="end"
+                        >
+                          {formatted}
+                        </text>
+                      </g>
+                    );
+                  })}
                 </g>
 
                 {/* Reference curve (for comparisons) */}
