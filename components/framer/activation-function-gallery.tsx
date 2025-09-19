@@ -3,6 +3,54 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 
+const DEFAULT_DOMAIN = { min: -5, max: 5 } as const;
+
+const generateTicks = (min: number, max: number, divisions = 4) => {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    return [0];
+  }
+
+  if (min === max) {
+    return [Number.parseFloat(min.toFixed(4))];
+  }
+
+  const step = (max - min) / divisions;
+  const ticks = Array.from({ length: divisions + 1 }, (_, index) => min + index * step);
+
+  if (min < 0 && max > 0) {
+    ticks.push(0);
+  }
+
+  const unique = Array.from(new Set(ticks.map((tick) => Number.parseFloat(tick.toFixed(4)))));
+  return unique.sort((a, b) => a - b);
+};
+
+const formatTick = (value: number) => {
+  if (!Number.isFinite(value)) {
+    return '';
+  }
+
+  const absValue = Math.abs(value);
+
+  if (absValue < 1e-4) {
+    return '0';
+  }
+
+  if (absValue >= 1000 || (absValue > 0 && absValue < 1e-2)) {
+    return value.toExponential(1);
+  }
+
+  if (absValue < 1) {
+    return Number.parseFloat(value.toFixed(2)).toString();
+  }
+
+  if (absValue < 10) {
+    return Number.parseFloat(value.toFixed(1)).toString();
+  }
+
+  return Number.parseFloat(value.toFixed(0)).toString();
+};
+
 interface ActivationFunction {
   name: string;
   formula: string;
@@ -10,6 +58,23 @@ interface ActivationFunction {
   fn: (x: number) => number;
   color: string;
   range: { min: number; max: number };
+  domain?: { min: number; max: number };
+  xTicks?: number[];
+  yTicks?: number[];
+  asymptotes?: number[];
+  sampleCount?: number;
+  customPath?: (helpers: {
+    toSvgX: (x: number) => number;
+    toSvgY: (y: number) => number;
+    domain: { min: number; max: number };
+    range: { min: number; max: number };
+  }) => string;
+  reference?: {
+    fn: (x: number) => number;
+    label: string;
+    color?: string;
+    strokeDasharray?: string;
+  };
 }
 
 interface ActivationFunctionGalleryProps {
@@ -116,41 +181,83 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       name: "Sign (Original)",
       formula: "sgn(x)",
       description: "Binary decisions: -1, 0, or 1",
-      fn: (x: number) => x > 0 ? 1 : x < 0 ? -1 : 0,
+      fn: (x: number) => (x > 0 ? 1 : x < 0 ? -1 : 0),
       color: colors.primary,
-      range: { min: -1.5, max: 1.5 }
+      range: { min: -1.5, max: 1.5 },
+      domain: { min: -5, max: 5 },
+      xTicks: [-5, -2.5, 0, 2.5, 5],
+      yTicks: [-1, 0, 1],
+      sampleCount: 2,
+      customPath: ({ toSvgX, toSvgY, domain }) => {
+        const epsilon = Math.max(1e-3, (domain.max - domain.min) / 400);
+        const leftBreak = Math.max(domain.min, -epsilon);
+        const rightBreak = Math.min(domain.max, epsilon);
+
+        return [
+          `M ${toSvgX(domain.min)} ${toSvgY(-1)}`,
+          `L ${toSvgX(leftBreak)} ${toSvgY(-1)}`,
+          `M ${toSvgX(rightBreak)} ${toSvgY(1)}`,
+          `L ${toSvgX(domain.max)} ${toSvgY(1)}`,
+          `M ${toSvgX(0)} ${toSvgY(0)}`,
+          `L ${toSvgX(0)} ${toSvgY(0)}`
+        ].join(' ');
+      }
     },
     {
       name: "Sigmoid",
-      formula: "1/(1+e^-x)",
+      formula: "sigma(x) = 1/(1+e^{-x})",
       description: "Smooth probability between 0 and 1",
       fn: (x: number) => 1 / (1 + Math.exp(-x)),
       color: colors.secondary,
-      range: { min: -0.05, max: 1.05 }  // Sigmoid approaches but never reaches 0 and 1
+      range: { min: -0.1, max: 1.1 },
+      domain: { min: -8, max: 8 },
+      xTicks: [-8, -4, 0, 4, 8],
+      yTicks: [0, 0.25, 0.5, 0.75, 1],
+      asymptotes: [0, 1],
+      sampleCount: 400
     },
     {
       name: "Tanh",
-      formula: "tanh(x)",
+      formula: "tanh(x) = (e^{x} - e^{-x})/(e^{x} + e^{-x})",
       description: "Centered sigmoid, outputs -1 to 1",
       fn: (x: number) => Math.tanh(x),
       color: colors.tertiary,
-      range: { min: -1.05, max: 1.05 }  // Tanh approaches but never reaches -1 and 1
+      range: { min: -1.1, max: 1.1 },
+      domain: { min: -3, max: 3 },
+      xTicks: [-3, -1.5, 0, 1.5, 3],
+      yTicks: [-1, -0.5, 0, 0.5, 1],
+      asymptotes: [-1, 1],
+      sampleCount: 400
     },
     {
       name: "ReLU",
-      formula: "max(0, x)",
+      formula: "ReLU(x) = max(0, x)",
       description: "Modern favorite: 0 or positive",
       fn: (x: number) => Math.max(0, x),
       color: colors.quaternary,
-      range: { min: -0.5, max: 5 }
+      range: { min: -1, max: 4 },
+      domain: { min: -4, max: 4 },
+      xTicks: [-4, -2, 0, 2, 4],
+      yTicks: [-1, 0, 1, 2, 3, 4],
+      sampleCount: 320
     },
     {
       name: "Leaky ReLU",
-      formula: "max(0.01x, x)",
-      description: "ReLU with a small negative slope",
-      fn: (x: number) => x > 0 ? x : 0.01 * x,
+      formula: "LeakyReLU(x) = max(0.01x, x)",
+      description: "ReLU with a small negative slope (alpha = 0.01)",
+      fn: (x: number) => (x >= 0 ? x : 0.01 * x),
       color: colors.quinary,
-      range: { min: -0.5, max: 5 }  // Adjusted to better show the 0.01 slope in negative region
+      range: { min: -1, max: 4 },
+      domain: { min: -8, max: 4 },
+      xTicks: [-8, -4, 0, 2, 4],
+      yTicks: [-1, -0.5, 0, 1, 2, 3, 4],
+      sampleCount: 400,
+      reference: {
+        fn: (x: number) => Math.max(0, x),
+        label: "Standard ReLU",
+        color: `${colors.quaternary}66`,
+        strokeDasharray: "6,4"
+      }
     }
   ], [colors]);
 
@@ -162,44 +269,88 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
   const padding = 40;
   const graphWidth = svgWidth - 2 * padding;
   const graphHeight = svgHeight - 2 * padding;
+  const currentDomain = currentFunction.domain ?? DEFAULT_DOMAIN;
+  const domainWidth = currentDomain.max - currentDomain.min || 1;
+  const rangeHeight = currentFunction.range.max - currentFunction.range.min || 1;
 
-  // X domain
-  const xMin = -5;
-  const xMax = 5;
+  const toSvgX = (x: number) => padding + ((x - currentDomain.min) / domainWidth) * graphWidth;
+  const toSvgY = (y: number) => padding + ((currentFunction.range.max - y) / rangeHeight) * graphHeight;
 
-  // Convert between coordinate systems
-  const toSvgX = (x: number) => padding + ((x - xMin) / (xMax - xMin)) * graphWidth;
-  const toSvgY = (y: number, yMin: number, yMax: number) =>
-    padding + ((yMax - y) / (yMax - yMin)) * graphHeight;
+  const buildPath = (
+    valueFn: (x: number) => number,
+    domain: { min: number; max: number },
+    range: { min: number; max: number },
+    samples: number,
+    customPath?: ActivationFunction['customPath']
+  ) => {
+    const domainSpan = domain.max - domain.min || 1;
+    const rangeSpan = range.max - range.min || 1;
 
-  // Generate path for function
-  const generatePath = (fn: ActivationFunction) => {
-    const points = [];
-    const steps = 200;  // Increased for better accuracy, especially for Leaky ReLU's subtle negative slope
+    const domainToSvgX = (x: number) => padding + ((x - domain.min) / domainSpan) * graphWidth;
+    const rangeToSvgY = (value: number) => padding + ((range.max - value) / rangeSpan) * graphHeight;
 
-    for (let i = 0; i <= steps; i++) {
-      const x = xMin + (i / steps) * (xMax - xMin);
-      const y = fn.fn(x);
-      points.push({ x, y });
+    if (customPath) {
+      return customPath({
+        toSvgX: domainToSvgX,
+        toSvgY: rangeToSvgY,
+        domain,
+        range
+      });
     }
 
-    // For step function, create proper steps with discontinuities
-    if (fn.name.includes("Sign")) {
-      // Draw three separate segments for the discontinuous sign function
-      return `
-        M ${toSvgX(xMin)} ${toSvgY(-1, fn.range.min, fn.range.max)}
-        L ${toSvgX(-0.001)} ${toSvgY(-1, fn.range.min, fn.range.max)}
-        M ${toSvgX(0.001)} ${toSvgY(1, fn.range.min, fn.range.max)}
-        L ${toSvgX(xMax)} ${toSvgY(1, fn.range.min, fn.range.max)}
-        M ${toSvgX(0)} ${toSvgY(0, fn.range.min, fn.range.max)}
-        L ${toSvgX(0)} ${toSvgY(0, fn.range.min, fn.range.max)}
-      `;
+    const effectiveSamples = Math.max(2, Math.floor(samples));
+    const segments: string[] = [];
+
+    for (let i = 0; i <= effectiveSamples; i++) {
+      const x = domain.min + (i / effectiveSamples) * domainSpan;
+      const rawY = valueFn(x);
+      const y = Number.isFinite(rawY)
+        ? rawY
+        : rawY > 0
+          ? range.max
+          : range.min;
+
+      segments.push(`${i === 0 ? 'M' : 'L'} ${domainToSvgX(x)} ${rangeToSvgY(y)}`);
     }
 
-    return points.map((p, i) =>
-      `${i === 0 ? 'M' : 'L'} ${toSvgX(p.x)} ${toSvgY(p.y, fn.range.min, fn.range.max)}`
-    ).join(' ');
+    return segments.join(' ');
   };
+
+  const generatePath = (fn: ActivationFunction) => {
+    const domain = fn.domain ?? currentDomain;
+    return buildPath(fn.fn, domain, fn.range, fn.sampleCount ?? 300, fn.customPath);
+  };
+
+  const generateReferencePath = () => {
+    if (!currentFunction.reference) {
+      return null;
+    }
+
+    return buildPath(
+      currentFunction.reference.fn,
+      currentDomain,
+      currentFunction.range,
+      currentFunction.sampleCount ?? 300
+    );
+  };
+
+  const xTicks = currentFunction.xTicks ?? generateTicks(currentDomain.min, currentDomain.max, 4);
+  const yTicks = currentFunction.yTicks ?? generateTicks(currentFunction.range.min, currentFunction.range.max, 4);
+
+  const currentPath = generatePath(currentFunction);
+  const referencePath = generateReferencePath();
+  const sliderMin = currentDomain.min;
+  const sliderMax = currentDomain.max;
+  const sliderStep = Math.max(0.01, Number.parseFloat(((sliderMax - sliderMin) / 200).toFixed(3)));
+
+  useEffect(() => {
+    const domain = currentFunction.domain ?? DEFAULT_DOMAIN;
+    setInputValue((prev) => {
+      if (prev < domain.min) return domain.min;
+      if (prev > domain.max) return domain.max;
+      return prev;
+    });
+  }, [currentFunction]);
 
   const handleFunctionSelect = (index: number) => {
     if (config.animateTransitions) {
@@ -286,7 +437,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
               >
                 {/* Grid */}
                 <g opacity="0.3">
-                  {[-4, -2, 0, 2, 4].map(x => (
+                  {xTicks.map((x) => (
                     <line
                       key={`vgrid-${x}`}
                       x1={toSvgX(x)}
@@ -298,8 +449,12 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       strokeDasharray="2,2"
                     />
                   ))}
-                  {[-1, 0, 1].map(y => {
-                    const svgY = toSvgY(y, currentFunction.range.min, currentFunction.range.max);
+                  {yTicks.map((y) => {
+                    const svgY = toSvgY(y);
+                    if (!Number.isFinite(svgY)) {
+                      return null;
+                    }
+
                     return (
                       <line
                         key={`hgrid-${y}`}
@@ -315,49 +470,94 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                   })}
                 </g>
 
+                {/* Horizontal asymptotes */}
+                {(currentFunction.asymptotes ?? [])
+                  .filter((value) =>
+                    value >= currentFunction.range.min &&
+                    value <= currentFunction.range.max &&
+                    !(Math.abs(value) <= 1e-6 && currentFunction.range.min <= 0 && currentFunction.range.max >= 0)
+                  )
+                  .map((value) => {
+                    const svgY = toSvgY(value);
+                    return (
+                      <line
+                        key={`asymptote-${value}`}
+                        x1={padding}
+                        y1={svgY}
+                        x2={svgWidth - padding}
+                        y2={svgY}
+                        stroke={currentFunction.color}
+                        strokeWidth="1.5"
+                        strokeDasharray="6,4"
+                        opacity="0.6"
+                      />
+                    );
+                  })}
+
                 {/* Axes */}
                 <g>
-                  <line
-                    x1={toSvgX(0)}
-                    y1={padding}
-                    x2={toSvgX(0)}
-                    y2={svgHeight - padding}
-                    stroke={colors.axisLine}
-                    strokeWidth="2"
-                  />
-                  <line
-                    x1={padding}
-                    y1={toSvgY(0, currentFunction.range.min, currentFunction.range.max)}
-                    x2={svgWidth - padding}
-                    y2={toSvgY(0, currentFunction.range.min, currentFunction.range.max)}
-                    stroke={colors.axisLine}
-                    strokeWidth="2"
-                  />
+                  {currentDomain.min <= 0 && currentDomain.max >= 0 && (
+                    <line
+                      x1={toSvgX(0)}
+                      y1={padding}
+                      x2={toSvgX(0)}
+                      y2={svgHeight - padding}
+                      stroke={colors.axisLine}
+                      strokeWidth="2"
+                    />
+                  )}
+                  {currentFunction.range.min <= 0 && currentFunction.range.max >= 0 && (
+                    <line
+                      x1={padding}
+                      y1={toSvgY(0)}
+                      x2={svgWidth - padding}
+                      y2={toSvgY(0)}
+                      stroke={colors.axisLine}
+                      strokeWidth="2"
+                    />
+                  )}
 
                   {/* Axis labels */}
-                  <text
-                    x={svgWidth - padding + 5}
-                    y={toSvgY(0, currentFunction.range.min, currentFunction.range.max) + 5}
-                    fill={colors.textSecondary}
-                    fontSize="10"
-                    fontFamily="monospace"
-                  >
-                    x
-                  </text>
-                  <text
-                    x={toSvgX(0) - 10}
-                    y={padding - 5}
-                    fill={colors.textSecondary}
-                    fontSize="10"
-                    fontFamily="monospace"
-                  >
-                    y
-                  </text>
+                  {currentFunction.range.min <= 0 && currentFunction.range.max >= 0 && (
+                    <text
+                      x={svgWidth - padding + 5}
+                      y={toSvgY(0) + 5}
+                      fill={colors.textSecondary}
+                      fontSize="10"
+                      fontFamily="monospace"
+                    >
+                      x
+                    </text>
+                  )}
+                  {currentDomain.min <= 0 && currentDomain.max >= 0 && (
+                    <text
+                      x={toSvgX(0) - 10}
+                      y={padding - 5}
+                      fill={colors.textSecondary}
+                      fontSize="10"
+                      fontFamily="monospace"
+                    >
+                      y
+                    </text>
+                  )}
                 </g>
+
+                {/* Reference curve (for comparisons) */}
+                {referencePath && (
+                  <path
+                    d={referencePath}
+                    fill="none"
+                    stroke={currentFunction.reference?.color ?? colors.gridLine}
+                    strokeWidth="2"
+                    strokeDasharray={currentFunction.reference?.strokeDasharray ?? '6,4'}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
 
                 {/* Function curve */}
                 <path
-                  d={generatePath(currentFunction)}
+                  d={currentPath}
                   fill="none"
                   stroke={currentFunction.color}
                   strokeWidth="3"
@@ -367,12 +567,12 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                 />
 
                 {/* Show discontinuity points for Sign function */}
-                {currentFunction.name.includes("Sign") && (
+                {currentFunction.name.includes("Sign") && currentDomain.min <= 0 && currentDomain.max >= 0 && (
                   <>
                     {/* Open circle at (0, -1) */}
                     <circle
                       cx={toSvgX(0)}
-                      cy={toSvgY(-1, currentFunction.range.min, currentFunction.range.max)}
+                      cy={toSvgY(-1)}
                       r="4"
                       fill={colors.cardBg}
                       stroke={currentFunction.color}
@@ -381,14 +581,14 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                     {/* Filled circle at (0, 0) */}
                     <circle
                       cx={toSvgX(0)}
-                      cy={toSvgY(0, currentFunction.range.min, currentFunction.range.max)}
+                      cy={toSvgY(0)}
                       r="4"
                       fill={currentFunction.color}
                     />
                     {/* Open circle at (0, 1) */}
                     <circle
                       cx={toSvgX(0)}
-                      cy={toSvgY(1, currentFunction.range.min, currentFunction.range.max)}
+                      cy={toSvgY(1)}
                       r="4"
                       fill={colors.cardBg}
                       stroke={currentFunction.color}
@@ -402,7 +602,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                   <>
                     <circle
                       cx={toSvgX(inputValue)}
-                      cy={toSvgY(currentFunction.fn(inputValue), currentFunction.range.min, currentFunction.range.max)}
+                      cy={toSvgY(currentFunction.fn(inputValue))}
                       r="5"
                       fill={currentFunction.color}
                       stroke={isDark ? colors.bgGradient1 : '#fff'}
@@ -411,9 +611,9 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                     />
                     <line
                       x1={toSvgX(inputValue)}
-                      y1={toSvgY(currentFunction.range.min, currentFunction.range.min, currentFunction.range.max)}
+                      y1={toSvgY(currentFunction.range.min)}
                       x2={toSvgX(inputValue)}
-                      y2={toSvgY(currentFunction.fn(inputValue), currentFunction.range.min, currentFunction.range.max)}
+                      y2={toSvgY(currentFunction.fn(inputValue))}
                       stroke={currentFunction.color}
                       strokeWidth="1"
                       strokeDasharray="3,3"
@@ -493,6 +693,17 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                     {currentFunction.name.includes('Leaky') && 'The cautious optimist'}
                   </span>
                 </div>
+                {currentFunction.reference && (
+                  <div
+                    className="flex items-center gap-2 text-xs mt-2"
+                    style={{ color: colors.textSecondary }}
+                  >
+                    <span>Comparison baseline:</span>
+                    <span className="font-medium" style={{ color: colors.textPrimary }}>
+                      {currentFunction.reference.label} (dashed)
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -513,13 +724,13 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                 </h4>
                 <div>
                   <label className="block text-sm mb-2" style={{ color: colors.textSecondary }}>
-                    Input (x): {inputValue.toFixed(2)}
+                    Input (x ∈ [{sliderMin.toFixed(2)}, {sliderMax.toFixed(2)}]): {inputValue.toFixed(2)}
                   </label>
                   <input
                     type="range"
-                    min="-5"
-                    max="5"
-                    step="0.1"
+                    min={sliderMin}
+                    max={sliderMax}
+                    step={sliderStep}
                     value={inputValue}
                     onChange={(e) => setInputValue(parseFloat(e.target.value))}
                     className="w-full mb-3"
