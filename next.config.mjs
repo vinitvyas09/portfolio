@@ -16,14 +16,16 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   webpack: (config, { isServer }) => {
     if (isServer) {
+      const serverExternals = ['esprima', 'framer-motion']
+
       if (Array.isArray(config.externals)) {
-        config.externals.push('esprima')
+        config.externals.push(...serverExternals)
       } else if (typeof config.externals === 'function') {
-        config.externals = [config.externals, 'esprima']
+        config.externals = [config.externals, ...serverExternals]
       } else if (config.externals) {
-        config.externals = [...config.externals, 'esprima']
+        config.externals = [...config.externals, ...serverExternals]
       } else {
-        config.externals = ['esprima']
+        config.externals = [...serverExternals]
       }
     }
 
