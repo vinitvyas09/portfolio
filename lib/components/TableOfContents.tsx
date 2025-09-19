@@ -152,7 +152,7 @@ export function TableOfContents() {
     })
   }, [])
 
-  const renderHeading = (heading: Heading, depth: number = 0): JSX.Element => {
+  const renderHeading = (heading: Heading, depth: number = 0) => {
     const hasChildren = heading.children && heading.children.length > 0
     const isExpanded = expandedSections.has(heading.id)
     const isActive = activeIds.has(heading.id)
