@@ -189,18 +189,34 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       yTicks: [-1, 0, 1],
       sampleCount: 2,
       customPath: ({ toSvgX, toSvgY, domain }) => {
-        const epsilon = Math.max(1e-3, (domain.max - domain.min) / 400);
-        const leftBreak = Math.max(domain.min, -epsilon);
-        const rightBreak = Math.min(domain.max, epsilon);
+        const epsilon = 0.01;
 
-        return [
-          `M ${toSvgX(domain.min)} ${toSvgY(-1)}`,
-          `L ${toSvgX(leftBreak)} ${toSvgY(-1)}`,
-          `M ${toSvgX(rightBreak)} ${toSvgY(1)}`,
-          `L ${toSvgX(domain.max)} ${toSvgY(1)}`,
+        // Create three separate segments for the sign function
+        const segments = [];
+
+        // Left segment: y = -1 for x < 0
+        if (domain.min < -epsilon) {
+          segments.push(
+            `M ${toSvgX(domain.min)} ${toSvgY(-1)}`,
+            `L ${toSvgX(-epsilon)} ${toSvgY(-1)}`
+          );
+        }
+
+        // Center point: y = 0 at x = 0
+        segments.push(
           `M ${toSvgX(0)} ${toSvgY(0)}`,
           `L ${toSvgX(0)} ${toSvgY(0)}`
-        ].join(' ');
+        );
+
+        // Right segment: y = 1 for x > 0
+        if (domain.max > epsilon) {
+          segments.push(
+            `M ${toSvgX(epsilon)} ${toSvgY(1)}`,
+            `L ${toSvgX(domain.max)} ${toSvgY(1)}`
+          );
+        }
+
+        return segments.join(' ');
       }
     },
     {
@@ -235,10 +251,10 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Modern favorite: 0 or positive",
       fn: (x: number) => Math.max(0, x),
       color: colors.quaternary,
-      range: { min: -1, max: 4 },
-      domain: { min: -4, max: 4 },
+      range: { min: -0.5, max: 5 },
+      domain: { min: -4, max: 5 },
       xTicks: [-4, -2, 0, 2, 4],
-      yTicks: [-1, 0, 1, 2, 3, 4],
+      yTicks: [0, 1, 2, 3, 4, 5],
       sampleCount: 320
     },
     {
@@ -247,10 +263,10 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "ReLU with a small negative slope (alpha = 0.01)",
       fn: (x: number) => (x >= 0 ? x : 0.01 * x),
       color: colors.quinary,
-      range: { min: -1, max: 4 },
-      domain: { min: -8, max: 4 },
+      range: { min: -0.2, max: 5 },
+      domain: { min: -8, max: 5 },
       xTicks: [-8, -4, 0, 2, 4],
-      yTicks: [-1, -0.5, 0, 1, 2, 3, 4],
+      yTicks: [-0.08, 0, 1, 2, 3, 4, 5],
       sampleCount: 400,
       reference: {
         fn: (x: number) => Math.max(0, x),
@@ -287,7 +303,11 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
     const rangeSpan = range.max - range.min || 1;
 
     const domainToSvgX = (x: number) => padding + ((x - domain.min) / domainSpan) * graphWidth;
-    const rangeToSvgY = (value: number) => padding + ((range.max - value) / rangeSpan) * graphHeight;
+    const rangeToSvgY = (value: number) => {
+      // Clamp values to stay within SVG bounds but allow visual extension to edges
+      const clampedValue = Math.max(range.min, Math.min(range.max, value));
+      return padding + ((range.max - clampedValue) / rangeSpan) * graphHeight;
+    };
 
     if (customPath) {
       return customPath({
@@ -300,17 +320,36 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
     const effectiveSamples = Math.max(2, Math.floor(samples));
     const segments: string[] = [];
+    let lastValidY: number | null = null;
 
     for (let i = 0; i <= effectiveSamples; i++) {
       const x = domain.min + (i / effectiveSamples) * domainSpan;
       const rawY = valueFn(x);
-      const y = Number.isFinite(rawY)
-        ? rawY
-        : rawY > 0
-          ? range.max
-          : range.min;
 
-      segments.push(`${i === 0 ? 'M' : 'L'} ${domainToSvgX(x)} ${rangeToSvgY(y)}`);
+      // Handle infinite values by extending to viewport edge
+      let y = rawY;
+      if (!Number.isFinite(rawY)) {
+        y = rawY > 0 ? range.max * 1.5 : range.min * 1.5;
+      }
+
+      // For functions that grow beyond range, extend them visually
+      if (y > range.max) {
+        y = range.max + (range.max - range.min) * 0.1; // Extend slightly beyond
+      } else if (y < range.min) {
+        y = range.min - (range.max - range.min) * 0.1; // Extend slightly beyond
+      }
+
+      const svgY = rangeToSvgY(y);
+
+      // Check for discontinuities
+      if (lastValidY !== null && Math.abs(y - lastValidY) > rangeSpan * 0.5) {
+        // Large jump detected, might be a discontinuity
+        segments.push(`M ${domainToSvgX(x)} ${svgY}`);
+      } else {
+        segments.push(`${i === 0 ? 'M' : 'L'} ${domainToSvgX(x)} ${svgY}`);
+      }
+
+      lastValidY = y;
     }
 
     return segments.join(' ');
@@ -656,15 +695,27 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                 )}
 
                 {/* Function curve */}
-                <path
-                  d={currentPath}
-                  fill="none"
-                  stroke={currentFunction.color}
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="transition-all duration-500"
-                />
+                <g clipPath="url(#graph-clip)">
+                  <defs>
+                    <clipPath id="graph-clip">
+                      <rect
+                        x={padding}
+                        y={padding}
+                        width={graphWidth}
+                        height={graphHeight}
+                      />
+                    </clipPath>
+                  </defs>
+                  <path
+                    d={currentPath}
+                    fill="none"
+                    stroke={currentFunction.color}
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-all duration-500"
+                  />
+                </g>
 
                 {/* Show discontinuity points for Sign function */}
                 {currentFunction.name.includes("Sign") && currentDomain.min <= 0 && currentDomain.max >= 0 && (
@@ -698,29 +749,33 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                 )}
 
                 {/* Interactive point */}
-                {config.showInteractive && (
-                  <>
-                    <circle
-                      cx={toSvgX(inputValue)}
-                      cy={toSvgY(currentFunction.fn(inputValue))}
-                      r="5"
-                      fill={currentFunction.color}
-                      stroke={isDark ? colors.bgGradient1 : '#fff'}
-                      strokeWidth="2"
-                      className="animate-pulse"
-                    />
-                    <line
-                      x1={toSvgX(inputValue)}
-                      y1={toSvgY(currentFunction.range.min)}
-                      x2={toSvgX(inputValue)}
-                      y2={toSvgY(currentFunction.fn(inputValue))}
-                      stroke={currentFunction.color}
-                      strokeWidth="1"
-                      strokeDasharray="3,3"
-                      opacity="0.5"
-                    />
-                  </>
-                )}
+                {config.showInteractive && (() => {
+                  const yValue = currentFunction.fn(inputValue);
+                  const clampedY = Math.max(currentFunction.range.min, Math.min(currentFunction.range.max, yValue));
+                  return (
+                    <>
+                      <circle
+                        cx={toSvgX(inputValue)}
+                        cy={toSvgY(clampedY)}
+                        r="5"
+                        fill={currentFunction.color}
+                        stroke={isDark ? colors.bgGradient1 : '#fff'}
+                        strokeWidth="2"
+                        className="animate-pulse"
+                      />
+                      <line
+                        x1={toSvgX(inputValue)}
+                        y1={toSvgY(currentFunction.range.min)}
+                        x2={toSvgX(inputValue)}
+                        y2={toSvgY(clampedY)}
+                        stroke={currentFunction.color}
+                        strokeWidth="1"
+                        strokeDasharray="3,3"
+                        opacity="0.5"
+                      />
+                    </>
+                  );
+                })()}
               </svg>
             </div>
           </div>
