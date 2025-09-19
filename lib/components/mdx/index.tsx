@@ -17,6 +17,7 @@ import NeuronVsPerceptron from "../../../components/framer/neuron-vs-perceptron"
 import InteractivePerceptronPlayground from "../../../components/framer/interactive-perceptron-playground"
 import LinearSeparableDataViz from "../../../components/framer/linear-separable-data-viz"
 import DimensionScalingViz from "../../../components/framer/dimension-scaling-viz"
+import InfoBox from "../../../components/framer/info-box"
 
 // Caption component for styled text
 const Caption = ({ children, ...props }: any) => (
@@ -43,6 +44,7 @@ export const mdxComponents = {
   InteractivePerceptronPlayground,
   LinearSeparableDataViz,
   DimensionScalingViz,
+  InfoBox,
   h1: (props: any) => <h1 {...props} className="text-4xl font-light tracking-tight mt-12 mb-6" />,
   h2: (props: any) => <h2 {...props} className="text-3xl font-light tracking-tight mt-10 mb-4" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h3: (props: any) => <h3 {...props} className="text-2xl font-light tracking-tight mt-8 mb-3" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
