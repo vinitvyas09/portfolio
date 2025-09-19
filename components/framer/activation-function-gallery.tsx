@@ -412,8 +412,13 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
   const currentPath = generatePath(currentFunction);
   const referencePath = generateReferencePath();
-  const sliderMin = currentDomain.min;
-  const sliderMax = currentDomain.max;
+  // Adjust slider range for better interaction
+  const sliderMin = currentFunction.name === "Sigmoid" || currentFunction.name === "Tanh"
+    ? currentDomain.min * 0.8  // Slightly smaller range for S-curves
+    : currentDomain.min;
+  const sliderMax = currentFunction.name === "Sigmoid" || currentFunction.name === "Tanh"
+    ? currentDomain.max * 0.8  // Slightly smaller range for S-curves
+    : currentDomain.max;
   const sliderStep = Math.max(0.01, Number.parseFloat(((sliderMax - sliderMin) / 200).toFixed(3)));
   const xAxisY = currentFunction.range.min <= 0 && currentFunction.range.max >= 0
     ? toSvgY(0)
@@ -935,8 +940,22 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
                 {/* Interactive point */}
                 {config.showInteractive && (() => {
-                  const yValue = currentFunction.fn(inputValue);
+                  let yValue = currentFunction.fn(inputValue);
+
+                  // Apply the same visual constraints as the curve
+                  if (currentFunction.name === "Sigmoid") {
+                    // Clamp sigmoid to visual range [0.02, 0.98]
+                    if (yValue < 0.02) yValue = 0.02;
+                    if (yValue > 0.98) yValue = 0.98;
+                  } else if (currentFunction.name === "Tanh") {
+                    // Clamp tanh to visual range [-0.95, 0.95]
+                    if (yValue < -0.95) yValue = -0.95;
+                    if (yValue > 0.95) yValue = 0.95;
+                  }
+
+                  // Also clamp to the display range
                   const clampedY = Math.max(currentFunction.range.min, Math.min(currentFunction.range.max, yValue));
+
                   return (
                     <>
                       <circle
@@ -1057,7 +1076,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                 </h4>
                 <div>
                   <label className="block text-sm mb-2" style={{ color: colors.textSecondary }}>
-                    Input (x ∈ [{sliderMin.toFixed(2)}, {sliderMax.toFixed(2)}]): {inputValue.toFixed(2)}
+                    Input (x ∈ [{sliderMin.toFixed(1)}, {sliderMax.toFixed(1)}]): {inputValue.toFixed(2)}
                   </label>
                   <input
                     type="range"
@@ -1078,7 +1097,32 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       color: currentFunction.color
                     }}
                   >
-                    f({inputValue.toFixed(2)}) = {currentFunction.fn(inputValue).toFixed(3)}
+                    {(() => {
+                      let yValue = currentFunction.fn(inputValue);
+                      let displayValue = yValue;
+                      let approxSymbol = "=";
+
+                      // For Sigmoid and Tanh, show approximation when near asymptotes
+                      if (currentFunction.name === "Sigmoid") {
+                        if (yValue < 0.02) {
+                          displayValue = 0.02;
+                          approxSymbol = "≈";
+                        } else if (yValue > 0.98) {
+                          displayValue = 0.98;
+                          approxSymbol = "≈";
+                        }
+                      } else if (currentFunction.name === "Tanh") {
+                        if (yValue < -0.95) {
+                          displayValue = -0.95;
+                          approxSymbol = "≈";
+                        } else if (yValue > 0.95) {
+                          displayValue = 0.95;
+                          approxSymbol = "≈";
+                        }
+                      }
+
+                      return `f(${inputValue.toFixed(2)}) ${approxSymbol} ${displayValue.toFixed(3)}`;
+                    })()}
                   </div>
                 </div>
               </div>
