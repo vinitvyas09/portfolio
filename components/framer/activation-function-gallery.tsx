@@ -366,6 +366,37 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                   className="transition-all duration-500"
                 />
 
+                {/* Show discontinuity points for Sign function */}
+                {currentFunction.name.includes("Sign") && (
+                  <>
+                    {/* Open circle at (0, -1) */}
+                    <circle
+                      cx={toSvgX(0)}
+                      cy={toSvgY(-1, currentFunction.range.min, currentFunction.range.max)}
+                      r="4"
+                      fill={colors.cardBg}
+                      stroke={currentFunction.color}
+                      strokeWidth="2"
+                    />
+                    {/* Filled circle at (0, 0) */}
+                    <circle
+                      cx={toSvgX(0)}
+                      cy={toSvgY(0, currentFunction.range.min, currentFunction.range.max)}
+                      r="4"
+                      fill={currentFunction.color}
+                    />
+                    {/* Open circle at (0, 1) */}
+                    <circle
+                      cx={toSvgX(0)}
+                      cy={toSvgY(1, currentFunction.range.min, currentFunction.range.max)}
+                      r="4"
+                      fill={colors.cardBg}
+                      stroke={currentFunction.color}
+                      strokeWidth="2"
+                    />
+                  </>
+                )}
+
                 {/* Interactive point */}
                 {config.showInteractive && (
                   <>
