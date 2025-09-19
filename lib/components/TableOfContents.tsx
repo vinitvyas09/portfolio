@@ -221,11 +221,8 @@ export function TableOfContents() {
 
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
-      <div className="px-1">
-        <h4 className="mb-3 text-xs font-semibold tracking-[0.2em] uppercase text-foreground/50">
-          Table of Contents
-        </h4>
-        <ul className="space-y-0.5 pb-4">
+      <div className="relative">
+        <ul className="pb-4">
           {headings.map(heading => renderHeading(heading))}
         </ul>
       </div>
