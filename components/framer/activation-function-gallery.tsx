@@ -221,29 +221,29 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
     },
     {
       name: "Sigmoid",
-      formula: "sigma(x) = 1/(1+e^{-x})",
+      formula: "σ(x) = 1/(1+e^{-x})",
       description: "Smooth probability between 0 and 1",
       fn: (x: number) => 1 / (1 + Math.exp(-x)),
       color: colors.secondary,
-      range: { min: -0.1, max: 1.1 },
-      domain: { min: -8, max: 8 },
-      xTicks: [-8, -4, 0, 4, 8],
+      range: { min: -0.2, max: 1.2 },
+      domain: { min: -10, max: 10 },
+      xTicks: [-10, -5, 0, 5, 10],
       yTicks: [0, 0.25, 0.5, 0.75, 1],
       asymptotes: [0, 1],
-      sampleCount: 400
+      sampleCount: 500
     },
     {
       name: "Tanh",
-      formula: "tanh(x) = (e^{x} - e^{-x})/(e^{x} + e^{-x})",
+      formula: "tanh(x) = (e^x - e^{-x})/(e^x + e^{-x})",
       description: "Centered sigmoid, outputs -1 to 1",
       fn: (x: number) => Math.tanh(x),
       color: colors.tertiary,
-      range: { min: -1.1, max: 1.1 },
-      domain: { min: -3, max: 3 },
-      xTicks: [-3, -1.5, 0, 1.5, 3],
+      range: { min: -1.2, max: 1.2 },
+      domain: { min: -5, max: 5 },
+      xTicks: [-5, -2.5, 0, 2.5, 5],
       yTicks: [-1, -0.5, 0, 0.5, 1],
       asymptotes: [-1, 1],
-      sampleCount: 400
+      sampleCount: 500
     },
     {
       name: "ReLU",
@@ -498,27 +498,37 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                   })}
                 </g>
 
-                {/* Horizontal asymptotes */}
+                {/* Horizontal asymptotes with labels */}
                 {(currentFunction.asymptotes ?? [])
                   .filter((value) =>
                     value >= currentFunction.range.min &&
-                    value <= currentFunction.range.max &&
-                    !(Math.abs(value) <= 1e-6 && currentFunction.range.min <= 0 && currentFunction.range.max >= 0)
+                    value <= currentFunction.range.max
                   )
                   .map((value) => {
                     const svgY = toSvgY(value);
                     return (
-                      <line
-                        key={`asymptote-${value}`}
-                        x1={padding}
-                        y1={svgY}
-                        x2={svgWidth - padding}
-                        y2={svgY}
-                        stroke={currentFunction.color}
-                        strokeWidth="1.5"
-                        strokeDasharray="6,4"
-                        opacity="0.6"
-                      />
+                      <g key={`asymptote-${value}`}>
+                        <line
+                          x1={padding}
+                          y1={svgY}
+                          x2={svgWidth - padding}
+                          y2={svgY}
+                          stroke={currentFunction.color}
+                          strokeWidth="1.5"
+                          strokeDasharray="6,4"
+                          opacity="0.4"
+                        />
+                        <text
+                          x={svgWidth - padding + 5}
+                          y={svgY + 4}
+                          fill={colors.textMuted}
+                          fontSize="10"
+                          fontFamily="monospace"
+                          opacity="0.8"
+                        >
+                          y={value}
+                        </text>
+                      </g>
                     );
                   })}
 
@@ -713,7 +723,60 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                   />
                 </g>
 
-                {/* Arrows for functions that extend to infinity */}
+                {/* Arrows for functions that extend to infinity or asymptotes */}
+                {(currentFunction.name === "Sigmoid" || currentFunction.name === "Tanh") && (
+                  <>
+                    {/* Left side arrow approaching asymptote */}
+                    <g>
+                      <line
+                        x1={padding + 30}
+                        y1={toSvgY(currentFunction.fn(currentDomain.min))}
+                        x2={padding + 5}
+                        y2={toSvgY(currentFunction.fn(currentDomain.min))}
+                        stroke={currentFunction.color}
+                        strokeWidth="3"
+                      />
+                      <polygon
+                        points={`${padding + 5},${toSvgY(currentFunction.fn(currentDomain.min))} ${padding + 10},${toSvgY(currentFunction.fn(currentDomain.min)) - 5} ${padding + 10},${toSvgY(currentFunction.fn(currentDomain.min)) + 5}`}
+                        fill={currentFunction.color}
+                      />
+                      <text
+                        x={padding - 35}
+                        y={toSvgY(currentFunction.name === "Sigmoid" ? 0 : -1) + 5}
+                        fill={colors.textMuted}
+                        fontSize="11"
+                        fontFamily="monospace"
+                      >
+                        x→-∞
+                      </text>
+                    </g>
+                    {/* Right side arrow approaching asymptote */}
+                    <g>
+                      <line
+                        x1={svgWidth - padding - 30}
+                        y1={toSvgY(currentFunction.fn(currentDomain.max))}
+                        x2={svgWidth - padding - 5}
+                        y2={toSvgY(currentFunction.fn(currentDomain.max))}
+                        stroke={currentFunction.color}
+                        strokeWidth="3"
+                      />
+                      <polygon
+                        points={`${svgWidth - padding - 5},${toSvgY(currentFunction.fn(currentDomain.max))} ${svgWidth - padding - 10},${toSvgY(currentFunction.fn(currentDomain.max)) - 5} ${svgWidth - padding - 10},${toSvgY(currentFunction.fn(currentDomain.max)) + 5}`}
+                        fill={currentFunction.color}
+                      />
+                      <text
+                        x={svgWidth - padding + 10}
+                        y={toSvgY(currentFunction.name === "Sigmoid" ? 1 : 1) + 5}
+                        fill={colors.textMuted}
+                        fontSize="11"
+                        fontFamily="monospace"
+                      >
+                        x→+∞
+                      </text>
+                    </g>
+                  </>
+                )}
+
                 {(currentFunction.name === "ReLU" || currentFunction.name === "Leaky ReLU") && (() => {
                   const rightEdgeX = currentDomain.max;
                   const rightEdgeY = currentFunction.fn(rightEdgeX);
