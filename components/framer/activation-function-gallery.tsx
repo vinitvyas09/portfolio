@@ -126,7 +126,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Smooth probability between 0 and 1",
       fn: (x: number) => 1 / (1 + Math.exp(-x)),
       color: colors.secondary,
-      range: { min: -0.1, max: 1.1 }
+      range: { min: -0.05, max: 1.05 }  // Sigmoid approaches but never reaches 0 and 1
     },
     {
       name: "Tanh",
