@@ -225,12 +225,29 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Smooth probability between 0 and 1",
       fn: (x: number) => 1 / (1 + Math.exp(-x)),
       color: colors.secondary,
-      range: { min: -0.2, max: 1.2 },
-      domain: { min: -10, max: 10 },
-      xTicks: [-10, -5, 0, 5, 10],
+      range: { min: -0.15, max: 1.15 },
+      domain: { min: -8, max: 8 },
+      xTicks: [-8, -4, 0, 4, 8],
       yTicks: [0, 0.25, 0.5, 0.75, 1],
       asymptotes: [0, 1],
-      sampleCount: 500
+      sampleCount: 600,
+      customPath: ({ toSvgX, toSvgY, domain }) => {
+        const points: string[] = [];
+        const samples = 600;
+        // Extend beyond the visible domain to show continuation
+        const extMin = domain.min - 4;
+        const extMax = domain.max + 4;
+
+        for (let i = 0; i <= samples; i++) {
+          const x = extMin + (i / samples) * (extMax - extMin);
+          const y = 1 / (1 + Math.exp(-x));
+          const svgX = toSvgX(x);
+          const svgY = toSvgY(y);
+
+          points.push(`${i === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+        }
+        return points.join(' ');
+      }
     },
     {
       name: "Tanh",
@@ -238,12 +255,29 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Centered sigmoid, outputs -1 to 1",
       fn: (x: number) => Math.tanh(x),
       color: colors.tertiary,
-      range: { min: -1.2, max: 1.2 },
+      range: { min: -1.15, max: 1.15 },
       domain: { min: -5, max: 5 },
       xTicks: [-5, -2.5, 0, 2.5, 5],
       yTicks: [-1, -0.5, 0, 0.5, 1],
       asymptotes: [-1, 1],
-      sampleCount: 500
+      sampleCount: 600,
+      customPath: ({ toSvgX, toSvgY, domain }) => {
+        const points: string[] = [];
+        const samples = 600;
+        // Extend beyond the visible domain to show continuation
+        const extMin = domain.min - 3;
+        const extMax = domain.max + 3;
+
+        for (let i = 0; i <= samples; i++) {
+          const x = extMin + (i / samples) * (extMax - extMin);
+          const y = Math.tanh(x);
+          const svgX = toSvgX(x);
+          const svgY = toSvgY(y);
+
+          points.push(`${i === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+        }
+        return points.join(' ');
+      }
     },
     {
       name: "ReLU",
@@ -320,8 +354,17 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
     const effectiveSamples = Math.max(2, Math.floor(samples));
     const segments: string[] = [];
 
+    // For sigmoid and tanh, extend beyond visible domain to show asymptotic behavior
+    let extendedDomain = { ...domain };
+    if (valueFn.name === '' && (domain.max === 10 || domain.max === 5)) {
+      // Extend domain for smooth functions to show they continue
+      extendedDomain.min = domain.min - 2;
+      extendedDomain.max = domain.max + 2;
+    }
+    const extendedSpan = extendedDomain.max - extendedDomain.min || 1;
+
     for (let i = 0; i <= effectiveSamples; i++) {
-      const x = domain.min + (i / effectiveSamples) * domainSpan;
+      const x = extendedDomain.min + (i / effectiveSamples) * extendedSpan;
       const y = valueFn(x);
 
       const svgX = domainToSvgX(x);
