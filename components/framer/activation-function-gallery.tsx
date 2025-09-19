@@ -231,7 +231,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       yTicks: [0, 0.25, 0.5, 0.75, 1],
       asymptotes: [0, 1],
       sampleCount: 400,
-      customPath: ({ toSvgX, toSvgY, domain, range }) => {
+      customPath: ({ toSvgX, toSvgY, domain }) => {
         const points: string[] = [];
         const samples = 400;
 
@@ -367,7 +367,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
     const segments: string[] = [];
 
     // For sigmoid and tanh, extend beyond visible domain to show asymptotic behavior
-    let extendedDomain = { ...domain };
+    const extendedDomain = { ...domain };
     if (valueFn.name === '' && (domain.max === 10 || domain.max === 5)) {
       // Extend domain for smooth functions to show they continue
       extendedDomain.min = domain.min - 2;
@@ -1098,7 +1098,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                     }}
                   >
                     {(() => {
-                      let yValue = currentFunction.fn(inputValue);
+                      const yValue = currentFunction.fn(inputValue);
                       let displayValue = yValue;
                       let approxSymbol = "=";
 
