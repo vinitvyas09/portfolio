@@ -1353,13 +1353,31 @@ showDecisionRegions: true
 
 This is the birth of neural networks: just perceptrons feeding into other perceptrons. But it took until the 1980s for this idea to gain traction, and another few decades to become deep learning.
 
+## The Perceptron's Legacy
 
+Let's be honest about what we just spent thousands of words explaining:
 
+1. Take inputs
+2. Multiply by weights
+3. Add them up (plus bias)
+4. Output 1 if positive, 0 if negative
 
+That's it. The perceptron is embarrassingly simple. After all the buildup about neurons and intelligence and learning, it boils down to a weighted sum and a threshold. You could explain it to a middle schooler in five minutes.
 
+But here's what's wild: this trivial operation is the atomic unit of artificial intelligence. Every large language model, every image generator, every game-playing AI, they're all, at their core, vast networks of this same basic operation. GPT-5 isn't doing anything fundamentally different from Rosenblatt's 1958 machine. It's just doing it a trillion times in parallel with better organization.
 
+The perceptron teaches us something profound about intelligence itself: maybe it's not about complex reasoning units. Maybe it's about simple units, properly connected, at massive scale. A single perceptron can only cut space with a straight line. But compose enough straight cuts and you can carve any shape. It's like discovering that you can't build a house with one brick, then realizing you can build a cathedral with millions of them.
 
+## Why This Still Matters
 
+In an era of trillion parameter models and trillion-dollar AI companies, why study something from 1958 that can't even solve XOR?
+
+Because you can't understand the cathedral without understanding the brick. Every breakthrough in deep learning (backpropagation, convolutions, attention, transformers, etc.) is about organizing perceptron-like units in clever ways. The operations got slightly fancier (ReLU instead of step functions, softmax instead of single outputs), but the core insight remains: simple units, weighted connections, learned from data.
+
+When you read about the next AI breakthrough, remember: somewhere in that system, millions of little perceptrons are doing exactly what Frank Rosenblatt's room-sized machine did: taking inputs, multiplying by weights, adding them up, and deciding.
+
+The perceptron isn't obsolete history. It's the hydrogen atom of artificial intelligence where the simplest possible unit that exhibits the behavior we're interested in. And just as understanding hydrogen helps explain stars, understanding the perceptron explains why machines can now see, read, and create.
+Simple ideas aren't less important as systems get more complex. They become more important, because they're the only solid ground in a sea of complexity. The li'l perceptron, which we spent a lot of time looking at, is that solid ground.
 
 # References
 https://americanhistory.si.edu/collections/object/nmah_334414
