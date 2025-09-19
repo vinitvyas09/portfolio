@@ -244,7 +244,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         textPrimary: "#1e293b",
         textSecondary: "#64748b",
         borderColor: "#e2e8f0",
-        gridColor: "#f1f5f9"
+        gridColor: "#f1f5f9",
+        accent: "#f59e0b"
       };
     }
 
@@ -259,7 +260,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       textPrimary: "#f3f4f6",
       textSecondary: "#d1d5db",
       borderColor: "#404040",
-      gridColor: "#262626"
+      gridColor: "#262626",
+      accent: "#fbbf24"
     } : {
       bgGradient1: "#ffffff",
       bgGradient2: "#fafafa",
@@ -271,7 +273,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       textPrimary: "#1e293b",
       textSecondary: "#64748b",
       borderColor: "#e2e8f0",
-      gridColor: "#f1f5f9"
+      gridColor: "#f1f5f9",
+      accent: "#f59e0b"
     };
   }, [isDark, mounted]);
 
@@ -611,15 +614,15 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   return (
     <div style={{
-      padding: '1rem 1.5rem 0.75rem',
+      padding: '1.5rem',
       background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
       border: `1px solid ${colors.borderColor}`,
-      borderRadius: '12px',
-      margin: '1.5rem 0',
+      borderRadius: '16px',
+      margin: '2rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       boxShadow: isDark
-        ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
-        : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        ? '0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)'
+        : '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       transition: 'all 0.3s ease'
     }}>
       <svg
@@ -936,34 +939,40 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         <div style={{
           display: 'flex',
           justifyContent: 'center',
-          gap: '2rem',
-          marginTop: '0.25rem',
-          padding: '0.75rem',
-          background: colors.bgGradient1,
-          borderRadius: '8px',
-          border: `1px solid ${colors.borderColor}`
+          gap: '2.5rem',
+          marginTop: '1rem',
+          padding: '1rem 1.5rem',
+          background: isDark
+            ? 'rgba(23, 23, 23, 0.6)'
+            : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '12px',
+          border: `1px solid ${colors.borderColor}`,
+          boxShadow: isDark
+            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+            : 'inset 0 1px 0 rgba(255, 255, 255, 0.9)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
-              width: '16px',
-              height: '16px',
+              width: '18px',
+              height: '18px',
               borderRadius: '50%',
-              background: colors.catColor,
-              border: `2px solid ${colors.catColor}`
+              background: `linear-gradient(135deg, ${colors.catColor}, ${isDark ? '#f87171' : '#dc2626'})`,
+              boxShadow: `0 2px 4px ${colors.catColor}40`
             }} />
-            <span style={{ color: colors.textPrimary, fontSize: '14px', fontWeight: '500' }}>
+            <span style={{ color: colors.textPrimary, fontSize: '14px', fontWeight: '600', letterSpacing: '0.01em' }}>
               🐱 {catRegionLabel}
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
-              width: '16px',
-              height: '16px',
+              width: '18px',
+              height: '18px',
               borderRadius: '50%',
-              background: colors.dogColor,
-              border: `2px solid ${colors.dogColor}`
+              background: `linear-gradient(135deg, ${colors.dogColor}, ${isDark ? '#93c5fd' : '#2563eb'})`,
+              boxShadow: `0 2px 4px ${colors.dogColor}40`
             }} />
-            <span style={{ color: colors.textPrimary, fontSize: '14px', fontWeight: '500' }}>
+            <span style={{ color: colors.textPrimary, fontSize: '14px', fontWeight: '600', letterSpacing: '0.01em' }}>
               🐕 {dogRegionLabel}
             </span>
           </div>
@@ -989,20 +998,34 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               onClick={generateNewData}
               disabled={isTraining}
               style={{
-                padding: '0.75rem 1.5rem',
+                padding: '0.875rem 2rem',
                 background: isTraining
                   ? colors.borderColor
-                  : `linear-gradient(135deg, ${colors.dogColor}, #60a5fa)`,
+                  : `linear-gradient(135deg, ${colors.dogColor}, ${isDark ? '#93c5fd' : '#60a5fa'})`,
                 color: isTraining ? colors.textSecondary : 'white',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                letterSpacing: '0.025em',
                 cursor: isTraining ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
+                transform: 'translateY(0)',
                 boxShadow: isTraining
                   ? 'none'
-                  : '0 4px 12px rgba(59, 130, 246, 0.3)'
+                  : `0 4px 14px ${colors.dogColor}33, inset 0 1px 0 rgba(255,255,255,0.2)`
+              }}
+              onMouseEnter={(e) => {
+                if (!isTraining) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = `0 6px 20px ${colors.dogColor}44, inset 0 1px 0 rgba(255,255,255,0.2)`;
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = isTraining
+                  ? 'none'
+                  : `0 4px 14px ${colors.dogColor}33, inset 0 1px 0 rgba(255,255,255,0.2)`;
               }}
             >
               🎲 New Data
@@ -1012,20 +1035,34 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               onClick={startTraining}
               disabled={isTraining || dataPoints.length === 0}
               style={{
-                padding: '0.75rem 1.5rem',
+                padding: '0.875rem 2rem',
                 background: isTraining || dataPoints.length === 0
                   ? colors.borderColor
-                  : `linear-gradient(135deg, ${colors.lineColor}, #10b981)`,
+                  : `linear-gradient(135deg, ${colors.lineColor}, ${isDark ? '#34d399' : '#10b981'})`,
                 color: isTraining || dataPoints.length === 0 ? colors.textSecondary : 'white',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                letterSpacing: '0.025em',
                 cursor: isTraining || dataPoints.length === 0 ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
+                transform: 'translateY(0)',
                 boxShadow: isTraining || dataPoints.length === 0
                   ? 'none'
-                  : '0 4px 12px rgba(5, 150, 105, 0.3)'
+                  : `0 4px 14px ${colors.lineColor}33, inset 0 1px 0 rgba(255,255,255,0.2)`
+              }}
+              onMouseEnter={(e) => {
+                if (!isTraining && dataPoints.length > 0) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = `0 6px 20px ${colors.lineColor}44, inset 0 1px 0 rgba(255,255,255,0.2)`;
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = isTraining || dataPoints.length === 0
+                  ? 'none'
+                  : `0 4px 14px ${colors.lineColor}33, inset 0 1px 0 rgba(255,255,255,0.2)`;
               }}
             >
               {isTraining ? '🧠 Training...' : '🧠 Train Perceptron'}
@@ -1035,31 +1072,77 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           {/* Training progress */}
           {isTraining && (
             <div style={{
-              color: colors.textSecondary,
-              fontSize: '13px',
+              marginTop: '1.5rem',
+              padding: '1.25rem',
+              background: isDark
+                ? 'rgba(23, 23, 23, 0.6)'
+                : 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              border: `1px solid ${colors.borderColor}`,
+              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
               textAlign: 'center'
             }}>
-              <div>Epoch: {trainingStep} / 50</div>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: colors.textPrimary,
+                marginBottom: '0.75rem'
+              }}>
+                🔄 Training Progress
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                marginBottom: '1rem'
+              }}>
+                <div>
+                  <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                    Epoch
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: colors.textPrimary }}>
+                    {trainingStep}
+                    <span style={{ fontSize: '14px', fontWeight: '400', color: colors.textSecondary }}>/50</span>
+                  </div>
+                </div>
+
+                {trainingHistory.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                      Errors
+                    </div>
+                    <div style={{ fontSize: '18px', fontWeight: '700', color: colors.accent }}>
+                      {trainingHistory[trainingHistory.length - 1]?.error || 0}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {currentWeights && (
                 <div style={{
-                  marginTop: '0.5rem',
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontFamily: 'monospace',
-                  background: colors.bgGradient1,
-                  padding: '0.5rem',
-                  borderRadius: '4px',
-                  border: `1px solid ${colors.borderColor}`
+                  background: isDark
+                    ? 'rgba(0, 0, 0, 0.3)'
+                    : 'rgba(0, 0, 0, 0.05)',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  color: colors.textPrimary,
+                  fontWeight: '500'
                 }}>
-                  Current: {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
+                  {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
                 </div>
               )}
+
               {currentTrainingPoint >= 0 && (
-                <div style={{ marginTop: '0.25rem', fontSize: '11px' }}>
-                  Training on point {currentTrainingPoint + 1} ({dataPoints[currentTrainingPoint]?.label})
+                <div style={{
+                  marginTop: '0.75rem',
+                  fontSize: '12px',
+                  color: colors.textSecondary
+                }}>
+                  Processing: Point {currentTrainingPoint + 1} ({dataPoints[currentTrainingPoint]?.label})
                 </div>
-              )}
-              {trainingHistory.length > 0 && (
-                <div>Last epoch errors: {trainingHistory[trainingHistory.length - 1]?.error || 0}</div>
               )}
             </div>
           )}
@@ -1067,33 +1150,71 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           {/* Training results */}
           {learnedWeights && !isTraining && (
             <div style={{
-              padding: '1rem',
-              background: colors.bgGradient1,
-              borderRadius: '8px',
-              border: `1px solid ${colors.borderColor}`,
+              marginTop: '1.5rem',
+              padding: '1.5rem',
+              background: `linear-gradient(135deg,
+                ${isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.05)'},
+                ${isDark ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)'})`,
+              backdropFilter: 'blur(10px)',
+              borderRadius: '14px',
+              border: `2px solid ${colors.lineColor}`,
               textAlign: 'center',
-              maxWidth: '400px'
+              maxWidth: '450px',
+              margin: '1.5rem auto 0',
+              boxShadow: `0 8px 32px ${colors.lineColor}15`
             }}>
               <div style={{
-                color: colors.textPrimary,
+                fontSize: '16px',
+                fontWeight: '700',
+                color: colors.lineColor,
+                marginBottom: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
+                <span style={{ fontSize: '20px' }}>✨</span>
+                Perceptron Converged!
+                <span style={{ fontSize: '20px' }}>✨</span>
+              </div>
+
+              <div style={{
                 fontSize: '14px',
+                fontFamily: 'monospace',
+                background: isDark
+                  ? 'rgba(0, 0, 0, 0.4)'
+                  : 'rgba(255, 255, 255, 0.7)',
+                padding: '1rem',
+                borderRadius: '8px',
+                marginBottom: '1rem',
+                color: colors.textPrimary,
                 fontWeight: '600',
-                marginBottom: '0.5rem'
+                letterSpacing: '0.025em'
               }}>
-                ✅ Perceptron Converged!
+                {learnedWeights.a.toFixed(2)}x + {learnedWeights.b.toFixed(2)}y + {learnedWeights.c.toFixed(2)} = 0
               </div>
+
               <div style={{
-                color: colors.textSecondary,
-                fontSize: '12px',
-                marginBottom: '0.5rem'
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '2rem'
               }}>
-                Learned equation: {learnedWeights.a.toFixed(2)}x + {learnedWeights.b.toFixed(2)}y + {learnedWeights.c.toFixed(2)} = 0
-              </div>
-              <div style={{
-                color: colors.textSecondary,
-                fontSize: '12px'
-              }}>
-                Converged in {trainingHistory.length} epochs
+                <div>
+                  <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                    Epochs
+                  </div>
+                  <div style={{ fontSize: '20px', fontWeight: '700', color: colors.textPrimary }}>
+                    {trainingHistory.length}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                    Accuracy
+                  </div>
+                  <div style={{ fontSize: '20px', fontWeight: '700', color: colors.lineColor }}>
+                    100%
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -1101,46 +1222,65 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           {/* Legend for lines */}
           {(showSeparatingLine || learnedWeights || currentWeights) && (
             <div style={{
+              marginTop: '1rem',
               display: 'flex',
               justifyContent: 'center',
-              gap: '1.5rem',
-              fontSize: '12px',
-              color: colors.textSecondary,
-              flexWrap: 'wrap'
+              gap: '2rem',
+              padding: '0.75rem 1.25rem',
+              background: isDark
+                ? 'rgba(23, 23, 23, 0.4)'
+                : 'rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '10px',
+              fontSize: '13px',
+              flexWrap: 'wrap',
+              maxWidth: 'fit-content',
+              margin: '1rem auto 0'
             }}>
               {showSeparatingLine && !currentWeights && !learnedWeights && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
-                    width: '20px',
-                    height: '2px',
-                    background: colors.lineColor,
-                    opacity: '0.7',
-                    borderRadius: '1px',
-                    border: `1px dashed ${colors.lineColor}`
-                  }} />
-                  <span>True boundary</span>
+                    width: '24px',
+                    height: '3px',
+                    background: `linear-gradient(90deg, transparent, ${colors.lineColor}, transparent)`,
+                    borderRadius: '2px',
+                    position: 'relative'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: '0',
+                      left: '0',
+                      right: '0',
+                      bottom: '0',
+                      border: `1px dashed ${colors.lineColor}`,
+                      borderRadius: '2px'
+                    }} />
+                  </div>
+                  <span style={{ color: colors.textPrimary, fontWeight: '500' }}>True boundary</span>
                 </div>
               )}
               {currentWeights && isTraining && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
-                    width: '20px',
+                    width: '24px',
                     height: '3px',
-                    background: '#f59e0b',
-                    borderRadius: '1px'
+                    background: `linear-gradient(90deg, #f59e0b, #fbbf24)`,
+                    borderRadius: '2px',
+                    boxShadow: '0 2px 4px rgba(245, 158, 11, 0.3)'
                   }} />
-                  <span>Learning...</span>
+                  <span style={{ color: '#f59e0b', fontWeight: '600' }}>Learning...</span>
                 </div>
               )}
               {learnedWeights && !isTraining && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
-                    width: '20px',
+                    width: '24px',
                     height: '3px',
-                    background: colors.lineColor,
-                    borderRadius: '1px'
+                    background: `linear-gradient(90deg, ${colors.lineColor}, ${isDark ? '#10b981' : '#059669'})`,
+                    borderRadius: '2px',
+                    boxShadow: `0 2px 4px ${colors.lineColor}33`
                   }} />
-                  <span>Learned boundary</span>
+                  <span style={{ color: colors.lineColor, fontWeight: '600' }}>Learned boundary</span>
                 </div>
               )}
             </div>
