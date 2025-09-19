@@ -367,33 +367,7 @@ li {
 .nav-link:focus-visible { outline: none; }
 .nav-link:focus-visible::after { width: 100%; }
 
-/* TOC links */
-.toc-link {
-  color: hsl(var(--foreground) / 0.55);
-  padding: 6px 0;
-  border-left: 1px solid hsl(var(--border));
-  padding-left: 12px;
-}
-.toc-link.active {
-  color: hsl(var(--foreground));
-  border-left-color: hsl(var(--foreground));
-}
-
+/* Animation */
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out forwards;
-}
-
-.toc-link {
-  transition: all 0.2s ease;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-}
-
-.toc-link:hover {
-  background: hsl(var(--muted) / 0.5);
-}
-
-.toc-link.active {
-  background: hsl(var(--muted));
-  font-weight: 500;
 }
