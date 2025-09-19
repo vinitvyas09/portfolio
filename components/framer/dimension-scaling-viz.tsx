@@ -7,7 +7,6 @@ interface DimensionScalingVizProps {
   config?: {
     animationSpeed?: number;
     autoPlay?: boolean;
-    featureCycleMs?: number;
     showCode?: boolean;
   };
 }
@@ -23,7 +22,6 @@ type ContributionRow = {
   index: number;
   name: string;
   value: number;
-  isSummary?: boolean;
 };
 
 interface StageBlueprint {
@@ -40,6 +38,11 @@ interface StageBlueprint {
   seed: number;
   deemphasizeVisibleDims?: boolean;
   pairOverrides?: Array<[number, number]>;
+  exampleBreakdown: {
+    label: string;
+    projection: number;
+    contributions: Array<{ name: string; value: number }>;
+  };
 }
 
 interface StageData extends StageBlueprint {
@@ -66,7 +69,18 @@ const stageBlueprints: StageBlueprint[] = [
     separation: 1.35,
     noise: 0.28,
     seed: 11,
-    pairOverrides: [[0, 1]]
+    pairOverrides: [[0, 1]],
+    exampleBreakdown: {
+      label: "Dog",
+      projection: 0.78,
+      contributions: [
+        { name: "Running speed", value: 0.92 },
+        { name: "Hours of sleep", value: -0.38 },
+        { name: "Bias", value: 0.24 },
+        { name: "Hidden dims", value: 0 },
+        { name: "Noise floor", value: 0 }
+      ]
+    }
   },
   {
     dims: 6,
@@ -95,12 +109,23 @@ const stageBlueprints: StageBlueprint[] = [
       [0, 3],
       [2, 4],
       [1, 5]
-    ]
+    ],
+    exampleBreakdown: {
+      label: "Dog",
+      projection: 0.79,
+      contributions: [
+        { name: "Tail wag variance", value: 0.58 },
+        { name: "Bark pitch", value: 0.44 },
+        { name: "Running speed", value: 0.21 },
+        { name: "Ear tilt", value: -0.38 },
+        { name: "Bias", value: -0.06 }
+      ]
+    }
   },
   {
     dims: 50,
     title: "50 features · Text classification reality",
-    subtitle: "Every dimension is a word frequency or embedding component — way beyond what we can picture",
+    subtitle: "Every dimension is a word frequency or embedding component",
     description:
       "No 2D projection carries the structure, yet the perceptron only needs the dot product with its weight vector to decide.",
     perceptronNote:
@@ -128,9 +153,21 @@ const stageBlueprints: StageBlueprint[] = [
       [6, 7],
       [10, 27],
       [5, 32]
-    ]
+    ],
+    exampleBreakdown: {
+      label: "Spam",
+      projection: 1.04,
+      contributions: [
+        { name: 'freq("urgent")', value: 0.91 },
+        { name: 'freq("refund")', value: 0.72 },
+        { name: 'freq("unsubscribe")', value: -0.46 },
+        { name: 'freq("family")', value: -0.31 },
+        { name: "Bias", value: 0.18 }
+      ]
+    }
   }
 ];
+
 
 const createRng = (seed: number) => {
   let t = seed;
@@ -198,11 +235,10 @@ const createPairOptions = (
 const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   config = {
     animationSpeed: 16000,
-    autoPlay: true,
-    featureCycleMs: 3600
+    autoPlay: true
   }
 }) => {
-  const { animationSpeed = 16000, autoPlay = true, featureCycleMs = 3600 } = config;
+  const { animationSpeed = 16000, autoPlay = true } = config;
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -258,8 +294,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   }, []);
 
   const [activeStageIndex, setActiveStageIndex] = useState(0);
-  const [activePairIndex, setActivePairIndex] = useState(0);
-  const [focusIndex, setFocusIndex] = useState(0);
 
   useEffect(() => {
     if (!autoPlay || stageData.length <= 1) return;
@@ -269,31 +303,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
     );
     return () => clearInterval(id);
   }, [autoPlay, animationSpeed, stageData.length]);
-
-  useEffect(() => {
-    const stage = stageData[activeStageIndex];
-    if (!stage || stage.pairOptions.length <= 1) return;
-    const id = setInterval(
-      () => setActivePairIndex(prev => (prev + 1) % stage.pairOptions.length),
-      featureCycleMs
-    );
-    return () => clearInterval(id);
-  }, [activeStageIndex, stageData, featureCycleMs]);
-
-  useEffect(() => {
-    const stage = stageData[activeStageIndex];
-    if (!stage || stage.points.length === 0) return;
-    const id = setInterval(
-      () => setFocusIndex(prev => (prev + 1) % stage.points.length),
-      2800
-    );
-    return () => clearInterval(id);
-  }, [activeStageIndex, stageData]);
-
-  useEffect(() => {
-    setActivePairIndex(0);
-    setFocusIndex(0);
-  }, [activeStageIndex]);
 
   const colors = useMemo(() => {
     if (!mounted) {
@@ -346,15 +355,12 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   const projectionRef = useRef<HTMLCanvasElement>(null);
 
   const currentStage = stageData[activeStageIndex];
-  const safePointCount = currentStage?.points.length ?? 0;
-  const safeFocusIndex =
-    safePointCount > 0 ? focusIndex % safePointCount : 0;
-  const focusPoint =
-    safePointCount > 0 ? currentStage.points[safeFocusIndex] : undefined;
-
   const currentPair =
-    currentStage?.pairOptions[activePairIndex] ??
+    currentStage?.pairOptions[0] ??
     (currentStage ? [0, Math.min(1, currentStage.dims - 1)] : [0, 1]);
+  const highlightIndex =
+    currentStage && currentStage.points.length > 0 ? 0 : -1;
+  const example = currentStage?.exampleBreakdown;
 
   const drawScatter = useCallback(() => {
     const canvas = scatterRef.current;
@@ -406,15 +412,15 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
     stage.points.forEach((point, index) => {
       const x = scaleX(point.coords[xIndex] ?? 0);
       const y = scaleY(point.coords[yIndex] ?? 0);
-      const radius = index === safeFocusIndex ? 7 : 4;
+      const radius = highlightIndex >= 0 && index === highlightIndex ? 7 : 4;
 
       ctx.beginPath();
-      ctx.globalAlpha = index === safeFocusIndex ? 1 : 0.75;
+      ctx.globalAlpha = highlightIndex >= 0 && index === highlightIndex ? 1 : 0.75;
       ctx.fillStyle = point.label === 0 ? colors.classA : colors.classB;
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
 
-      if (index === safeFocusIndex) {
+      if (highlightIndex >= 0 && index === highlightIndex) {
         ctx.lineWidth = 2;
         ctx.strokeStyle = colors.highlight;
         ctx.stroke();
@@ -430,7 +436,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
     colors.highlight,
     currentStage,
     currentPair,
-    safeFocusIndex
+    highlightIndex
   ]);
 
   const drawPerceptron = useCallback(() => {
@@ -476,19 +482,19 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const focusIdx = safeFocusIndex;
     stage.points.forEach((point, index) => {
       const x = scaleX(point.projection);
       const y = point.label === 1 ? axisTop + zoneHeight * 0.25 : axisBottom - zoneHeight * 0.25;
-      const radius = index === focusIdx ? 7 : 4.5;
+      const isHighlight = highlightIndex >= 0 && index === highlightIndex;
+      const radius = isHighlight ? 7 : 4.5;
 
       ctx.beginPath();
-      ctx.globalAlpha = index === focusIdx ? 1 : 0.78;
+      ctx.globalAlpha = isHighlight ? 1 : 0.78;
       ctx.fillStyle = point.label === 0 ? colors.classA : colors.classB;
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
 
-      if (index === focusIdx) {
+      if (isHighlight) {
         ctx.lineWidth = 2;
         ctx.strokeStyle = colors.highlight;
         ctx.stroke();
@@ -513,7 +519,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
     colors.highlight,
     colors.textSecondary,
     currentStage,
-    safeFocusIndex
+    highlightIndex
   ]);
 
   useEffect(() => {
@@ -527,30 +533,13 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   }, [mounted, drawPerceptron]);
 
   const contributionRows = useMemo<ContributionRow[]>(() => {
-    if (!currentStage || !focusPoint) return [];
-    const rows = currentStage.featureNames.map((name, index) => ({
+    if (!example) return [];
+    return example.contributions.map((entry, index) => ({
       index,
-      name,
-      value: focusPoint.contributions[index] ?? 0
+      name: entry.name,
+      value: entry.value
     }));
-    const sorted = [...rows].sort(
-      (a, b) => Math.abs(b.value) - Math.abs(a.value)
-    );
-    const topCount =
-      currentStage.dims <= 6 ? currentStage.dims : Math.min(5, sorted.length);
-    const selected = sorted.slice(0, topCount);
-    if (sorted.length > topCount) {
-      const remaining = sorted.slice(topCount);
-      const remainderValue = remaining.reduce((acc, curr) => acc + curr.value, 0);
-      selected.push({
-        index: -1,
-        name: `${remaining.length} more dims`,
-        value: remainderValue,
-        isSummary: true
-      });
-    }
-    return selected;
-  }, [currentStage, focusPoint]);
+  }, [example]);
 
   const maxAbsContribution = useMemo(() => {
     if (!contributionRows.length) return 1;
@@ -577,6 +566,21 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           currentStage.featureNames[currentPair[1]] ?? `Feature ${currentPair[1] + 1}`
         }`
       : "";
+
+  const predictedLabel =
+    example && currentStage
+      ? example.projection >= 0
+        ? currentStage.labels[1]
+        : currentStage.labels[0]
+      : undefined;
+  const focusLabelColor =
+    example && currentStage
+      ? example.label === currentStage.labels[1]
+        ? colors.classB
+        : colors.classA
+      : colors.textSecondary;
+  const predictionColor =
+    example ? (example.projection >= 0 ? colors.classB : colors.classA) : colors.textSecondary;
 
   return (
     <div
@@ -646,7 +650,8 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             style={{
               fontSize: "0.95rem",
               color: colors.textSecondary,
-              marginBottom: "0.9rem",
+              marginTop: 0,
+              marginBottom: 0,
               lineHeight: 1.6
             }}
           >
@@ -872,7 +877,12 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           borderRadius: "14px",
           padding: "1.25rem",
           boxShadow: `0 18px 50px ${colors.shadow}`,
-          transition: "background 0.3s ease, border 0.3s ease"
+          transition: "background 0.3s ease, border 0.3s ease",
+          minHeight: "320px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          gap: "1rem"
         }}
       >
         <div
@@ -909,10 +919,10 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
               style={{
                 fontSize: "1.1rem",
                 fontWeight: 700,
-                color: focusPoint?.label === 0 ? colors.classA : colors.classB
+                color: focusLabelColor
               }}
             >
-              {focusPoint ? currentStage?.labels[focusPoint.label] : "—"}
+              {example?.label ?? "—"}
             </div>
           </div>
 
@@ -933,7 +943,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                 color: colors.textPrimary
               }}
             >
-              {focusPoint ? focusPoint.projection.toFixed(2) : "—"}
+              {example ? example.projection.toFixed(2) : "—"}
             </div>
           </div>
 
@@ -951,14 +961,10 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
               style={{
                 fontSize: "1.1rem",
                 fontWeight: 700,
-                color: focusPoint && focusPoint.projection >= 0 ? colors.classB : colors.classA
+                color: predictionColor
               }}
             >
-              {focusPoint
-                ? focusPoint.projection >= 0
-                  ? currentStage?.labels[1]
-                  : currentStage?.labels[0]
-                : "—"}
+              {predictedLabel ?? "—"}
             </div>
           </div>
         </div>
@@ -966,7 +972,8 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         <div
           style={{
             display: "grid",
-            gap: "0.75rem"
+            gap: "0.75rem",
+            flexGrow: 1
           }}
         >
           {contributionRows.map(row => {
@@ -989,7 +996,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
               >
                 <div style={{ flex: "0 0 150px", color: colors.textPrimary }}>
                   {row.name}
-                  {row.isSummary ? " (combined)" : ""}
                 </div>
                 <div
                   style={{
@@ -1018,7 +1024,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                         right: "50%",
                         width: `${negativeWidth}px`,
                         height: "100%",
-                        background: row.isSummary ? `${colors.highlight}AA` : `${colors.classA}DD`,
+                        background: `${colors.classA}DD`,
                         borderRadius: "999px"
                       }}
                     />
@@ -1030,7 +1036,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                         left: "50%",
                         width: `${positiveWidth}px`,
                         height: "100%",
-                        background: row.isSummary ? `${colors.highlight}AA` : `${colors.classB}DD`,
+                        background: `${colors.classB}DD`,
                         borderRadius: "999px"
                       }}
                     />
