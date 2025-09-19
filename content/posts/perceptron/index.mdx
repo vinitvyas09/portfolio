@@ -1088,6 +1088,194 @@ The convergence theorem is like a warranty: it guarantees the perceptron will wo
 
 But for a simple algorithm from 1958, a mathematical guarantee of convergence is pretty remarkable. It's why the perceptron remains a cornerstone of machine learning theory, even as we've moved on to deeper and more complex models.
 
+## Variations: Making Perceptrons Practical
+
+Now we're almost done with perceptrons! Just a few little details remain. No deep-dive on perceptron can wrap up without giving a practical insight on its usage (no matter its usage numbers hah!). 
+
+The vanilla perceptron we've been working with has a dirty secret: it's biased toward recent examples. This makes it vulnerable to a particularly annoying failure mode that I'll show you in a second. Fortunately, there are two clever fixes: one beautiful but impractical (voted perceptron), and one slightly less beautiful but actually usable (averaged perceptron).
+
+### The Late-Update Problem
+
+Imagine this scenario: you're training a perceptron on 10,000 examples. After the first 100 examples, through sheer luck or good initialization, your perceptron has found a fantastic separator. It's so good that it correctly classifies the next 9,899 examples without a single update. Then comes example 10,000—maybe it's noisy, maybe it's mislabeled, or maybe it's just sitting right on the edge of the margin. The perceptron misclassifies it and updates.
+
+That single update just overwrote a weight vector that was correct on 99.99% of your data.
+
+```python
+# The tragedy in code
+weights = [0.5, -0.3]  # Works perfectly for 9,999 examples
+
+# Example 10,000 comes along
+misclassified_point = [8, 2]  # An outlier
+weights = [0.5 + 8, -0.3 + 2]  # Now [8.5, 1.7] - completely different!
+
+# Your beautiful separator is gone, replaced by one that fits that single outlier
+```
+
+This is the perceptron's recency bias. The last example to cause an update has massive influence, regardless of how well the previous weights performed. It's like letting the newest employee completely reorganize the company, ignoring the wisdom of everyone who's been there for years.
+
+### The Voted Perceptron: Democracy for Hyperplanes
+The voted perceptron solves this by keeping every weight vector the algorithm ever considers, along with how long each one "survived" before being updated. At test time, each historical weight vector votes on the classification, weighted by its survival time.
+
+Here's the idea: if a weight vector classified 500 examples correctly before finally making a mistake, it gets 500 votes. If another weight vector got updated immediately, it gets just 1 vote.
+
+```python
+def voted_perceptron_predict(x, weight_history):
+    """
+    weight_history: List of (weights, bias, survival_count) tuples
+    """
+    total_vote = 0
+    
+    for weights, bias, survival_count in weight_history:
+        activation = sum(w * xi for w, xi in zip(weights, x)) + bias
+        vote = survival_count * sign(activation)  # Weight by survival time
+        total_vote += vote
+    
+    return sign(total_vote)  # Majority wins
+```
+
+{/*
+<VotedPerceptronDiagram
+config={{
+showWeightHistory: true,
+exampleVotes: [
+{weights: [0.2, 0.3], survivalTime: 50, vote: "+50"},
+{weights: [0.5, -0.1], survivalTime: 300, vote: "+300"},
+{weights: [2.1, 0.8], survivalTime: 1, vote: "-1"},
+{weights: [1.9, 0.7], survivalTime: 150, vote: "+150"}
+],
+totalVote: "+499 → Positive"
+}}
+/>
+*/}
+
+<Caption>Each historical weight vector votes, weighted by how long it survived</Caption>
+
+The best part: there's solid theory proving the voted perceptron generalizes better than vanilla. The tragic part: it's completely impractical.
+
+If your perceptron makes 1,000 updates during training, you need to store 1,000 weight vectors. Prediction becomes 1,000× slower because you need to compute 1,000 dot products instead of one. For high-dimensional data, this quickly becomes absurd. Imagine storing 1,000 copies of a million-dimensional weight vector.
+
+### The Averaged Perceptron: The Practical Compromise
+
+The averaged perceptron takes the voting idea and makes one crucial simplification: instead of letting each weight vector vote, we just use their average.
+
+The prediction rule changes in this way:
+
+```python
+voted:    sign(Σ survival_count × sign(w·x))
+averaged: sign((Σ survival_count × w) · x)
+```
+
+That movement of the sign function outside makes all the difference. Now we can pre-compute the averaged weight vector:
+
+```python
+# During training, maintain a running sum
+averaged_weights = [0] * num_features
+averaged_bias = 0
+
+# After each example (not just mistakes!)
+averaged_weights += current_weights
+averaged_bias += current_bias
+
+# At test time, just use the average
+final_weights = averaged_weights / num_examples
+final_bias = averaged_bias / num_examples
+```
+
+But wait! This seems to require updating the averaged weights on every example, even correct ones. That's wasteful! 
+
+Here's the clever trick used in practice:
+
+```python
+def averaged_perceptron_train(data, labels):
+    weights = [0] * num_features
+    bias = 0
+    
+    # The clever part: cached weights for efficiency
+    cached_weights = [0] * num_features  
+    cached_bias = 0
+    counter = 1
+    
+    for x, y in zip(data, labels):
+        activation = dot(weights, x) + bias
+        
+        if y * activation <= 0:  # Mistake
+            # Update actual weights
+            weights += y * x
+            bias += y
+            
+            # Update cached weights (accumulator trick)
+            cached_weights += y * counter * x
+            cached_bias += y * counter
+        
+        counter += 1
+    
+    # Final averaged weights
+    return (weights - cached_weights/counter), (bias - cached_bias/counter)
+```
+
+The math here is subtle but clever. By keeping track of when each weight was added and scaling by the counter, we automatically compute the average without updating on every example. It's one of those algorithms where you need to work through the algebra to believe it actually computes the right thing.
+
+### Empirical Comparison
+
+Let me show you how these three variants typically perform:
+
+{/*
+<PerceptronVariantComparison
+config={{
+dataset: "noisy_linear",
+variants: ["vanilla", "voted", "averaged"],
+metrics: ["training_error", "test_error", "storage_cost"],
+showConvergence: true
+}}
+/>
+*/}
+
+<Caption>Averaged perceptron: almost as good as voted, almost as cheap as vanilla</Caption>
+
+The averaged perceptron is almost always better than vanilla. On typical datasets, you'll see:
+
+- Vanilla: Fast, simple, but sensitive to ordering and outliers
+- Voted: Best generalization, but requires storing entire history
+- Averaged: 95% of voted's performance with vanilla's efficiency
+
+### Early Stopping: When to Stop Averaging
+
+Even the averaged perceptron will eventually overfit if you let it run forever. The solution is early stopping—halt training when performance on a validation set starts degrading.
+
+```python
+def train_with_early_stopping(train_data, val_data, patience=5):
+    best_val_accuracy = 0
+    patience_counter = 0
+    best_weights = None
+    
+    for epoch in range(max_epochs):
+        # Train for one epoch
+        weights = train_one_epoch(train_data)
+        
+        # Check validation accuracy
+        val_accuracy = evaluate(weights, val_data)
+        
+        if val_accuracy > best_val_accuracy:
+            best_val_accuracy = val_accuracy
+            best_weights = weights.copy()
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            
+        if patience_counter >= patience:
+            print(f"Stopping at epoch {epoch}, val accuracy stopped improving")
+            break
+    
+    return best_weights
+```
+
+The averaged perceptron with early stopping is remarkably effective. It's simple enough to implement in 50 lines of code, fast enough to run on huge datasets, and accurate enough to compete with much fancier algorithms. Not bad for an algorithm from the 1950s with a 2002 twist.
+
+Think of it this way: The vanilla perceptron is like a weather forecast that only considers today's conditions where one unusual day can throw off the entire prediction. The voted perceptron keeps every historical forecast and lets them all vote on tomorrow's weather, so more accurate but requires storing years of data. The averaged perceptron is the practical compromise: it maintains a running average of all past forecasts, capturing historical patterns without the storage overhead. Same wisdom, fraction of the cost.
+
+In practice, I'd always recommend the averaged perceptron. The extra code complexity/computational overhead is minimal and the improvement in generalization is significant. Probably as close to a free lunch as it gets in Machine Learning.
+
+
 
 
 
