@@ -51,11 +51,13 @@ export function TableOfContents() {
 
   useEffect(() => {
     const elements = document.querySelectorAll("article h1, article h2, article h3, article h4, article h5")
-    const flatHeadings: FlatHeading[] = Array.from(elements).map((elem) => ({
-      id: elem.id || elem.textContent?.toLowerCase().replace(/\s+/g, "-") || "",
-      text: elem.textContent || "",
-      level: parseInt(elem.tagName.substring(1)),
-    }))
+    const flatHeadings: FlatHeading[] = Array.from(elements)
+      .filter((elem) => !elem.closest('header')) // Exclude headings inside header (like blog title)
+      .map((elem) => ({
+        id: elem.id || elem.textContent?.toLowerCase().replace(/\s+/g, "-") || "",
+        text: elem.textContent || "",
+        level: parseInt(elem.tagName.substring(1)),
+      }))
 
     const nestedHeadings = buildNestedHeadings(flatHeadings)
     setHeadings(nestedHeadings)
@@ -64,11 +66,13 @@ export function TableOfContents() {
     setExpandedSections(allHeadingIds)
 
     headingElementsRef.current.clear()
-    elements.forEach(elem => {
-      if (elem.id) {
-        headingElementsRef.current.set(elem.id, elem as HTMLElement)
-      }
-    })
+    Array.from(elements)
+      .filter((elem) => !elem.closest('header'))
+      .forEach(elem => {
+        if (elem.id) {
+          headingElementsRef.current.set(elem.id, elem as HTMLElement)
+        }
+      })
 
     if (observerRef.current) {
       observerRef.current.disconnect()
@@ -109,9 +113,11 @@ export function TableOfContents() {
       }
     }, observerOptions)
 
-    elements.forEach(elem => {
-      if (elem.id) observerRef.current?.observe(elem)
-    })
+    Array.from(elements)
+      .filter((elem) => !elem.closest('header'))
+      .forEach(elem => {
+        if (elem.id) observerRef.current?.observe(elem)
+      })
 
     return () => {
       observerRef.current?.disconnect()
