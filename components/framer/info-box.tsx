@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
 import {
   AlertCircle,
   Info,
@@ -59,27 +58,12 @@ const InfoBox: React.FC<InfoBoxProps> = ({ type = "info", title, children }) => 
   const { icon: Icon, bgColor, borderColor, iconColor, titleColor } = config[type];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`my-8 relative overflow-hidden rounded-lg border-2 ${borderColor} ${bgColor}`}
-    >
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 opacity-30">
-        <div className={`absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-${type === "insight" ? "purple" : type === "warning" ? "yellow" : type === "advanced" ? "indigo" : type === "tip" ? "green" : "blue"}-200/20 dark:to-${type === "insight" ? "purple" : type === "warning" ? "yellow" : type === "advanced" ? "indigo" : type === "tip" ? "green" : "blue"}-400/10`} />
-      </div>
-
+    <div className={`my-8 relative overflow-hidden rounded-lg border-2 ${borderColor} ${bgColor}`}>
       <div className="relative p-6">
         <div className="flex items-start space-x-3">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className={`flex-shrink-0 ${iconColor}`}
-          >
+          <div className={`flex-shrink-0 ${iconColor}`}>
             <Icon className="h-6 w-6" />
-          </motion.div>
+          </div>
 
           <div className="flex-1 space-y-2">
             <h4 className={`font-semibold text-lg ${titleColor}`}>
@@ -91,7 +75,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({ type = "info", title, children }) => 
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
