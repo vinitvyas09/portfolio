@@ -134,7 +134,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Centered sigmoid, outputs -1 to 1",
       fn: (x: number) => Math.tanh(x),
       color: colors.tertiary,
-      range: { min: -1.2, max: 1.2 }
+      range: { min: -1.05, max: 1.05 }  // Tanh approaches but never reaches -1 and 1
     },
     {
       name: "ReLU",
@@ -150,7 +150,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "ReLU with a small negative slope",
       fn: (x: number) => x > 0 ? x : 0.01 * x,
       color: colors.quinary,
-      range: { min: -2, max: 5 }
+      range: { min: -0.5, max: 5 }  // Adjusted to better show the 0.01 slope in negative region
     }
   ], [colors]);
 
@@ -175,7 +175,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
   // Generate path for function
   const generatePath = (fn: ActivationFunction) => {
     const points = [];
-    const steps = 100;
+    const steps = 200;  // Increased for better accuracy, especially for Leaky ReLU's subtle negative slope
 
     for (let i = 0; i <= steps; i++) {
       const x = xMin + (i / steps) * (xMax - xMin);
