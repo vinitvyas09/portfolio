@@ -1,77 +1,268 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils/cn"
+import { ChevronRight } from "lucide-react"
 
 interface Heading {
   id: string
   text: string
   level: number
+  children?: Heading[]
+}
+
+interface FlatHeading {
+  id: string
+  text: string
+  level: number
+}
+
+function buildNestedHeadings(headings: FlatHeading[]): Heading[] {
+  const nested: Heading[] = []
+  const stack: Heading[] = []
+
+  headings.forEach(heading => {
+    const item: Heading = { ...heading, children: [] }
+
+    while (stack.length > 0 && stack[stack.length - 1].level >= item.level) {
+      stack.pop()
+    }
+
+    if (stack.length === 0) {
+      nested.push(item)
+    } else {
+      const parent = stack[stack.length - 1]
+      if (!parent.children) parent.children = []
+      parent.children.push(item)
+    }
+
+    stack.push(item)
+  })
+
+  return nested
 }
 
 export function TableOfContents() {
   const [headings, setHeadings] = useState<Heading[]>([])
-  const [activeId, setActiveId] = useState<string>("")
+  const [activeIds, setActiveIds] = useState<Set<string>>(new Set())
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const headingElementsRef = useRef<Map<string, HTMLElement>>(new Map())
 
   useEffect(() => {
-    const elements = document.querySelectorAll("article h2, article h3")
-    const headingElements: Heading[] = Array.from(elements).map((elem) => ({
+    const elements = document.querySelectorAll("article h1, article h2, article h3, article h4, article h5")
+    const flatHeadings: FlatHeading[] = Array.from(elements).map((elem) => ({
       id: elem.id || elem.textContent?.toLowerCase().replace(/\s+/g, "-") || "",
       text: elem.textContent || "",
       level: parseInt(elem.tagName.substring(1)),
     }))
-    setHeadings(headingElements)
 
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100
+    const nestedHeadings = buildNestedHeadings(flatHeadings)
+    setHeadings(nestedHeadings)
 
-      for (let i = headingElements.length - 1; i >= 0; i--) {
-        const elem = document.getElementById(headingElements[i].id)
-        if (elem && elem.offsetTop <= scrollPosition) {
-          setActiveId(headingElements[i].id)
-          break
-        }
+    const allHeadingIds = new Set(flatHeadings.map(h => h.id))
+    setExpandedSections(allHeadingIds)
+
+    headingElementsRef.current.clear()
+    elements.forEach(elem => {
+      if (elem.id) {
+        headingElementsRef.current.set(elem.id, elem as HTMLElement)
       }
+    })
+
+    if (observerRef.current) {
+      observerRef.current.disconnect()
     }
 
-    window.addEventListener("scroll", handleScroll)
-    handleScroll()
+    const observerOptions = {
+      rootMargin: "-80px 0px -70% 0px",
+      threshold: [0, 1]
+    }
 
-    return () => window.removeEventListener("scroll", handleScroll)
+    observerRef.current = new IntersectionObserver((entries) => {
+      const visibleIds = new Set<string>()
+
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          visibleIds.add(entry.target.id)
+        }
+      })
+
+      if (visibleIds.size > 0) {
+        setActiveIds(visibleIds)
+      } else {
+        const scrollPosition = window.scrollY + 100
+        let closestId = ""
+        let closestDistance = Infinity
+
+        headingElementsRef.current.forEach((elem, id) => {
+          const distance = Math.abs(elem.offsetTop - scrollPosition)
+          if (distance < closestDistance) {
+            closestDistance = distance
+            closestId = id
+          }
+        })
+
+        if (closestId) {
+          setActiveIds(new Set([closestId]))
+        }
+      }
+    }, observerOptions)
+
+    elements.forEach(elem => {
+      if (elem.id) observerRef.current?.observe(elem)
+    })
+
+    return () => {
+      observerRef.current?.disconnect()
+    }
   }, [])
+
+  const scrollToHeading = useCallback((id: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    const element = document.getElementById(id)
+    if (element) {
+      const offset = 80
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.scrollY - offset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      })
+    }
+  }, [])
+
+  const toggleSection = useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setExpandedSections(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }, [])
+
+  const renderHeading = (heading: Heading, depth: number = 0): JSX.Element => {
+    const hasChildren = heading.children && heading.children.length > 0
+    const isExpanded = expandedSections.has(heading.id)
+    const isActive = activeIds.has(heading.id)
+    const isChildActive = heading.children?.some(child =>
+      activeIds.has(child.id) || child.children?.some(gc => activeIds.has(gc.id))
+    )
+
+    return (
+      <li key={heading.id} className="relative">
+        <div className="flex items-center group">
+          {hasChildren && (
+            <button
+              onClick={(e) => toggleSection(heading.id, e)}
+              className={cn(
+                "p-0.5 mr-1 rounded hover:bg-muted/50 transition-all",
+                "text-muted-foreground hover:text-foreground",
+                depth === 0 ? "-ml-1" : ""
+              )}
+              aria-label={isExpanded ? "Collapse section" : "Expand section"}
+            >
+              <ChevronRight
+                className={cn(
+                  "h-3 w-3 transition-transform duration-200",
+                  isExpanded && "rotate-90"
+                )}
+              />
+            </button>
+          )}
+          <a
+            href={`#${heading.id}`}
+            onClick={(e) => scrollToHeading(heading.id, e)}
+            className={cn(
+              "toc-item flex-1 py-1.5 leading-relaxed transition-all duration-200",
+              "hover:text-foreground",
+              !hasChildren && "ml-5",
+              heading.level === 1 && "text-sm font-medium",
+              heading.level === 2 && "text-sm",
+              heading.level === 3 && "text-xs",
+              heading.level >= 4 && "text-xs opacity-90",
+              isActive ? "text-foreground font-semibold" : "text-muted-foreground",
+              (isChildActive && !isActive) && "text-foreground/70"
+            )}
+          >
+            <span className="relative">
+              {heading.text}
+              {isActive && (
+                <span className="absolute -left-6 top-1/2 -translate-y-1/2 w-1 h-4 bg-foreground rounded-full" />
+              )}
+            </span>
+          </a>
+        </div>
+
+        {hasChildren && isExpanded && (
+          <ul className={cn(
+            "mt-1 border-l border-border/40",
+            depth === 0 ? "ml-2 pl-3" : "ml-4 pl-2"
+          )}>
+            {heading.children!.map(child => renderHeading(child, depth + 1))}
+          </ul>
+        )}
+      </li>
+    )
+  }
 
   if (headings.length === 0) return null
 
   return (
-    <nav className="sticky top-20 space-y-1">
-      <h4 className="mb-4 text-xs tracking-[0.2em] uppercase text-foreground/70">On this page</h4>
-      <ul className="space-y-1 text-sm">
-        {headings.map((heading) => (
-          <li
-            key={heading.id}
-            className={cn(
-              heading.level === 3 && "ml-4"
-            )}
-          >
-            <a
-              href={`#${heading.id}`}
-              className={cn(
-                "toc-link block",
-                activeId === heading.id && "active"
-              )}
-              onClick={(e) => {
-                e.preventDefault()
-                document.getElementById(heading.id)?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                })
-              }}
-            >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
+      <div className="px-1">
+        <h4 className="mb-3 text-xs font-semibold tracking-[0.2em] uppercase text-foreground/50">
+          Table of Contents
+        </h4>
+        <ul className="space-y-0.5 pb-4">
+          {headings.map(heading => renderHeading(heading))}
+        </ul>
+      </div>
+
+      <style jsx>{`
+        nav::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        nav::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        nav::-webkit-scrollbar-thumb {
+          background: hsl(var(--border));
+          border-radius: 2px;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover {
+          background: hsl(var(--muted-foreground) / 0.3);
+        }
+
+        .toc-item {
+          position: relative;
+          display: block;
+        }
+
+        .toc-item::before {
+          content: "";
+          position: absolute;
+          left: -12px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 2px;
+          height: 0;
+          background: hsl(var(--foreground));
+          transition: height 0.2s ease;
+        }
+
+        .toc-item.font-medium::before {
+          height: 16px;
+        }
+      `}</style>
     </nav>
   )
 }
