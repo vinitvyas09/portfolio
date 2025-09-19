@@ -167,15 +167,15 @@ export function TableOfContents() {
             <button
               onClick={(e) => toggleSection(heading.id, e)}
               className={cn(
-                "p-0.5 mr-1 rounded hover:bg-muted/50 transition-all",
-                "text-muted-foreground hover:text-foreground",
-                depth === 0 ? "-ml-1" : ""
+                "p-0.5 mr-0.5 rounded-sm hover:bg-muted/30 transition-all",
+                "text-muted-foreground/60 hover:text-muted-foreground",
+                depth === 0 ? "-ml-0.5" : ""
               )}
               aria-label={isExpanded ? "Collapse section" : "Expand section"}
             >
               <ChevronRight
                 className={cn(
-                  "h-3 w-3 transition-transform duration-200",
+                  "h-2.5 w-2.5 transition-transform duration-200",
                   isExpanded && "rotate-90"
                 )}
               />
@@ -185,21 +185,21 @@ export function TableOfContents() {
             href={`#${heading.id}`}
             onClick={(e) => scrollToHeading(heading.id, e)}
             className={cn(
-              "toc-item flex-1 py-1.5 leading-relaxed transition-all duration-200",
+              "toc-item flex-1 py-0.5 leading-snug transition-all duration-200",
               "hover:text-foreground",
-              !hasChildren && "ml-5",
-              heading.level === 1 && "text-sm font-medium",
-              heading.level === 2 && "text-sm",
-              heading.level === 3 && "text-xs",
-              heading.level >= 4 && "text-xs opacity-90",
-              isActive ? "text-foreground font-semibold" : "text-muted-foreground",
-              (isChildActive && !isActive) && "text-foreground/70"
+              !hasChildren && "ml-4",
+              heading.level === 1 && "text-[13px] font-medium",
+              heading.level === 2 && "text-xs",
+              heading.level === 3 && "text-[11px]",
+              heading.level >= 4 && "text-[11px] opacity-80",
+              isActive ? "text-foreground font-medium" : "text-muted-foreground/70 hover:text-muted-foreground",
+              (isChildActive && !isActive) && "text-muted-foreground/85"
             )}
           >
-            <span className="relative">
+            <span className="relative block">
               {heading.text}
               {isActive && (
-                <span className="absolute -left-6 top-1/2 -translate-y-1/2 w-1 h-4 bg-foreground rounded-full" />
+                <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-[2px] h-3.5 bg-foreground rounded-full" />
               )}
             </span>
           </a>
@@ -207,8 +207,8 @@ export function TableOfContents() {
 
         {hasChildren && isExpanded && (
           <ul className={cn(
-            "mt-1 border-l border-border/40",
-            depth === 0 ? "ml-2 pl-3" : "ml-4 pl-2"
+            "border-l border-border/30",
+            depth === 0 ? "ml-1.5 pl-2" : "ml-3 pl-1.5"
           )}>
             {heading.children!.map(child => renderHeading(child, depth + 1))}
           </ul>
@@ -229,7 +229,7 @@ export function TableOfContents() {
 
       <style jsx>{`
         nav::-webkit-scrollbar {
-          width: 4px;
+          width: 3px;
         }
 
         nav::-webkit-scrollbar-track {
@@ -237,33 +237,12 @@ export function TableOfContents() {
         }
 
         nav::-webkit-scrollbar-thumb {
-          background: hsl(var(--border));
-          border-radius: 2px;
+          background: hsl(var(--border) / 0.5);
+          border-radius: 1.5px;
         }
 
         nav::-webkit-scrollbar-thumb:hover {
-          background: hsl(var(--muted-foreground) / 0.3);
-        }
-
-        .toc-item {
-          position: relative;
-          display: block;
-        }
-
-        .toc-item::before {
-          content: "";
-          position: absolute;
-          left: -12px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 2px;
-          height: 0;
-          background: hsl(var(--foreground));
-          transition: height 0.2s ease;
-        }
-
-        .toc-item.font-medium::before {
-          height: 16px;
+          background: hsl(var(--border));
         }
       `}</style>
     </nav>
