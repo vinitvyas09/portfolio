@@ -251,11 +251,11 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Modern favorite: 0 or positive",
       fn: (x: number) => Math.max(0, x),
       color: colors.quaternary,
-      range: { min: -0.5, max: 4 },
-      domain: { min: -5, max: 5 },
-      xTicks: [-5, -2.5, 0, 2.5, 5],
-      yTicks: [0, 1, 2, 3, 4],
-      sampleCount: 200
+      range: { min: -1, max: 6 },
+      domain: { min: -3, max: 6 },
+      xTicks: [-3, 0, 3, 6],
+      yTicks: [0, 2, 4, 6],
+      sampleCount: 100
     },
     {
       name: "Leaky ReLU",
@@ -263,11 +263,11 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "ReLU with a small negative slope (alpha = 0.01)",
       fn: (x: number) => (x >= 0 ? x : 0.01 * x),
       color: colors.quinary,
-      range: { min: -0.1, max: 4 },
-      domain: { min: -10, max: 5 },
-      xTicks: [-10, -5, 0, 2.5, 5],
-      yTicks: [-0.1, 0, 1, 2, 3, 4],
-      sampleCount: 300,
+      range: { min: -0.2, max: 6 },
+      domain: { min: -20, max: 6 },
+      xTicks: [-20, -10, 0, 3, 6],
+      yTicks: [-0.2, 0, 2, 4, 6],
+      sampleCount: 200,
       reference: {
         fn: (x: number) => Math.max(0, x),
         label: "Standard ReLU",
@@ -670,6 +670,20 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       height={graphHeight}
                     />
                   </clipPath>
+                  <marker
+                    id="arrow-end"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="9"
+                    refY="3"
+                    orient="auto"
+                    markerUnits="strokeWidth"
+                  >
+                    <path
+                      d="M0,0 L0,6 L9,3 z"
+                      fill={currentFunction.color}
+                    />
+                  </marker>
                 </defs>
 
                 {/* Apply clipping to both curves */}
@@ -698,6 +712,77 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                     className="transition-all duration-500"
                   />
                 </g>
+
+                {/* Arrows for functions that extend to infinity */}
+                {(currentFunction.name === "ReLU" || currentFunction.name === "Leaky ReLU") && (() => {
+                  const rightEdgeX = currentDomain.max;
+                  const rightEdgeY = currentFunction.fn(rightEdgeX);
+                  const rightSvgY = Math.min(Math.max(padding, toSvgY(rightEdgeY)), padding + graphHeight);
+
+                  return (
+                    <>
+                      {/* Arrow at the right edge for positive infinity */}
+                      <g>
+                        <line
+                          x1={svgWidth - padding - 30}
+                          y1={rightSvgY}
+                          x2={svgWidth - padding - 5}
+                          y2={rightSvgY}
+                          stroke={currentFunction.color}
+                          strokeWidth="3"
+                        />
+                        <polygon
+                          points={`${svgWidth - padding - 5},${rightSvgY} ${svgWidth - padding - 10},${rightSvgY - 5} ${svgWidth - padding - 10},${rightSvgY + 5}`}
+                          fill={currentFunction.color}
+                        />
+                        <text
+                          x={svgWidth - padding + 10}
+                          y={rightSvgY + 5}
+                          fill={colors.textMuted}
+                          fontSize="12"
+                          fontFamily="monospace"
+                        >
+                          →∞
+                        </text>
+                      </g>
+                    </>
+                  );
+                })()}
+
+                {currentFunction.name === "Leaky ReLU" && (() => {
+                  const leftEdgeX = currentDomain.min;
+                  const leftEdgeY = currentFunction.fn(leftEdgeX);
+                  const leftSvgY = Math.min(Math.max(padding, toSvgY(leftEdgeY)), padding + graphHeight);
+
+                  return (
+                    <>
+                      {/* Arrow at the left edge for negative infinity */}
+                      <g>
+                        <line
+                          x1={padding + 30}
+                          y1={leftSvgY}
+                          x2={padding + 5}
+                          y2={leftSvgY}
+                          stroke={currentFunction.color}
+                          strokeWidth="3"
+                        />
+                        <polygon
+                          points={`${padding + 5},${leftSvgY} ${padding + 10},${leftSvgY - 5} ${padding + 10},${leftSvgY + 5}`}
+                          fill={currentFunction.color}
+                        />
+                        <text
+                          x={padding - 25}
+                          y={leftSvgY + 5}
+                          fill={colors.textMuted}
+                          fontSize="12"
+                          fontFamily="monospace"
+                        >
+                          -∞
+                        </text>
+                      </g>
+                    </>
+                  );
+                })()}
 
                 {/* Show discontinuity points for Sign function */}
                 {currentFunction.name.includes("Sign") && currentDomain.min <= 0 && currentDomain.max >= 0 && (
