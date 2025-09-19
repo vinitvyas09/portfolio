@@ -937,7 +937,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           display: 'flex',
           justifyContent: 'center',
           gap: '2rem',
-          marginTop: '1rem',
+          marginTop: '0.5rem',
           padding: '1rem',
           background: colors.bgGradient1,
           borderRadius: '8px',
