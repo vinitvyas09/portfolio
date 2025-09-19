@@ -1275,6 +1275,86 @@ Think of it this way: The vanilla perceptron is like a weather forecast that onl
 
 In practice, I'd always recommend the averaged perceptron. The extra code complexity/computational overhead is minimal and the improvement in generalization is significant. Probably as close to a free lunch as it gets in Machine Learning.
 
+## The XOR Problem: When Lines Aren't Enough
+
+The perceptron has one fatal flaw that almost killed AI research: it can only draw straight lines. 
+
+This sounds trivial until you realize that some of the simplest real-world patterns need curves.
+
+### The Limitation That Changed History
+Consider this sentiment analysis scenario. You're classifying product reviews using three word features:
+
+1. "excellent" → usually positive
+2. "terrible" → usually negative
+3. "not" → flips everything
+
+The review "excellent product" is positive. The review "not excellent" is negative. Same word, opposite meanings. Now watch what happens when we plot this:
+
+{/*
+<XORProblem
+config={{
+dataset: "sentiment_with_negation",
+points: [
+{x: 1, y: 0, label: "positive", text: "excellent"},
+{x: 0, y: 1, label: "negative", text: "terrible"},
+{x: 1, y: 1, label: "negative", text: "not excellent"},
+{x: 0, y: 0, label: "positive", text: "not terrible"}
+],
+showFailedAttempts: true,
+animateLineSearch: true
+}}
+/>
+*/}
+
+<Caption>Try drawing a single straight line that separates positive from negative. You can't.</Caption>
+
+The positive reviews sit on opposite corners. The negative reviews sit on the other corners. This checkerboard pattern is called XOR (exclusive-or), and no single straight line will ever separate it correctly.
+
+This isn't some contrived mathematical curiosity. Language is full of modifiers that flip meaning. 
+- "The food was good" vs "The food was not good"
+- "Surprisingly bad" vs "Surprisingly good"
+- "I would recommend" vs "I would never recommend"
+
+### "Winter is here" (Temporarily)
+
+In 1969, Marvin Minsky and Seymour Papert published a book called "Perceptrons" that proved mathematically what we just saw visually: perceptrons cannot learn XOR. The proof was elegant, devastating, and completely correct.
+
+The impact was nuclear. Funding dried up. Researchers abandoned neural networks. The field entered what we now call the "First AI Winter", a decade where mentioning perceptrons at a conference seemed like a career suicide.
+
+The tragedy? The solution was staring them in the face: more perceptrons.
+
+The perceptron can't solve XOR with a single line. But what about two lines? Or better yet, what if we stack perceptrons? 
+
+```python
+# Single perceptron: doomed to fail
+def xor_attempt(x1, x2):
+    return sign(w1*x1 + w2*x2 + b)  # No values of w1,w2,b will work
+
+# Two perceptrons feeding into a third: problem solved
+def xor_solved(x1, x2):
+    hidden1 = sign(x1 + x2 - 0.5)    # Detects "at least one feature"
+    hidden2 = sign(x1 + x2 - 1.5)    # Detects "both features"
+    return sign(hidden1 - hidden2)    # XOR logic!
+```
+
+Interestingly, Minsky/Papert acknowledged this, but dismissed it thinking it would be computationally intractible.
+
+{/*
+<MultiLayerXOR
+config={{
+showLayers: true,
+animateSignalFlow: true,
+showDecisionRegions: true
+}}
+/>
+*/}
+
+<Caption>Stack perceptrons and XOR becomes trivial. This is a 2-layer neural network.</Caption>
+
+This is the birth of neural networks: just perceptrons feeding into other perceptrons. But it took until the 1980s for this idea to gain traction, and another few decades to become deep learning.
+
+
+
 
 
 
