@@ -71,7 +71,7 @@ const CONFIG: Record<InfoBoxVariant, InfoBoxStyle> = {
     bulletColor:
       "[&_li]:text-black dark:[&_li]:text-slate-200 [&_li::marker]:text-violet-400 dark:[&_li::marker]:text-violet-300",
     codeBg:
-      "[&_code]:bg-violet-50/80 dark:[&_code]:bg-violet-500/25 [&_code]:text-violet-950 dark:[&_code]:text-violet-100",
+      "[&_code]:bg-violet-50/80 dark:[&_code]:bg-violet-500/25 [&_code]:!text-violet-900 dark:[&_code]:!text-violet-100 [&_code.hljs]:!text-violet-900 dark:[&_code.hljs]:!text-violet-100 [&_code_.hljs]:!text-violet-900 dark:[&_code_.hljs]:!text-violet-100",
     visualText: "text-slate-700 dark:text-slate-300",
     gradient: {
       light: ["rgba(237,233,254,0.92)", "rgba(221,214,254,0.55)"],
@@ -105,7 +105,7 @@ const CONFIG: Record<InfoBoxVariant, InfoBoxStyle> = {
     bulletColor:
       "[&_li]:text-black dark:[&_li]:text-slate-200 [&_li::marker]:text-amber-400 dark:[&_li::marker]:text-yellow-300",
     codeBg:
-      "[&_code]:bg-amber-50/80 dark:[&_code]:bg-yellow-500/25 [&_code]:text-amber-950 dark:[&_code]:text-yellow-50",
+      "[&_code]:bg-amber-50/80 dark:[&_code]:bg-yellow-500/25 [&_code]:!text-amber-900 dark:[&_code]:!text-yellow-100 [&_code.hljs]:!text-amber-900 dark:[&_code.hljs]:!text-yellow-100 [&_code_.hljs]:!text-amber-900 dark:[&_code_.hljs]:!text-yellow-100",
     visualText: "text-slate-700 dark:text-slate-300",
     gradient: {
       light: ["rgba(254,243,199,0.9)", "rgba(253,230,138,0.55)"],
@@ -139,7 +139,7 @@ const CONFIG: Record<InfoBoxVariant, InfoBoxStyle> = {
     bulletColor:
       "[&_li]:text-black dark:[&_li]:text-slate-200 [&_li::marker]:text-indigo-400 dark:[&_li::marker]:text-indigo-300",
     codeBg:
-      "[&_code]:bg-indigo-50/80 dark:[&_code]:bg-indigo-500/25 [&_code]:text-indigo-950 dark:[&_code]:text-indigo-100",
+      "[&_code]:bg-indigo-50/80 dark:[&_code]:bg-indigo-500/25 [&_code]:!text-indigo-900 dark:[&_code]:!text-indigo-100 [&_code.hljs]:!text-indigo-900 dark:[&_code.hljs]:!text-indigo-100 [&_code_.hljs]:!text-indigo-900 dark:[&_code_.hljs]:!text-indigo-100",
     visualText: "text-slate-700 dark:text-slate-300",
     gradient: {
       light: ["rgba(224,231,255,0.92)", "rgba(197,211,255,0.55)"],
@@ -172,7 +172,7 @@ const CONFIG: Record<InfoBoxVariant, InfoBoxStyle> = {
     bulletColor:
       "[&_li]:text-black dark:[&_li]:text-slate-200 [&_li::marker]:text-sky-400 dark:[&_li::marker]:text-sky-300",
     codeBg:
-      "[&_code]:bg-sky-50/80 dark:[&_code]:bg-sky-500/25 [&_code]:text-sky-950 dark:[&_code]:text-sky-100",
+      "[&_code]:bg-sky-50/80 dark:[&_code]:bg-sky-500/25 [&_code]:!text-sky-900 dark:[&_code]:!text-sky-100 [&_code.hljs]:!text-sky-900 dark:[&_code.hljs]:!text-sky-100 [&_code_.hljs]:!text-sky-900 dark:[&_code_.hljs]:!text-sky-100",
     visualText: "text-slate-700 dark:text-slate-300",
     gradient: {
       light: ["rgba(224,242,254,0.92)", "rgba(186,230,253,0.55)"],
@@ -206,7 +206,7 @@ const CONFIG: Record<InfoBoxVariant, InfoBoxStyle> = {
     bulletColor:
       "[&_li]:text-black dark:[&_li]:text-slate-200 [&_li::marker]:text-emerald-400 dark:[&_li::marker]:text-green-300",
     codeBg:
-      "[&_code]:bg-emerald-50/80 dark:[&_code]:bg-green-500/25 [&_code]:text-emerald-950 dark:[&_code]:text-green-100",
+      "[&_code]:bg-emerald-50/80 dark:[&_code]:bg-green-500/25 [&_code]:!text-emerald-900 dark:[&_code]:!text-green-100 [&_code.hljs]:!text-emerald-900 dark:[&_code.hljs]:!text-green-100 [&_code_.hljs]:!text-emerald-900 dark:[&_code_.hljs]:!text-green-100",
     visualText: "text-slate-700 dark:text-slate-300",
     gradient: {
       light: ["rgba(209,250,229,0.92)", "rgba(167,243,208,0.55)"],
@@ -556,6 +556,10 @@ const InfoBox: React.FC<InfoBoxProps> = ({
         "--info-grid-dark": scheme.gridColorDark,
         "--info-prose-body-light": "#000000",
         "--info-prose-body-dark": "rgba(226,232,240,0.95)",
+        "--info-prose-code-light": "#000000",
+        "--info-prose-code-dark": "rgba(226,232,240,0.95)",
+        "--info-prose-pre-code-light": "#000000",
+        "--info-prose-pre-code-dark": "rgba(226,232,240,0.95)",
       }) as React.CSSProperties,
     [scheme],
   );
@@ -571,6 +575,8 @@ const InfoBox: React.FC<InfoBoxProps> = ({
   const proseStyle = {
     "--tw-prose-body": "var(--info-prose-body)",
     "--tw-prose-links": accentVar,
+    "--tw-prose-code": "var(--info-prose-code)",
+    "--tw-prose-pre-code": "var(--info-prose-pre-code)",
   } as React.CSSProperties;
 
   const proseClasses = [
@@ -581,25 +587,116 @@ const InfoBox: React.FC<InfoBoxProps> = ({
     "[&_a:hover]:opacity-80",
     scheme.strongColor,
     scheme.codeBg,
-    "[&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:font-mono [&_code]:text-sm",
+    "[&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:font-mono [&_code]:text-sm [&_code]:font-medium",
+    "[&_.hljs]:!bg-transparent",
+    "[&_code_*]:!text-inherit",
+    "[&_code_span]:!color-inherit",
     "[&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5",
     scheme.bulletColor,
   ].join(" ");
 
+  // Create a unique class name for this InfoBox instance
+  const instanceId = React.useId();
+  const codeColorClass = `infobox-code-${instanceId.replace(/:/g, '')}`;
+
+  // Determine colors based on variant
+  const codeColors = React.useMemo(() => {
+    switch (type) {
+      case "insight":
+        return { light: "#5b21b6", dark: "#ddd6fe" };
+      case "warning":
+        return { light: "#92400e", dark: "#fef08a" };
+      case "advanced":
+        return { light: "#4338ca", dark: "#c7d2fe" };
+      case "info":
+        return { light: "#0284c7", dark: "#bae6fd" };
+      default:
+        return { light: "#059669", dark: "#a7f3d0" };
+    }
+  }, [type]);
+
+  const styleContent = `
+    .${codeColorClass} code,
+    .${codeColorClass} code.hljs,
+    .${codeColorClass} code *,
+    .${codeColorClass} code.hljs *,
+    .${codeColorClass} code .hljs,
+    .${codeColorClass} code span,
+    .${codeColorClass} code .hljs-keyword,
+    .${codeColorClass} code .hljs-built_in,
+    .${codeColorClass} code .hljs-type,
+    .${codeColorClass} code .hljs-literal,
+    .${codeColorClass} code .hljs-number,
+    .${codeColorClass} code .hljs-operator,
+    .${codeColorClass} code .hljs-punctuation,
+    .${codeColorClass} code .hljs-property,
+    .${codeColorClass} code .hljs-regexp,
+    .${codeColorClass} code .hljs-string,
+    .${codeColorClass} code .hljs-char,
+    .${codeColorClass} code .hljs-symbol,
+    .${codeColorClass} code .hljs-variable,
+    .${codeColorClass} code .hljs-language,
+    .${codeColorClass} code .hljs-meta,
+    .${codeColorClass} code .hljs-comment,
+    .${codeColorClass} code .hljs-atom,
+    .${codeColorClass} code .hljs-tag,
+    .${codeColorClass} code .hljs-attribute,
+    .${codeColorClass} code .hljs-selector,
+    .${codeColorClass} code .hljs-name {
+      color: ${codeColors.light} !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .dark .${codeColorClass} code,
+      .dark .${codeColorClass} code.hljs,
+      .dark .${codeColorClass} code *,
+      .dark .${codeColorClass} code.hljs *,
+      .dark .${codeColorClass} code .hljs,
+      .dark .${codeColorClass} code span,
+      .dark .${codeColorClass} code .hljs-keyword,
+      .dark .${codeColorClass} code .hljs-built_in,
+      .dark .${codeColorClass} code .hljs-type,
+      .dark .${codeColorClass} code .hljs-literal,
+      .dark .${codeColorClass} code .hljs-number,
+      .dark .${codeColorClass} code .hljs-operator,
+      .dark .${codeColorClass} code .hljs-punctuation,
+      .dark .${codeColorClass} code .hljs-property,
+      .dark .${codeColorClass} code .hljs-regexp,
+      .dark .${codeColorClass} code .hljs-string,
+      .dark .${codeColorClass} code .hljs-char,
+      .dark .${codeColorClass} code .hljs-symbol,
+      .dark .${codeColorClass} code .hljs-variable,
+      .dark .${codeColorClass} code .hljs-language,
+      .dark .${codeColorClass} code .hljs-meta,
+      .dark .${codeColorClass} code .hljs-comment,
+      .dark .${codeColorClass} code .hljs-atom,
+      .dark .${codeColorClass} code .hljs-tag,
+      .dark .${codeColorClass} code .hljs-attribute,
+      .dark .${codeColorClass} code .hljs-selector,
+      .dark .${codeColorClass} code .hljs-name {
+        color: ${codeColors.dark} !important;
+      }
+    }
+  `;
+
   return (
-    <div
-      className={`relative my-8 overflow-hidden rounded-2xl border border-transparent bg-white/90 shadow-lg backdrop-blur-md dark:bg-slate-950/45 dark:shadow-xl ${scheme.ring}
-        [--info-accent:var(--info-accent-light)] dark:[--info-accent:var(--info-accent-dark)]
-        [--info-accent-soft:var(--info-accent-soft-light)] dark:[--info-accent-soft:var(--info-accent-soft-dark)]
-        [--info-accent-muted:var(--info-accent-muted-light)] dark:[--info-accent-muted:var(--info-accent-muted-dark)]
-        [--info-neutral:var(--info-neutral-light)] dark:[--info-neutral:var(--info-neutral-dark)]
-        [--info-gradient-start:var(--info-gradient-start-light)] dark:[--info-gradient-start:var(--info-gradient-start-dark)]
-        [--info-gradient-end:var(--info-gradient-end-light)] dark:[--info-gradient-end:var(--info-gradient-end-dark)]
-        [--info-grid:var(--info-grid-light)] dark:[--info-grid:var(--info-grid-dark)]
-        [--info-prose-body:var(--info-prose-body-light)] dark:[--info-prose-body:var(--info-prose-body-dark)]
-      `}
-      style={cssVars}
-    >
+    <>
+      <style dangerouslySetInnerHTML={{ __html: styleContent }} />
+      <div
+        className={`${codeColorClass} relative my-8 overflow-hidden rounded-2xl border border-transparent bg-white/90 shadow-lg backdrop-blur-md dark:bg-slate-950/45 dark:shadow-xl ${scheme.ring}
+          [--info-accent:var(--info-accent-light)] dark:[--info-accent:var(--info-accent-dark)]
+          [--info-accent-soft:var(--info-accent-soft-light)] dark:[--info-accent-soft:var(--info-accent-soft-dark)]
+          [--info-accent-muted:var(--info-accent-muted-light)] dark:[--info-accent-muted:var(--info-accent-muted-dark)]
+          [--info-neutral:var(--info-neutral-light)] dark:[--info-neutral:var(--info-neutral-dark)]
+          [--info-gradient-start:var(--info-gradient-start-light)] dark:[--info-gradient-start:var(--info-gradient-start-dark)]
+          [--info-gradient-end:var(--info-gradient-end-light)] dark:[--info-gradient-end:var(--info-gradient-end-dark)]
+          [--info-grid:var(--info-grid-light)] dark:[--info-grid:var(--info-grid-dark)]
+          [--info-prose-body:var(--info-prose-body-light)] dark:[--info-prose-body:var(--info-prose-body-dark)]
+          [--info-prose-code:var(--info-prose-code-light)] dark:[--info-prose-code:var(--info-prose-code-dark)]
+          [--info-prose-pre-code:var(--info-prose-pre-code-light)] dark:[--info-prose-pre-code:var(--info-prose-pre-code-dark)]
+        `}
+        style={cssVars}
+      >
       <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -669,6 +766,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 
