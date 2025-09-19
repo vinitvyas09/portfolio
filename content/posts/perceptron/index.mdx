@@ -930,6 +930,51 @@ If you have a weight vector [2, 1], it's pointing up and to the right. That mean
 
 This is why the dot product w·x gives us the activation. Dot products measure alignment. When your input x points in the same direction as w, you get a positive dot product. When they point in opposite directions, negative. When perpendicular, zero.
 
+## The Convergence Theorem: Will It Ever Stop Learning?
+
+Here's a question that might keep you up at night: when you train a perceptron, will it ever finish? Or will it keep adjusting weights forever, never quite satisfied with its decision boundary?
+
+This isn't a philosophical question, it's a practical one. If your perceptron is going to run forever on some datasets, you'd probably want to know that before deploying it to production.
+
+### What Does "Convergence" Even Mean?
+
+For a perceptron, convergence means it can look at every single training example and think "yeah, I got that one right" without adjusting anything. One complete pass through all the data, zero updates. The perceptron has found its perfect line (or hyperplane) and it's done.
+
+But here's the catch, and it's a big one! Let's look at two different datasets:
+
+{/*
+
+maybe reuse perceptron playground component somehow?
+
+
+<ConvergenceComparison
+config={{
+datasets: [
+{
+name: "Linearly Separable",
+type: "two_clusters",
+description: "Watch the perceptron find the line and stop",
+willConverge: true
+},
+{
+name: "XOR Pattern",
+type: "xor",
+description: "Watch it struggle forever",
+willConverge: false
+}
+],
+showUpdateCount: true,
+showEpochCount: true,
+maxEpochs: 100
+}}
+/>
+*/}
+
+<Caption>Same algorithm, vastly different outcomes. The left converges in ~10 updates. The right will run until the heat death of the universe.</Caption>
+
+See that XOR pattern on the right? No single straight line can separate those points correctly. The perceptron will keep adjusting its weights forever. And this leads us to the fundamental requirement: the perceptron will only converge if the data is linearly separable. No line, no convergence. It's that simple.
+
+
 
 
 
