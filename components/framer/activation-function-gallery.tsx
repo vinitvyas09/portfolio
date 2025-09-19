@@ -251,11 +251,11 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Modern favorite: 0 or positive",
       fn: (x: number) => Math.max(0, x),
       color: colors.quaternary,
-      range: { min: -0.5, max: 5 },
-      domain: { min: -4, max: 5 },
-      xTicks: [-4, -2, 0, 2, 4],
-      yTicks: [0, 1, 2, 3, 4, 5],
-      sampleCount: 320
+      range: { min: -0.5, max: 4 },
+      domain: { min: -5, max: 5 },
+      xTicks: [-5, -2.5, 0, 2.5, 5],
+      yTicks: [0, 1, 2, 3, 4],
+      sampleCount: 200
     },
     {
       name: "Leaky ReLU",
@@ -263,11 +263,11 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "ReLU with a small negative slope (alpha = 0.01)",
       fn: (x: number) => (x >= 0 ? x : 0.01 * x),
       color: colors.quinary,
-      range: { min: -0.2, max: 5 },
-      domain: { min: -8, max: 5 },
-      xTicks: [-8, -4, 0, 2, 4],
-      yTicks: [-0.08, 0, 1, 2, 3, 4, 5],
-      sampleCount: 400,
+      range: { min: -0.1, max: 4 },
+      domain: { min: -10, max: 5 },
+      xTicks: [-10, -5, 0, 2.5, 5],
+      yTicks: [-0.1, 0, 1, 2, 3, 4],
+      sampleCount: 300,
       reference: {
         fn: (x: number) => Math.max(0, x),
         label: "Standard ReLU",
@@ -279,10 +279,10 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
   const currentFunction = activationFunctions[selectedFunction];
 
-  // SVG dimensions
-  const svgWidth = 280;
-  const svgHeight = 200;
-  const padding = 40;
+  // SVG dimensions - larger graph
+  const svgWidth = 600;
+  const svgHeight = 400;
+  const padding = 50;
   const graphWidth = svgWidth - 2 * padding;
   const graphHeight = svgHeight - 2 * padding;
   const currentDomain = currentFunction.domain ?? DEFAULT_DOMAIN;
@@ -304,9 +304,8 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
     const domainToSvgX = (x: number) => padding + ((x - domain.min) / domainSpan) * graphWidth;
     const rangeToSvgY = (value: number) => {
-      // Clamp values to stay within SVG bounds but allow visual extension to edges
-      const clampedValue = Math.max(range.min, Math.min(range.max, value));
-      return padding + ((range.max - clampedValue) / rangeSpan) * graphHeight;
+      // Don't clamp - let values extend beyond viewport
+      return padding + ((range.max - value) / rangeSpan) * graphHeight;
     };
 
     if (customPath) {
@@ -320,36 +319,16 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
     const effectiveSamples = Math.max(2, Math.floor(samples));
     const segments: string[] = [];
-    let lastValidY: number | null = null;
 
     for (let i = 0; i <= effectiveSamples; i++) {
       const x = domain.min + (i / effectiveSamples) * domainSpan;
-      const rawY = valueFn(x);
+      const y = valueFn(x);
 
-      // Handle infinite values by extending to viewport edge
-      let y = rawY;
-      if (!Number.isFinite(rawY)) {
-        y = rawY > 0 ? range.max * 1.5 : range.min * 1.5;
-      }
-
-      // For functions that grow beyond range, extend them visually
-      if (y > range.max) {
-        y = range.max + (range.max - range.min) * 0.1; // Extend slightly beyond
-      } else if (y < range.min) {
-        y = range.min - (range.max - range.min) * 0.1; // Extend slightly beyond
-      }
-
+      const svgX = domainToSvgX(x);
       const svgY = rangeToSvgY(y);
 
-      // Check for discontinuities
-      if (lastValidY !== null && Math.abs(y - lastValidY) > rangeSpan * 0.5) {
-        // Large jump detected, might be a discontinuity
-        segments.push(`M ${domainToSvgX(x)} ${svgY}`);
-      } else {
-        segments.push(`${i === 0 ? 'M' : 'L'} ${domainToSvgX(x)} ${svgY}`);
-      }
-
-      lastValidY = y;
+      // Simply plot the points, let clipping handle overflow
+      segments.push(`${i === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
     }
 
     return segments.join(' ');
@@ -463,8 +442,8 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
         </div>
 
         {/* Main visualization area */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Graph */}
+        <div className="flex flex-col gap-6">
+          {/* Graph - centered and larger */}
           <div className="flex flex-col items-center">
             <h3
               className="font-bold text-lg mb-4"
@@ -473,7 +452,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
               Function Graph
             </h3>
             <div
-              className="rounded-lg p-4"
+              className="rounded-lg p-4 mx-auto"
               style={{
                 backgroundColor: colors.cardBg,
                 border: `1px solid ${colors.borderColor}`
@@ -681,31 +660,34 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                   })}
                 </g>
 
-                {/* Reference curve (for comparisons) */}
-                {referencePath && (
-                  <path
-                    d={referencePath}
-                    fill="none"
-                    stroke={currentFunction.reference?.color ?? colors.gridLine}
-                    strokeWidth="2"
-                    strokeDasharray={currentFunction.reference?.strokeDasharray ?? '6,4'}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                )}
+                {/* Define clipping region */}
+                <defs>
+                  <clipPath id="graph-clip">
+                    <rect
+                      x={padding}
+                      y={padding}
+                      width={graphWidth}
+                      height={graphHeight}
+                    />
+                  </clipPath>
+                </defs>
 
-                {/* Function curve */}
+                {/* Apply clipping to both curves */}
                 <g clipPath="url(#graph-clip)">
-                  <defs>
-                    <clipPath id="graph-clip">
-                      <rect
-                        x={padding}
-                        y={padding}
-                        width={graphWidth}
-                        height={graphHeight}
-                      />
-                    </clipPath>
-                  </defs>
+                  {/* Reference curve (for comparisons) */}
+                  {referencePath && (
+                    <path
+                      d={referencePath}
+                      fill="none"
+                      stroke={currentFunction.reference?.color ?? colors.gridLine}
+                      strokeWidth="2"
+                      strokeDasharray={currentFunction.reference?.strokeDasharray ?? '6,4'}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  )}
+
+                  {/* Function curve */}
                   <path
                     d={currentPath}
                     fill="none"
@@ -780,18 +762,11 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
             </div>
           </div>
 
-          {/* Properties and interactive controls */}
-          <div className="flex flex-col">
-            <h3
-              className="font-bold text-lg mb-4"
-              style={{ color: colors.textPrimary }}
-            >
-              Properties & Behavior
-            </h3>
-
-            {/* Description card */}
+          {/* Properties and Behavior - two boxes side by side */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Properties card */}
             <div
-              className="rounded-lg p-4 mb-4"
+              className="rounded-lg p-4"
               style={{
                 backgroundColor: colors.cardBg,
                 border: `1px solid ${colors.borderColor}`
@@ -862,7 +837,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
               </div>
             </div>
 
-            {/* Interactive slider */}
+            {/* Interactive behavior */}
             {config.showInteractive && (
               <div
                 className="rounded-lg p-4"
@@ -872,10 +847,10 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                 }}
               >
                 <h4
-                  className="font-medium mb-3"
+                  className="font-semibold mb-3"
                   style={{ color: colors.textPrimary }}
                 >
-                  Try it yourself
+                  Interactive Behavior
                 </h4>
                 <div>
                   <label className="block text-sm mb-2" style={{ color: colors.textSecondary }}>
