@@ -874,6 +874,62 @@ emphasize: "Same algorithm, just more loops"
 
 And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature. 
 
+## Decision Boundaries: The Geometry of Classification
+
+So far we've been training our perceptron to find "the right line" to separate cats from dogs. But we've been treating this line like a black box, it magically appears after training and somehow makes the right decisions. Time to crack it open.
+
+### What Even Is a Decision Boundary?
+
+The decision boundary is the fence-sitter's paradise—it's where the perceptron literally cannot decide. Remember our equation:
+
+```
+activation = w1*x1 + w2*x2 + bias
+```
+
+On one side of space, this activation is positive (dog territory). On the other side, it's negative (cat territory). The decision boundary is the exact line where activation equals zero—the perceptron's "I genuinely have no idea" zone.
+
+```python
+# Decision boundary definition:
+# All points (x1, x2) where:
+w1*x1 + w2*x2 + bias = 0
+
+# Rearranging to standard line form:
+# This is just Ax + By + C = 0 where:
+# A = w1, B = w2, C = bias
+```
+
+We have been calling it a line but this is another way to look at it. 
+
+Here's where it gets interesting. The weights don't just tell us where the boundary is, they tell us its *orientation*. Specifically, the weight vector [w1, w2] is always perpendicular to the decision boundary. Not sometimes. Not usually. Always.
+
+### The Perpendicular Truth
+
+Let me show you why this perpendicular relationship is the key to understanding what weights actually mean.
+
+{/*
+<DecisionBoundaryGeometry
+config={{
+showWeightVector: true,
+showBoundary: true,
+showAngle: true,
+dataset: "interactive",
+allowRotation: true,
+annotation: "The weight vector and decision boundary are always at 90°"
+}}
+/>
+*/}
+
+<Caption>No matter how you rotate the weights, the boundary stays perpendicular</Caption>
+
+Think of the weight vector as an arrow pointing from the origin. The decision boundary is the line that would block this arrow at exactly 90 degrees. But here's the nuance that matters: the weight vector doesn't just define the boundary's orientation, it points toward the positive class.
+
+If you have a weight vector [2, 1], it's pointing up and to the right. That means:
+1. Points in that direction (similar direction to weights) → positive activation → classified positive
+2. Points in the opposite direction → negative activation → classified negative
+3. Points perpendicular to the weights → zero activation → on the boundary
+
+This is why the dot product w·x gives us the activation. Dot products measure alignment. When your input x points in the same direction as w, you get a positive dot product. When they point in opposite directions, negative. When perpendicular, zero.
+
 
 
 
