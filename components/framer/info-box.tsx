@@ -18,76 +18,76 @@ const InfoBox: React.FC<InfoBoxProps> = ({ type, title, visual, children }) => {
 
   const isDark = mounted && resolvedTheme === "dark";
 
-  // Type-specific configurations
+  // Type-specific configurations with sophisticated, muted colors
   const typeConfig = {
     insight: {
       lightColors: {
-        bg: '#f0f9ff',
-        border: '#38bdf8',
-        icon: '#0284c7',
-        titleColor: '#075985',
-        textColor: '#0c4a6e',
-        accentGradient: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)',
+        bg: '#f8fafb',
+        border: '#94a3b8',
+        icon: '#64748b',
+        titleColor: '#475569',
+        textColor: '#64748b',
+        accentGradient: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
       },
       darkColors: {
-        bg: 'rgba(14, 165, 233, 0.1)',
-        border: '#0ea5e9',
-        icon: '#38bdf8',
-        titleColor: '#7dd3fc',
-        textColor: '#bae6fd',
-        accentGradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+        bg: 'rgba(148, 163, 184, 0.05)',
+        border: '#475569',
+        icon: '#64748b',
+        titleColor: '#94a3b8',
+        textColor: '#94a3b8',
+        accentGradient: 'linear-gradient(135deg, #475569 0%, #334155 100%)',
       },
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
             d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
     },
     warning: {
       lightColors: {
-        bg: '#fef3c7',
-        border: '#fbbf24',
-        icon: '#d97706',
-        titleColor: '#92400e',
-        textColor: '#78350f',
-        accentGradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+        bg: '#fdfbf7',
+        border: '#d4a574',
+        icon: '#b08968',
+        titleColor: '#8b6f47',
+        textColor: '#7a5f3f',
+        accentGradient: 'linear-gradient(135deg, #d4a574 0%, #b08968 100%)',
       },
       darkColors: {
-        bg: 'rgba(251, 191, 36, 0.1)',
-        border: '#f59e0b',
-        icon: '#fbbf24',
-        titleColor: '#fcd34d',
-        textColor: '#fde68a',
-        accentGradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+        bg: 'rgba(212, 165, 116, 0.05)',
+        border: '#8b6f47',
+        icon: '#a08060',
+        titleColor: '#d4a574',
+        textColor: '#c9a876',
+        accentGradient: 'linear-gradient(135deg, #8b6f47 0%, #6b5537 100%)',
       },
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       ),
     },
     advanced: {
       lightColors: {
-        bg: '#f3e8ff',
-        border: '#a855f7',
-        icon: '#7c3aed',
-        titleColor: '#6b21a8',
-        textColor: '#581c87',
-        accentGradient: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+        bg: '#faf9fb',
+        border: '#a393b8',
+        icon: '#8b7aa0',
+        titleColor: '#6b5b80',
+        textColor: '#5d4e6d',
+        accentGradient: 'linear-gradient(135deg, #a393b8 0%, #8b7aa0 100%)',
       },
       darkColors: {
-        bg: 'rgba(168, 85, 247, 0.1)',
-        border: '#9333ea',
-        icon: '#a855f7',
-        titleColor: '#c084fc',
-        textColor: '#d8b4fe',
-        accentGradient: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)',
+        bg: 'rgba(163, 147, 184, 0.05)',
+        border: '#6b5b80',
+        icon: '#8b7aa0',
+        titleColor: '#a393b8',
+        textColor: '#b5a6c9',
+        accentGradient: 'linear-gradient(135deg, #6b5b80 0%, #524360 100%)',
       },
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
             d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>
       ),
