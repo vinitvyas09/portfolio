@@ -225,26 +225,33 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Smooth probability between 0 and 1",
       fn: (x: number) => 1 / (1 + Math.exp(-x)),
       color: colors.secondary,
-      range: { min: -0.15, max: 1.15 },
+      range: { min: -0.05, max: 1.05 },
       domain: { min: -8, max: 8 },
       xTicks: [-8, -4, 0, 4, 8],
       yTicks: [0, 0.25, 0.5, 0.75, 1],
       asymptotes: [0, 1],
-      sampleCount: 600,
-      customPath: ({ toSvgX, toSvgY, domain }) => {
+      sampleCount: 400,
+      customPath: ({ toSvgX, toSvgY, domain, range }) => {
         const points: string[] = [];
-        const samples = 600;
-        // Extend beyond the visible domain to show continuation
-        const extMin = domain.min - 4;
-        const extMax = domain.max + 4;
+        const samples = 400;
 
+        // Don't extend too far - keep visual gap from asymptotes
         for (let i = 0; i <= samples; i++) {
-          const x = extMin + (i / samples) * (extMax - extMin);
+          const x = domain.min + (i / samples) * (domain.max - domain.min);
           const y = 1 / (1 + Math.exp(-x));
-          const svgX = toSvgX(x);
-          const svgY = toSvgY(y);
 
-          points.push(`${i === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+          // Stop drawing if we get too close to asymptotes
+          if (y < 0.02 || y > 0.98) {
+            // Add a small gap to show it doesn't touch
+            const clampedY = y < 0.5 ? 0.02 : 0.98;
+            const svgX = toSvgX(x);
+            const svgY = toSvgY(clampedY);
+            points.push(`${points.length === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+          } else {
+            const svgX = toSvgX(x);
+            const svgY = toSvgY(y);
+            points.push(`${points.length === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+          }
         }
         return points.join(' ');
       }
@@ -255,26 +262,31 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
       description: "Centered sigmoid, outputs -1 to 1",
       fn: (x: number) => Math.tanh(x),
       color: colors.tertiary,
-      range: { min: -1.15, max: 1.15 },
+      range: { min: -1.05, max: 1.05 },
       domain: { min: -5, max: 5 },
       xTicks: [-5, -2.5, 0, 2.5, 5],
       yTicks: [-1, -0.5, 0, 0.5, 1],
       asymptotes: [-1, 1],
-      sampleCount: 600,
+      sampleCount: 400,
       customPath: ({ toSvgX, toSvgY, domain }) => {
         const points: string[] = [];
-        const samples = 600;
-        // Extend beyond the visible domain to show continuation
-        const extMin = domain.min - 3;
-        const extMax = domain.max + 3;
+        const samples = 400;
 
         for (let i = 0; i <= samples; i++) {
-          const x = extMin + (i / samples) * (extMax - extMin);
+          const x = domain.min + (i / samples) * (domain.max - domain.min);
           const y = Math.tanh(x);
-          const svgX = toSvgX(x);
-          const svgY = toSvgY(y);
 
-          points.push(`${i === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+          // Stop drawing if we get too close to asymptotes
+          if (y < -0.95 || y > 0.95) {
+            const clampedY = y < 0 ? -0.95 : 0.95;
+            const svgX = toSvgX(x);
+            const svgY = toSvgY(clampedY);
+            points.push(`${points.length === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+          } else {
+            const svgX = toSvgX(x);
+            const svgY = toSvgY(y);
+            points.push(`${points.length === 0 ? 'M' : 'L'} ${svgX} ${svgY}`);
+          }
         }
         return points.join(' ');
       }
