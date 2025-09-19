@@ -159,14 +159,13 @@ This is what we're asking the perceptron to do: find that line. Given a new anim
 You might be thinking: "I can literally see where to draw that line. Why do we need a fancy algorithm?" Fair point! In 2D, with data this clean, you could absolutely eyeball it. But here's where it gets interesting:
 
 <DimensionScalingViz
-config={{
-animationSpeed: 4000,
-showCode: true,
-autoPlay: true
-}}
+  config={{
+    animationSpeed: 16000,
+    autoPlay: true,
+  }}
 />
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">Good luck "eyeballing" a separating hyperplane in 50,000 dimensions!</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Scan a single 2D slice on the left, then watch how the perceptron collapses everything onto w · x + b and reveals the per-feature contributions at the bottom — good luck "eyeballing" that in 50,000 dimensions.</p>
 Real-world data doesn't come in neat 2D packages. When you're classifying:
 
 Emails as spam/not spam: Hundreds of word frequencies as dimensions
@@ -175,23 +174,23 @@ Medical diagnoses: Dozens of test results, symptoms, and patient history
 
 Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care—the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
 
-{/* TODO: Implement InfoBox component
 <InfoBox type="insight" title="The Hyperplane Pattern">
-**Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern?
-To separate data in n dimensions, you need an (n-1) dimensional hyperplane.
-It's like how a piece of paper (2D) can divide a room (3D) into two halves, or how a line (1D) divides a paper (2D). The perceptron is just finding the right orientation for that dividing surface, regardless of how many dimensions we're working in.
-</InfoBox>
-*/}
 
-{/*
+**Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern?
+
+To separate data in n dimensions, you need an (n-1) dimensional hyperplane.
+
+It's like how a piece of paper (2D) can divide a room (3D) into two halves, or how a line (1D) divides a paper (2D). The perceptron is just finding the right orientation for that dividing surface, regardless of how many dimensions we're working in.
+
+</InfoBox>
+
 <InfoBox type="warning" title="The Perceptron's Kryptonite">
 
-**Spoiler alert:** The perceptron is amazing at finding these linear separations, but it has one fatal weakness that almost killed AI research for decades. It can't handle data that isn't linearly separable—imagine trying to separate a bullseye pattern with a straight line. 
+**Spoiler alert:** The perceptron is amazing at finding these linear separations, but it has one fatal weakness that almost killed AI research for decades. It can't handle data that isn't linearly separable—imagine trying to separate a bullseye pattern with a straight line.
 
 There's a famous example called XOR that's so simple a toddler could solve it, but it stumped the perceptron and caused what we now call the "first AI winter." We'll dive into that drama later.
 
 </InfoBox>
-*/}
 
 ## The Math: Which Side Are You On?
 
@@ -350,25 +349,19 @@ dataset: "cats_vs_dogs"
 
 ### The Signed Distance (For the Curious)
 
-{/* TODO: Implement InfoBox component
 <InfoBox type="advanced" title="Going Deeper: It's Actually Distance!">
+
 Here's something cool: the value of `Ax + By + C` doesn't just tell you which side of the line you're on—it's actually proportional to your distance from the line!
+
 The exact signed distance from point (x₀, y₀) to line Ax + By + C = 0 is:
-d = (Ax₀ + By₀ + C) / √(A² + B²)
+
+**d = (Ax₀ + By₀ + C) / √(A² + B²)**
+
 Since √(A² + B²) is always positive, it doesn't affect the sign. That's why we can ignore it for classification and just use Ax + By + C.
 
-<SignedDistanceViz
-config={{
-showFormula: true,
-showDistanceLines: true,
-colorByDistance: true,
-interactive: true
-}}
-/>
-
 Points far from the line have large absolute values (very positive or very negative), while points near the line have values close to zero. This becomes important later when we talk about "confidence" in predictions!
+
 </InfoBox>
-*/}
 
 ## The Activation Function: Teaching Our Perceptron to Make Decisions
 
