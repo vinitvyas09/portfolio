@@ -676,9 +676,9 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                   padding: "0.6rem 0.9rem",
                   borderRadius: "10px",
                   border: `1px solid ${
-                    isActive ? colors.classB : colors.border
+                    isActive ? `${colors.classB}66` : colors.border
                   }`,
-                  background: isActive ? `${colors.classB}22` : colors.surface,
+                  background: isActive ? `${colors.classB}15` : colors.surface,
                   color: colors.textPrimary,
                   fontSize: "0.8rem",
                   fontWeight: 600,
