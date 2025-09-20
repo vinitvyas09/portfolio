@@ -671,19 +671,6 @@ Both errors low and stable: Just right!
 
 So far, when we make a mistake, we've been adding the full input values to our weights. But what if we only added a fraction? Enter the learning rate (α).
 
-<LearningRateComparison
-config={{
-rates: [
-{ value: 0.01, label: "Tiny steps", description: "Careful but slow" },
-{ value: 0.1, label: "Balanced", description: "Good compromise" },
-{ value: 1.0, label: "Full updates", description: "Fast but unstable" },
-{ value: 10.0, label: "Giant leaps", description: "Chaos!" }
-],
-showConvergence: true,
-dataset: "spiral_data"
-}}
-/>
-
 With learning rate, our update rule becomes:
 
 ```python
