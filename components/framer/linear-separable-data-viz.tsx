@@ -242,6 +242,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     setShowLine(false);
     setVisiblePoints(0);
     setCurrentTrainingPoint(-1);
+    // reset fallback segment
+    lastLineRef.current = null;
   }, []);
 
   // Color palette
@@ -682,6 +684,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     };
   };
 
+  // Keep last valid line segment to avoid zero-length/degenerate frames
+  const lastLineRef = React.useRef<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+
   // Placeholder to avoid SSR/CSR theme mismatch flash
   if (!mounted) {
     return (
@@ -804,8 +809,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           </g>
         )}
 
-        {/* All lines clipped to chart area */}
-        <g clipPath={`url(#${svgIds.clipPath})`}>
+        {/* Lines (do not clip to avoid edge-case rendering issues) */}
+        <g>
           {/* True separating line (ground truth) */}
           {((showSeparatingLine && !interactive) || showLine) && !currentWeights && (
             <g>
@@ -843,7 +848,14 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           {currentWeights && (
             <g>
               {(() => {
-                const { x1, y1, x2, y2 } = getLinePoints(currentWeights);
+                let { x1, y1, x2, y2 } = getLinePoints(currentWeights);
+                const segLen = Math.hypot(x2 - x1, y2 - y1);
+                if (!Number.isFinite(segLen) || segLen < 2) {
+                  const fallback = lastLineRef.current || getLinePoints(trueLine);
+                  x1 = fallback.x1; y1 = fallback.y1; x2 = fallback.x2; y2 = fallback.y2;
+                } else {
+                  lastLineRef.current = { x1, y1, x2, y2 };
+                }
                 return (
                   <line
                     x1={x1}
