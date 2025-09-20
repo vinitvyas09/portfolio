@@ -447,25 +447,7 @@ Our prediction: sign(0.73(2) - 0.41(3) + 0.22) = sign(0.45) = 1 (we said dog!)
 
 We're wrong. The point is actually a cat (-1) but we predicted dog (1). How do we fix this?
 
-The perceptron's learning rule is surprisingly elegant:
-
-{/*
-<UpdateRuleVisualizer
-config={{
-example: {
-point: [2, 3],
-trueLabel: -1,
-prediction: 1,
-weights: [0.73, -0.41, 0.22]
-},
-showMathematically: true,
-animateUpdate: true,
-showGeometrically: true
-}}
-/>
-*/}
-
-Here's the rule in all its glory:
+The perceptron's learning rule is surprisingly elegant. Here's the rule in all its glory:
 
 If correct: Do absolutely nothing (if it ain't broke...)
 If wrong:
