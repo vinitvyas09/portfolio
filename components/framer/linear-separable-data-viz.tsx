@@ -576,7 +576,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     trainingTimeoutsRef.current.push(initialTimeoutId);
   }, [isTraining, dataPoints, visiblePoints, trueLine]);
 
-  // Calculate line points for SVG with proper clipping
+  // Calculate line points for SVG with robust clipping (handles corner cases)
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
     const line = lineParams || trueLine;
     const { a, b, c } = line;
@@ -605,26 +605,33 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       };
     }
 
-    // Calculate intersections with all four boundaries
-    const intersections = [];
+    // Calculate intersections with all four boundaries and dedupe
+    const intersections: Array<{ x: number; y: number }> = [];
+    const addPoint = (pt: { x: number; y: number }) => {
+      const eps = 1e-6;
+      for (const p of intersections) {
+        if (Math.abs(p.x - pt.x) < eps && Math.abs(p.y - pt.y) < eps) return; // duplicate (corner)
+      }
+      intersections.push(pt);
+    };
 
     // Left edge (x = xMin)
     const yAtXMin = -(a * xMin + c) / b;
     if (Number.isFinite(yAtXMin) && yAtXMin >= yMin && yAtXMin <= yMax) {
-      intersections.push({ x: xMin, y: yAtXMin });
+      addPoint({ x: xMin, y: yAtXMin });
     }
 
     // Right edge (x = xMax)
     const yAtXMax = -(a * xMax + c) / b;
     if (Number.isFinite(yAtXMax) && yAtXMax >= yMin && yAtXMax <= yMax) {
-      intersections.push({ x: xMax, y: yAtXMax });
+      addPoint({ x: xMax, y: yAtXMax });
     }
 
     // Bottom edge (y = yMin)
     if (Math.abs(a) > 0.001) {
       const xAtYMin = -(b * yMin + c) / a;
       if (Number.isFinite(xAtYMin) && xAtYMin >= xMin && xAtYMin <= xMax) {
-        intersections.push({ x: xAtYMin, y: yMin });
+        addPoint({ x: xAtYMin, y: yMin });
       }
     }
 
@@ -632,17 +639,30 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     if (Math.abs(a) > 0.001) {
       const xAtYMax = -(b * yMax + c) / a;
       if (Number.isFinite(xAtYMax) && xAtYMax >= xMin && xAtYMax <= xMax) {
-        intersections.push({ x: xAtYMax, y: yMax });
+        addPoint({ x: xAtYMax, y: yMax });
       }
     }
 
-    // We need exactly 2 intersection points
+    // We need two distinct points; if more, pick the farthest pair
     if (intersections.length >= 2) {
+      let p1 = intersections[0];
+      let p2 = intersections[1];
+      let maxD = -1;
+      for (let i = 0; i < intersections.length; i++) {
+        for (let j = i + 1; j < intersections.length; j++) {
+          const dx = intersections[i].x - intersections[j].x;
+          const dy = intersections[i].y - intersections[j].y;
+          const d = dx * dx + dy * dy;
+          if (d > maxD) {
+            maxD = d; p1 = intersections[i]; p2 = intersections[j];
+          }
+        }
+      }
       return {
-        x1: scaleX(intersections[0].x),
-        y1: scaleY(intersections[0].y),
-        x2: scaleX(intersections[1].x),
-        y2: scaleY(intersections[1].y)
+        x1: scaleX(p1.x),
+        y1: scaleY(p1.y),
+        x2: scaleX(p2.x),
+        y2: scaleY(p2.y)
       };
     }
 
