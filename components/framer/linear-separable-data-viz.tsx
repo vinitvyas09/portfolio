@@ -90,7 +90,7 @@ interface LinearSeparableDataVizProps {
 const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   config = {
     dataset: "cats_vs_dogs",
-    xAxis: "Tail wags per minute",
+    xAxis: "Body weight (kg)",
     yAxis: "Vocalization frequency (Hz)",
     showSeparatingLine: false,
     animateDataPoints: true,
@@ -114,7 +114,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const isDark = mounted && resolvedTheme === "dark";
 
   const {
-    xAxis = "Tail wags per minute",
+    xAxis = "Body weight (kg)",
     yAxis = "Vocalization frequency (Hz)",
     showSeparatingLine = false,
     animateDataPoints = true,
@@ -127,8 +127,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     regionLabels = ["Team Dog 🐕", "Team Cat 🐈"]
   } = config;
 
-  const dogRegionLabel = regionLabels?.[0] ?? "Dogs (Wag more, bark low)";
-  const catRegionLabel = regionLabels?.[1] ?? "Cats (Wag less, meow high)";
+  const dogRegionLabel = regionLabels?.[0] ?? "Dogs (Heavier, bark low)";
+  const catRegionLabel = regionLabels?.[1] ?? "Cats (Lighter, meow high)";
 
   // Animation states
   const [visiblePoints, setVisiblePoints] = useState<number>(0);
@@ -150,9 +150,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const trueLine = useMemo(() => {
     // Create deterministic but varying line based on dataGeneration
     const variation = Math.sin(dataGeneration * 1.7) * 0.5;
-    const a = 10 + variation * 2;    // coefficient for x (tail wags)
+    const a = 40 + variation * 5;    // coefficient for x (body weight)
     const b = 1;                     // coefficient for y (vocalization freq)
-    const c = -3000 + variation * 200; // constant term adjusted for Hz scale
+    const c = -1200 + variation * 100; // constant term adjusted for scale
 
     return { a, b, c };
   }, [dataGeneration]);
@@ -173,11 +173,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     };
 
     const pointsPerClass = 25;
-    const minMargin = 50;
-    const catXRange = { min: 0, max: 5 };   // cats rarely wag tails
-    const dogXRange = { min: 15, max: 30 }; // dogs wag a lot
-    const catYOffsetRange = 200;  // higher frequency for meows
-    const dogYOffsetRange = 200;  // lower frequency for barks
+    const minMargin = 100;
+    const catXRange = { min: 3, max: 7 };    // cats typically 3-7 kg
+    const dogXRange = { min: 10, max: 40 };  // dogs typically 10-40 kg
+    const catYOffsetRange = 400;  // meows 700-1500 Hz
+    const dogYOffsetRange = 200;  // barks 100-500 Hz
 
     for (let i = 0; i < pointsPerClass; i++) {
       const rawCatX = catXRange.min + seededRandom(i * 4) * (catXRange.max - catXRange.min);
@@ -286,7 +286,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const innerHeight = chartHeight - 2 * padding;
 
   const defaultBounds = useMemo(
-    () => ({ xMin: -5, xMax: 35, yMin: 50, yMax: 550 }),
+    () => ({ xMin: 0, xMax: 45, yMin: 0, yMax: 1600 }),
     []
   );
 
