@@ -752,21 +752,6 @@ def train_perceptron_any_dimension(data_points, labels, learning_rate=1.0):
 
 Whether you're classifying images (784 dimensions for MNIST), text (thousands of word frequencies), or cat videos (millions of pixels), the perceptron uses the exact same algorithm. The only difference is the loop runs longer.
 
-{/*
-<DimensionScalingFinal
-config={{
-examples: [
-{ dims: 2, use_case: "Cats vs dogs (weight, vocalization freq)" },
-{ dims: 3, use_case: "Add bark frequency" },
-{ dims: 784, use_case: "Handwritten digits (28×28 pixels)" },
-{ dims: 50000, use_case: "Text classification (word vectors)" },
-{ dims: "∞", use_case: "The math doesn't care!" }
-],
-emphasize: "Same algorithm, just more loops"
-}}
-/>
-*/}
-
 And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature. 
 
 ## Decision Boundaries: The Geometry of Classification
@@ -801,7 +786,6 @@ Here's where it gets interesting. The weights don't just tell us where the bound
 
 Let me show you why this perpendicular relationship is the key to understanding what weights actually mean.
 
-{/*
 <DecisionBoundaryGeometry
 config={{
 showWeightVector: true,
@@ -812,7 +796,6 @@ allowRotation: true,
 annotation: "The weight vector and decision boundary are always at 90°"
 }}
 />
-*/}
 
 <Caption>No matter how you rotate the weights, the boundary stays perpendicular</Caption>
 
