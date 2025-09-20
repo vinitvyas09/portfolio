@@ -129,9 +129,10 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   // True separating line
   const trueLine = useMemo(() => {
     const variation = Math.sin(dataGeneration * 1.7) * 0.2;
-    const a = 30 + variation * 5;
+    // Adjust line equation to ensure better data positioning
+    const a = 25 + variation * 5;  // Slightly less steep
     const b = 1;
-    const c = -600 + variation * 50;
+    const c = -800 + variation * 50;  // Shift line to ensure positive y values
     return { a, b, c };
   }, [dataGeneration]);
 
@@ -150,26 +151,30 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
 
     const pointsPerClass = 20; // Slightly fewer points for cleaner visualization
     const minMargin = 50;
-    const catXRange = { min: 3, max: 7 };
-    const dogXRange = { min: 15, max: 35 };
-    const catYOffsetRange = 300;
-    const dogYOffsetRange = 300;
+    const catXRange = { min: 3, max: 7 };    // cats: 3-7 kg
+    const dogXRange = { min: 15, max: 35 };  // dogs: 15-35 kg
+    const catYOffsetRange = 200;  // Reduced range for more realistic clustering
+    const dogYOffsetRange = 150;  // Smaller range to keep dogs above minimum
 
     for (let i = 0; i < pointsPerClass; i++) {
+      // Generate cat data (lighter weight, higher frequency)
       const catX = catXRange.min + seededRandom(i * 4) * (catXRange.max - catXRange.min);
       const boundaryCatY = -(a * catX + c) / b;
-      const catY = boundaryCatY + minMargin + seededRandom(i * 4 + 2) * catYOffsetRange + 400;
+      // Cats: typically 700-1500 Hz meows, ensure they're above the line
+      const catY = Math.min(1500, boundaryCatY + minMargin + seededRandom(i * 4 + 2) * catYOffsetRange + 200);
 
       points.push({
         x: catX,
-        y: catY,
+        y: Math.max(700, catY),  // Ensure minimum cat frequency
         label: 'cat',
         id: `cat-${i}-${dataGeneration}`
       });
 
+      // Generate dog data (heavier weight, lower frequency)
       const dogX = dogXRange.min + seededRandom(i * 4 + 100) * (dogXRange.max - dogXRange.min);
       const boundaryDogY = -(a * dogX + c) / b;
-      const dogY = boundaryDogY - minMargin - seededRandom(i * 4 + 102) * dogYOffsetRange;
+      // Dogs: typically 100-500 Hz barks, ensure they're below the line
+      const dogY = Math.max(100, Math.min(500, boundaryDogY - minMargin - seededRandom(i * 4 + 102) * dogYOffsetRange));
 
       points.push({
         x: dogX,
