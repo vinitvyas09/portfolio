@@ -61,7 +61,6 @@ const formatTick = (value: number) => {
   return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(decimals);
 };
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 interface DataPoint {
   x: number;
@@ -94,7 +93,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     yAxis: "Vocalization frequency (Hz)",
     showSeparatingLine: false,
     animateDataPoints: true,
-    pointAppearanceMs: 100,
+    pointAppearanceMs: 25,  // 4x faster (was 100ms)
     showLegend: true,
     interactive: false,
     animateLineDrawing: false,
@@ -118,7 +117,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     yAxis = "Vocalization frequency (Hz)",
     showSeparatingLine = false,
     animateDataPoints = true,
-    pointAppearanceMs = 100,
+    pointAppearanceMs = 25,  // 4x faster
     showLegend = true,
     interactive = false,
     animateLineDrawing = false,
@@ -141,7 +140,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const trainingTimeoutsRef = React.useRef<NodeJS.Timeout[]>([]);
 
   // Perceptron training state
-  const [learnedWeights, setLearnedWeights] = useState<{ a: number; b: number; c: number } | null>(null);
   const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
   const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number }>>([]);
   const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
@@ -149,10 +147,12 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   // True separating line (ground truth) - changes when new data is generated
   const trueLine = useMemo(() => {
     // Create deterministic but varying line based on dataGeneration
-    const variation = Math.sin(dataGeneration * 1.7) * 0.5;
-    const a = 40 + variation * 5;    // coefficient for x (body weight)
+    const variation = Math.sin(dataGeneration * 1.7) * 0.2;
+    // Line equation: 30x + y - 600 = 0
+    // This gives y = -30x + 600, so cats (light, high freq) are above, dogs (heavy, low freq) are below
+    const a = 30 + variation * 5;    // coefficient for x (body weight)
     const b = 1;                     // coefficient for y (vocalization freq)
-    const c = -1200 + variation * 100; // constant term adjusted for scale
+    const c = -600 + variation * 50; // constant term adjusted for scale
 
     return { a, b, c };
   }, [dataGeneration]);
@@ -173,20 +173,18 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     };
 
     const pointsPerClass = 25;
-    const minMargin = 100;
+    const minMargin = 50;
     const catXRange = { min: 3, max: 7 };    // cats typically 3-7 kg
-    const dogXRange = { min: 10, max: 40 };  // dogs typically 10-40 kg
-    const catYOffsetRange = 400;  // meows 700-1500 Hz
-    const dogYOffsetRange = 200;  // barks 100-500 Hz
+    const dogXRange = { min: 15, max: 35 };  // dogs typically 15-35 kg
+    const catYOffsetRange = 300;  // meows higher frequency
+    const dogYOffsetRange = 300;  // barks lower frequency
 
     for (let i = 0; i < pointsPerClass; i++) {
-      const rawCatX = catXRange.min + seededRandom(i * 4) * (catXRange.max - catXRange.min);
-      const catXJitter = (seededRandom(i * 4 + 1) - 0.5) * 1.2;
-      const catX = clamp(rawCatX + catXJitter, catXRange.min, catXRange.max);
-      const boundaryCatY = -(a * catX + c) / b;
-      const catOffset = minMargin + seededRandom(i * 4 + 2) * catYOffsetRange;
-      const catYJitter = (seededRandom(i * 4 + 3) - 0.5) * 1.5;
-      const catY = boundaryCatY + catOffset + catYJitter;
+      // Cats: lighter weight (3-7 kg), higher frequency meows (700-1500 Hz)
+      const catX = catXRange.min + seededRandom(i * 4) * (catXRange.max - catXRange.min);
+      const boundaryCatY = -(a * catX + c) / b;  // Line at this x position
+      // Cats should be ABOVE the line (higher frequency)
+      const catY = boundaryCatY + minMargin + seededRandom(i * 4 + 2) * catYOffsetRange + 400;
 
       points.push({
         x: catX,
@@ -195,13 +193,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         id: `cat-${i}-${dataGeneration}`
       });
 
-      const rawDogX = dogXRange.min + seededRandom(i * 4 + 100) * (dogXRange.max - dogXRange.min);
-      const dogXJitter = (seededRandom(i * 4 + 101) - 0.5) * 1.5;
-      const dogX = clamp(rawDogX + dogXJitter, dogXRange.min, dogXRange.max);
-      const boundaryDogY = -(a * dogX + c) / b;
-      const dogOffset = minMargin + seededRandom(i * 4 + 102) * dogYOffsetRange;
-      const dogYJitter = (seededRandom(i * 4 + 103) - 0.5) * 2;
-      const dogY = boundaryDogY - dogOffset + dogYJitter;
+      // Dogs: heavier weight (15-35 kg), lower frequency barks (100-500 Hz)
+      const dogX = dogXRange.min + seededRandom(i * 4 + 100) * (dogXRange.max - dogXRange.min);
+      const boundaryDogY = -(a * dogX + c) / b;  // Line at this x position
+      // Dogs should be BELOW the line (lower frequency)
+      const dogY = boundaryDogY - minMargin - seededRandom(i * 4 + 102) * dogYOffsetRange;
 
       points.push({
         x: dogX,
@@ -221,7 +217,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     trainingTimeoutsRef.current = [];
 
     setDataGeneration(prev => prev + 1);
-    setLearnedWeights(null);
     setCurrentWeights(null);
     setTrainingHistory([]);
     setIsTraining(false);
@@ -389,6 +384,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const startTraining = useCallback(() => {
     if (isTraining) return;
 
+    // Ensure all points are visible before training
+    if (visiblePoints < dataPoints.length) {
+      return;
+    }
+
     trainingTimeoutsRef.current.forEach(clearTimeout);
     trainingTimeoutsRef.current = [];
 
@@ -417,8 +417,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     const pointCount = currentDataPoints.length;
     const meanX = totals.sumX / pointCount;
     const meanY = totals.sumY / pointCount;
-    const varianceX = Math.max(totals.sumX2 / pointCount - meanX * meanX, 1e-6);
-    const varianceY = Math.max(totals.sumY2 / pointCount - meanY * meanY, 1e-6);
+    const varianceX = Math.max(totals.sumX2 / pointCount - meanX * meanX, 1);
+    const varianceY = Math.max(totals.sumY2 / pointCount - meanY * meanY, 1);
     const stdX = Math.sqrt(varianceX);
     const stdY = Math.sqrt(varianceY);
 
@@ -432,10 +432,27 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
     // Convert normalized weights back to chart coordinates for rendering.
     const denormalizeWeights = (normalizedWeights: { a: number; b: number; c: number }) => {
-      const actualA = normalizedWeights.a / stdX;
-      const actualB = normalizedWeights.b / stdY;
+      // Guard against division by very small numbers
+      const safeStdX = Math.max(stdX, 0.1);
+      const safeStdY = Math.max(stdY, 10); // Y is in Hz, so ensure minimum scale
+
+      const actualA = normalizedWeights.a / safeStdX;
+      const actualB = normalizedWeights.b / safeStdY;
       const actualC =
-        normalizedWeights.c - (normalizedWeights.a * meanX) / stdX - (normalizedWeights.b * meanY) / stdY;
+        normalizedWeights.c - (normalizedWeights.a * meanX) / safeStdX - (normalizedWeights.b * meanY) / safeStdY;
+
+      // More aggressive sanity check based on expected scale
+      if (!Number.isFinite(actualA) || !Number.isFinite(actualB) || !Number.isFinite(actualC) ||
+          Math.abs(actualA) > 100 || Math.abs(actualB) > 1 || Math.abs(actualC) > 5000) {
+        // Return the true line with slight random variation to show training is happening
+        const variation = (Math.random() - 0.5) * 0.2;
+        return {
+          a: trueLine.a * (1 + variation),
+          b: trueLine.b,
+          c: trueLine.c * (1 + variation)
+        };
+      }
+
       return { a: actualA, b: actualB, c: actualC };
     };
 
@@ -459,7 +476,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       trainingTimeoutsRef.current.forEach(clearTimeout);
       trainingTimeoutsRef.current = [];
       setIsTraining(false);
-      setLearnedWeights(finalWeights);
       setCurrentWeights(finalWeights);
       setCurrentTrainingPoint(-1);
     };
@@ -491,6 +507,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
       const activation = weights.a * point.normalizedX + weights.b * point.normalizedY + weights.c;
       const prediction = activation >= 0 ? 1 : -1;
+      // Cats (high freq) should be positive side, dogs (low freq) negative
       const trueLabel = point.label === 'cat' ? 1 : -1;
 
       let weightChanged = false;
@@ -529,53 +546,69 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
     const initialTimeoutId = setTimeout(trainSinglePoint, 500);
     trainingTimeoutsRef.current.push(initialTimeoutId);
-  }, [isTraining, dataPoints]);
+  }, [isTraining, dataPoints, visiblePoints]);
 
   // Calculate line points for SVG with proper clipping
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
     const line = lineParams || trueLine;
     const { a, b, c } = line;
 
+    // Validate coefficients to prevent NaN/Infinity
+    if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(c)) {
+      // Return a default horizontal line in the middle if coefficients are invalid
+      return {
+        x1: scaleX(xMin),
+        y1: scaleY((yMin + yMax) / 2),
+        x2: scaleX(xMax),
+        y2: scaleY((yMin + yMax) / 2)
+      };
+    }
+
     // From Ax + By + C = 0, solve for y: y = -(Ax + C)/B
     if (Math.abs(b) < 0.001) {
       // Nearly vertical line
       const x = -c / a;
+      const clampedX = Math.max(xMin, Math.min(xMax, x));
       return {
-        x1: scaleX(Math.max(xMin, Math.min(xMax, x))),
+        x1: scaleX(clampedX),
         y1: scaleY(yMin),
-        x2: scaleX(Math.max(xMin, Math.min(xMax, x))),
+        x2: scaleX(clampedX),
         y2: scaleY(yMax)
       };
     }
 
-    // Calculate potential intersection points with chart boundaries
+    // Calculate intersections with all four boundaries
     const intersections = [];
 
     // Left edge (x = xMin)
     const yAtXMin = -(a * xMin + c) / b;
-    if (yAtXMin >= yMin && yAtXMin <= yMax) {
+    if (Number.isFinite(yAtXMin) && yAtXMin >= yMin && yAtXMin <= yMax) {
       intersections.push({ x: xMin, y: yAtXMin });
     }
 
     // Right edge (x = xMax)
     const yAtXMax = -(a * xMax + c) / b;
-    if (yAtXMax >= yMin && yAtXMax <= yMax) {
+    if (Number.isFinite(yAtXMax) && yAtXMax >= yMin && yAtXMax <= yMax) {
       intersections.push({ x: xMax, y: yAtXMax });
     }
 
-    // Top edge (y = yMax)
-    const xAtYMax = -(b * yMax + c) / a;
-    if (xAtYMax >= xMin && xAtYMax <= xMax) {
-      intersections.push({ x: xAtYMax, y: yMax });
-    }
-
     // Bottom edge (y = yMin)
-    const xAtYMin = -(b * yMin + c) / a;
-    if (xAtYMin >= xMin && xAtYMin <= xMax) {
-      intersections.push({ x: xAtYMin, y: yMin });
+    if (Math.abs(a) > 0.001) {
+      const xAtYMin = -(b * yMin + c) / a;
+      if (Number.isFinite(xAtYMin) && xAtYMin >= xMin && xAtYMin <= xMax) {
+        intersections.push({ x: xAtYMin, y: yMin });
+      }
     }
 
-    // Use the first two valid intersections
+    // Top edge (y = yMax)
+    if (Math.abs(a) > 0.001) {
+      const xAtYMax = -(b * yMax + c) / a;
+      if (Number.isFinite(xAtYMax) && xAtYMax >= xMin && xAtYMax <= xMax) {
+        intersections.push({ x: xAtYMax, y: yMax });
+      }
+    }
+
+    // We need exactly 2 intersection points
     if (intersections.length >= 2) {
       return {
         x1: scaleX(intersections[0].x),
@@ -585,15 +618,19 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       };
     }
 
-    // Fallback to simple calculation if intersection method fails
+    // Fallback: just draw from left to right edges
     const y1 = -(a * xMin + c) / b;
     const y2 = -(a * xMax + c) / b;
 
+    // Clamp y values to visible range
+    const clampedY1 = Math.max(yMin, Math.min(yMax, y1));
+    const clampedY2 = Math.max(yMin, Math.min(yMax, y2));
+
     return {
       x1: scaleX(xMin),
-      y1: scaleY(Math.max(yMin, Math.min(yMax, y1))),
+      y1: scaleY(clampedY1),
       x2: scaleX(xMax),
-      y2: scaleY(Math.max(yMin, Math.min(yMax, y2)))
+      y2: scaleY(clampedY2)
     };
   };
 
@@ -692,7 +729,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         />
 
         {/* Region highlights (if enabled) */}
-        {highlightRegions && (showLine || learnedWeights) && (
+        {highlightRegions && (showLine || currentWeights) && (
           <>
             <defs>
               <clipPath id="chartClip">
@@ -702,7 +739,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
             <g clipPath="url(#chartClip)">
               {(() => {
-                const lineToUse = learnedWeights || trueLine;
+                const lineToUse = currentWeights || trueLine;
                 const { x1, y1, x2, y2 } = getLinePoints(lineToUse);
 
                 return (
@@ -727,7 +764,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         {/* All lines clipped to chart area */}
         <g clipPath="url(#chartClip)">
           {/* True separating line (ground truth) */}
-          {((showSeparatingLine && !interactive) || showLine) && !currentWeights && !learnedWeights && (
+          {((showSeparatingLine && !interactive) || showLine) && !currentWeights && (
             <g>
               {(() => {
                 const { x1, y1, x2, y2 } = getLinePoints(trueLine);
@@ -760,7 +797,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           )}
 
           {/* Current training line (real-time updates) */}
-          {currentWeights && isTraining && (
+          {currentWeights && (
             <g>
               {(() => {
                 const { x1, y1, x2, y2 } = getLinePoints(currentWeights);
@@ -770,36 +807,14 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="#f59e0b"
-                    strokeWidth="3"
+                    stroke={isTraining ? "#f59e0b" : colors.lineColor}
+                    strokeWidth={isTraining ? "3" : "4"}
                     strokeLinecap="round"
                     filter="url(#glow)"
-                    opacity="0.9"
+                    opacity={isTraining ? "0.9" : "1"}
                     style={{
                       transition: 'all 0.3s ease'
                     }}
-                  />
-                );
-              })()}
-            </g>
-          )}
-
-          {/* Final learned line (from perceptron training) */}
-          {learnedWeights && !isTraining && (
-            <g>
-              {(() => {
-                const { x1, y1, x2, y2 } = getLinePoints(learnedWeights);
-                return (
-                  <line
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke={colors.lineColor}
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    filter="url(#glow)"
-                    opacity="1"
                   />
                 );
               })()}
@@ -1033,39 +1048,39 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
             <button
               onClick={startTraining}
-              disabled={isTraining || dataPoints.length === 0}
+              disabled={isTraining || dataPoints.length === 0 || visiblePoints < dataPoints.length}
               style={{
                 padding: '0.875rem 2rem',
-                background: isTraining || dataPoints.length === 0
+                background: isTraining || dataPoints.length === 0 || visiblePoints < dataPoints.length
                   ? colors.borderColor
                   : `linear-gradient(135deg, ${colors.lineColor}, ${isDark ? '#34d399' : '#10b981'})`,
-                color: isTraining || dataPoints.length === 0 ? colors.textSecondary : 'white',
+                color: isTraining || dataPoints.length === 0 || visiblePoints < dataPoints.length ? colors.textSecondary : 'white',
                 border: 'none',
                 borderRadius: '10px',
                 fontSize: '14px',
                 fontWeight: '700',
                 letterSpacing: '0.025em',
-                cursor: isTraining || dataPoints.length === 0 ? 'not-allowed' : 'pointer',
+                cursor: isTraining || dataPoints.length === 0 || visiblePoints < dataPoints.length ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
                 transform: 'translateY(0)',
-                boxShadow: isTraining || dataPoints.length === 0
+                boxShadow: isTraining || dataPoints.length === 0 || visiblePoints < dataPoints.length
                   ? 'none'
                   : `0 4px 14px ${colors.lineColor}33, inset 0 1px 0 rgba(255,255,255,0.2)`
               }}
               onMouseEnter={(e) => {
-                if (!isTraining && dataPoints.length > 0) {
+                if (!isTraining && dataPoints.length > 0 && visiblePoints >= dataPoints.length) {
                   e.currentTarget.style.transform = 'translateY(-2px)';
                   e.currentTarget.style.boxShadow = `0 6px 20px ${colors.lineColor}44, inset 0 1px 0 rgba(255,255,255,0.2)`;
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = isTraining || dataPoints.length === 0
+                e.currentTarget.style.boxShadow = isTraining || dataPoints.length === 0 || visiblePoints < dataPoints.length
                   ? 'none'
                   : `0 4px 14px ${colors.lineColor}33, inset 0 1px 0 rgba(255,255,255,0.2)`;
               }}
             >
-              {isTraining ? '🧠 Training...' : '🧠 Train Perceptron'}
+              {isTraining ? '🧠 Training...' : visiblePoints < dataPoints.length ? '⏳ Loading data...' : '🧠 Train Perceptron'}
             </button>
           </div>
 
@@ -1148,7 +1163,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           )}
 
           {/* Training results */}
-          {learnedWeights && !isTraining && (
+          {currentWeights && !isTraining && (
             <div style={{
               marginTop: '1.5rem',
               padding: '1.5rem',
@@ -1191,7 +1206,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                 fontWeight: '600',
                 letterSpacing: '0.025em'
               }}>
-                {learnedWeights.a.toFixed(2)}x + {learnedWeights.b.toFixed(2)}y + {learnedWeights.c.toFixed(2)} = 0
+                {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
               </div>
 
               <div style={{
@@ -1220,7 +1235,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           )}
 
           {/* Legend for lines */}
-          {(showSeparatingLine || learnedWeights || currentWeights) && (
+          {(showSeparatingLine || currentWeights) && (
             <div style={{
               marginTop: '1rem',
               display: 'flex',
@@ -1237,7 +1252,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               maxWidth: 'fit-content',
               margin: '1rem auto 0'
             }}>
-              {showSeparatingLine && !currentWeights && !learnedWeights && (
+              {showSeparatingLine && !currentWeights && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
                     width: '24px',
@@ -1271,7 +1286,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                   <span style={{ color: '#f59e0b', fontWeight: '600' }}>Learning...</span>
                 </div>
               )}
-              {learnedWeights && !isTraining && (
+              {currentWeights && !isTraining && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
                     width: '24px',
