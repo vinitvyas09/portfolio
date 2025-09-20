@@ -114,16 +114,16 @@ Now that we have gotten a high level intuition for what a perceptron is, let's n
 
 Imagine you're a veterinarian with a very specific (and slightly ridiculous) diagnostic tool. You've discovered that you can tell cats from dogs using just two measurements:
 
-Hours of sleep per day (x-axis)
-Running speed in mph (y-axis)
+Body weight in kg (x-axis)
+Vocalization frequency in Hz (y-axis)
 
-Cats sleep more and run slower. Dogs sleep less and zoom around like caffeinated toddlers. Plot a bunch of examples, and something very interesting happens:
+Dogs tend to be heavier (10-40 kg typically) and bark at lower frequencies (100-500 Hz). Cats are lighter (3-7 kg usually) and meow at much higher frequencies (700-1500 Hz). Plot a bunch of examples, and something very interesting happens:
 
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
-xAxis: "Hours of Sleep (per day)",
-yAxis: "Running Speed (mph)",
+xAxis: "Body weight (kg)",
+yAxis: "Vocalization frequency (Hz)",
 showSeparatingLine: false,
 animateDataPoints: true,
 pointAppearanceMs: 100,
@@ -139,8 +139,8 @@ Now watch what happens when we draw a single line:
 <LinearSeparableDataViz
 config={{
 dataset: "cats_vs_dogs",
-xAxis: "Hours of Sleep (per day)",
-yAxis: "Running Speed (mph)",
+xAxis: "Body weight (kg)",
+yAxis: "Vocalization frequency (Hz)",
 showSeparatingLine: true,
 animateLineDrawing: true,
 lineAnimationMs: 2000,
@@ -152,7 +152,7 @@ interactive: true
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Click "🧠 Train Perceptron" to watch it learn the decision boundary using the actual perceptron learning algorithm!</p>
 
-This is what we're asking the perceptron to do: find that line. Given a new animal's sleep hours and running speed, tell us which side of the line it falls on. Cat or dog. That's it.
+This is what we're asking the perceptron to do: find that line. Given a new animal's weight and vocalization frequency, tell us which side of the line it falls on. Cat or dog. That's it.
 
 ## Err... But Why Do We Need a Perceptron for This?
 
@@ -213,7 +213,7 @@ config={{
 equation: "2x + 3y - 6 = 0",
 showRegions: true,
 testPoints: [
-{ x: 1, y: 0.5, label: "Sleepy cat" },
+{ x: 1, y: 0.5, label: "Quiet cat" },
 { x: 2, y: 2.5, label: "Energetic dog" },
 { x: 1.5, y: 1, label: "On the fence" }
 ],
@@ -420,7 +420,7 @@ import random
 
 # Birth of a perceptron: random and clueless
 A = random.uniform(-1, 1)  # Maybe 0.73
-B = random.uniform(-1, 1)  # Maybe -0.41  
+B = random.uniform(-1, 1)  # Maybe -0.41
 C = random.uniform(-1, 1)  # Maybe 0.22
 
 # Our initial line: 0.73x - 0.41y + 0.22 = 0
@@ -462,7 +462,7 @@ But wait—how exactly do we "nudge" the line? This is where it gets clever.
 
 Let's make this concrete. Say our random line encounters this situation:
 
-Point: (x=2, y=3) - a sleepy cat
+Point: (x=2, y=3) - a quiet cat
 True label: -1 (it's a cat)
 Our prediction: sign(0.73(2) - 0.41(3) + 0.22) = sign(0.45) = 1 (we said dog!)
 
@@ -861,7 +861,7 @@ Whether you're classifying images (784 dimensions for MNIST), text (thousands of
 <DimensionScalingFinal
 config={{
 examples: [
-{ dims: 2, use_case: "Cats vs dogs (sleep, speed)" },
+{ dims: 2, use_case: "Cats vs dogs (weight, vocalization freq)" },
 { dims: 3, use_case: "Add bark frequency" },
 { dims: 784, use_case: "Handwritten digits (28×28 pixels)" },
 { dims: 50000, use_case: "Text classification (word vectors)" },
