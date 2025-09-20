@@ -467,19 +467,6 @@ Why does this work? Because we're literally pushing the line away from misclassi
 If we said "dog" but it's a "cat", we make the line produce a more negative value for that point
 If we said "cat" but it's a "dog", we make the line produce a more positive value
 
-{/*
-<IntuitionBuilder
-config={{
-mode: "step-through",
-showWhy: true,
-examples: [
-"Predicted dog, actually cat → Push line to make this point more 'cat-like'",
-"Predicted cat, actually dog → Push line to make this point more 'dog-like'"
-]
-}}
-/>
-*/}
-
 ## The Complete Training Algorithm
 
 Let's break down what's actually happening when a perceptron learns. As I said before, the algorithm maintains a "guess" at good parameters (weights and bias) and improves them one mistake at a time. Here's the interesting part: it only changes when it's wrong. When it's right, it has the confidence to do absolutely nothing. Let's put it all together in actual code:
