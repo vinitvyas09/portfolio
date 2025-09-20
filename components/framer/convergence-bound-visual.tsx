@@ -337,28 +337,35 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
           )}
 
           {/* Actual convergence point */}
-          {config.showActualConvergence && (
-            <>
-              <circle
-                cx={xScale(actualConvergence.findIndex(e => e < 1))}
-                cy={yScale(1)}
-                r="5"
-                fill={colors.convergencePoint}
-                stroke={colors.bg}
-                strokeWidth="2"
-              />
-              <text
-                x={xScale(actualConvergence.findIndex(e => e < 1))}
-                y={yScale(1) - 10}
-                textAnchor="middle"
-                fontSize="10"
-                fontWeight="600"
-                fill={colors.convergencePoint}
-              >
-                Converged!
-              </text>
-            </>
-          )}
+          {config.showActualConvergence && (() => {
+            const convergenceIndex = actualConvergence.findIndex(e => e < 1);
+            // Only show if convergence actually happened within our visualization range
+            if (convergenceIndex >= 0 && convergenceIndex <= maxIterations) {
+              return (
+                <>
+                  <circle
+                    cx={xScale(convergenceIndex)}
+                    cy={yScale(1)}
+                    r="5"
+                    fill={colors.convergencePoint}
+                    stroke={colors.bg}
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={xScale(convergenceIndex)}
+                    y={yScale(1) - 10}
+                    textAnchor="middle"
+                    fontSize="10"
+                    fontWeight="600"
+                    fill={colors.convergencePoint}
+                  >
+                    Converged!
+                  </text>
+                </>
+              );
+            }
+            return null;
+          })()}
 
           {/* Interactive hover */}
           {config.interactive && hoveredIteration !== null && (
