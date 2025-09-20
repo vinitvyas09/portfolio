@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, useId } from 'react';
 import { useTheme } from 'next-themes';
 
 // Nice number helpers for grid/tick generation
@@ -125,6 +125,18 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   };
 
   const currentSpeedMultiplier = speedMultipliers[speed];
+
+  // Stable SVG ids per component instance to avoid DOM collisions between multiple visualizations
+  const idBase = useId();
+  const svgIds = useMemo(() => {
+    const safeBase = idBase.replace(/[:]/g, '');
+    return {
+      glow: `${safeBase}-glow`,
+      catGradient: `${safeBase}-catGradient`,
+      dogGradient: `${safeBase}-dogGradient`,
+      clipPath: `${safeBase}-chartClip`
+    };
+  }, [idBase]);
 
   // True separating line
   const trueLine = useMemo(() => {
@@ -349,7 +361,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
       const actualC = normalizedWeights.c - (normalizedWeights.a * meanX) / safeStdX - (normalizedWeights.b * meanY) / safeStdY;
 
       if (!Number.isFinite(actualA) || !Number.isFinite(actualB) || !Number.isFinite(actualC) ||
-          Math.abs(actualA) > 1000 || Math.abs(actualB) > 100 || Math.abs(actualC) > 10000) {
+          Math.abs(actualA) > 1000 || Math.abs(actualB) > 1000 || Math.abs(actualC) > 10000) {
         const variation = (Math.random() - 0.5) * 0.2;
         return {
           a: trueLine.a * (1 + variation),
@@ -386,6 +398,8 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
       }
 
       if (epoch >= maxEpochs || converged) {
+        const finalWeights = denormalizeWeights(weights);
+        setCurrentWeights(finalWeights);
         setIsTraining(false);
         setCurrentTrainingPoint(-1);
 
@@ -397,7 +411,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
             }
           }, 2000 * currentSpeedMultiplier);
         } else if (autoRestart && converged) {
-          // Generate new data and restart
+          // Generate new data and restart after a delay
           setTimeout(() => {
             if (autoRestart) {
               setDataGeneration(prev => prev + 1);
@@ -591,18 +605,18 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
         style={{ maxWidth: '700px', margin: '0 auto', display: 'block' }}
       >
         <defs>
-          <filter id="glow">
+          <filter id={svgIds.glow}>
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          <linearGradient id="catGradient" cx="50%" cy="50%">
+          <linearGradient id={svgIds.catGradient} cx="50%" cy="50%">
             <stop offset="0%" stopColor={colors.catColor} stopOpacity="0.8" />
             <stop offset="100%" stopColor={colors.catColor} stopOpacity="0.4" />
           </linearGradient>
-          <linearGradient id="dogGradient" cx="50%" cy="50%">
+          <linearGradient id={svgIds.dogGradient} cx="50%" cy="50%">
             <stop offset="0%" stopColor={colors.dogColor} stopOpacity="0.8" />
             <stop offset="100%" stopColor={colors.dogColor} stopOpacity="0.4" />
           </linearGradient>
@@ -646,12 +660,12 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
         />
 
         <defs>
-          <clipPath id="chartClip">
+          <clipPath id={svgIds.clipPath}>
             <rect x={padding} y={padding} width={innerWidth} height={innerHeight} />
           </clipPath>
         </defs>
 
-        <g clipPath="url(#chartClip)">
+        <g clipPath={`url(#${svgIds.clipPath})`}>
           {currentWeights && (
             <g>
               {(() => {
@@ -665,7 +679,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
                     stroke={isTraining ? colors.trainingLineColor : colors.lineColor}
                     strokeWidth="3"
                     strokeLinecap="round"
-                    filter="url(#glow)"
+                    filter={`url(#${svgIds.glow})`}
                     opacity="0.9"
                     style={{
                       transition: config.animateLineAdjustment ? 'all 0.2s ease' : 'none'
@@ -695,10 +709,10 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
                 cx={scaleX(point.x)}
                 cy={scaleY(point.y)}
                 r={radius}
-                fill={point.label === 'cat' ? 'url(#catGradient)' : 'url(#dogGradient)'}
+                fill={point.label === 'cat' ? `url(#${svgIds.catGradient})` : `url(#${svgIds.dogGradient})`}
                 stroke={isCurrentPoint ? colors.accent : color}
                 strokeWidth={isCurrentPoint ? "3" : "2"}
-                filter={isCurrentPoint ? "url(#glow)" : ""}
+                filter={isCurrentPoint ? `url(#${svgIds.glow})` : ""}
                 style={{
                   transition: 'all 0.2s ease'
                 }}
