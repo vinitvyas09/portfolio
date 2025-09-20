@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useId } from 'react';
 import { useTheme } from 'next-themes';
 
 // Nice number helpers for grid/tick generation on dynamic scales.
@@ -143,6 +143,18 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
   const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number }>>([]);
   const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
+
+  // Stable SVG ids per component instance to avoid DOM collisions between multiple visualizations.
+  const idBase = useId();
+  const svgIds = useMemo(() => {
+    const safeBase = idBase.replace(/[:]/g, '');
+    return {
+      glow: `${safeBase}-glow`,
+      catGradient: `${safeBase}-catGradient`,
+      dogGradient: `${safeBase}-dogGradient`,
+      clipPath: `${safeBase}-chartClip`
+    };
+  }, [idBase]);
 
   // True separating line (ground truth) - changes when new data is generated
   const trueLine = useMemo(() => {
@@ -678,21 +690,24 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         style={{ maxWidth: '700px', margin: '0 auto', display: 'block' }}
       >
         <defs>
-          <filter id="glow">
+          <filter id={svgIds.glow}>
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          <linearGradient id="catGradient" cx="50%" cy="50%">
+          <linearGradient id={svgIds.catGradient} cx="50%" cy="50%">
             <stop offset="0%" stopColor={colors.catColor} stopOpacity="0.8" />
             <stop offset="100%" stopColor={colors.catColor} stopOpacity="0.4" />
           </linearGradient>
-          <linearGradient id="dogGradient" cx="50%" cy="50%">
+          <linearGradient id={svgIds.dogGradient} cx="50%" cy="50%">
             <stop offset="0%" stopColor={colors.dogColor} stopOpacity="0.8" />
             <stop offset="100%" stopColor={colors.dogColor} stopOpacity="0.4" />
           </linearGradient>
+          <clipPath id={svgIds.clipPath}>
+            <rect x={padding} y={padding} width={innerWidth} height={innerHeight} />
+          </clipPath>
         </defs>
 
         {/* Grid lines */}
@@ -739,39 +754,31 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
         {/* Region highlights (if enabled) */}
         {highlightRegions && (showLine || currentWeights) && (
-          <>
-            <defs>
-              <clipPath id="chartClip">
-                <rect x={padding} y={padding} width={innerWidth} height={innerHeight} />
-              </clipPath>
-            </defs>
+          <g clipPath={`url(#${svgIds.clipPath})`}>
+            {(() => {
+              const lineToUse = currentWeights || trueLine;
+              const { x1, y1, x2, y2 } = getLinePoints(lineToUse);
 
-            <g clipPath="url(#chartClip)">
-              {(() => {
-                const lineToUse = currentWeights || trueLine;
-                const { x1, y1, x2, y2 } = getLinePoints(lineToUse);
-
-                return (
-                  <>
-                    <polygon
-                      points={`${x1},${y1} ${x2},${y2} ${chartWidth - padding},${chartHeight - padding} ${padding},${chartHeight - padding}`}
-                      fill={colors.regionDog}
-                      opacity="0.3"
-                    />
-                    <polygon
-                      points={`${x1},${y1} ${x2},${y2} ${chartWidth - padding},${padding} ${padding},${padding}`}
-                      fill={colors.regionCat}
-                      opacity="0.3"
-                    />
-                  </>
-                );
-              })()}
-            </g>
-          </>
+              return (
+                <>
+                  <polygon
+                    points={`${x1},${y1} ${x2},${y2} ${chartWidth - padding},${chartHeight - padding} ${padding},${chartHeight - padding}`}
+                    fill={colors.regionDog}
+                    opacity="0.3"
+                  />
+                  <polygon
+                    points={`${x1},${y1} ${x2},${y2} ${chartWidth - padding},${padding} ${padding},${padding}`}
+                    fill={colors.regionCat}
+                    opacity="0.3"
+                  />
+                </>
+              );
+            })()}
+          </g>
         )}
 
         {/* All lines clipped to chart area */}
-        <g clipPath="url(#chartClip)">
+        <g clipPath={`url(#${svgIds.clipPath})`}>
           {/* True separating line (ground truth) */}
           {((showSeparatingLine && !interactive) || showLine) && !currentWeights && (
             <g>
@@ -786,7 +793,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                     stroke={colors.lineColor}
                     strokeWidth="3"
                     strokeLinecap="round"
-                    filter="url(#glow)"
+                    filter={`url(#${svgIds.glow})`}
                     opacity={animateLineDrawing ? 0 : 0.7}
                     strokeDasharray="5,5"
                   >
@@ -819,7 +826,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                     stroke={isTraining ? "#f59e0b" : colors.lineColor}
                     strokeWidth={isTraining ? "3" : "4"}
                     strokeLinecap="round"
-                    filter="url(#glow)"
+                    filter={`url(#${svgIds.glow})`}
                     opacity={isTraining ? "0.9" : "1"}
                     style={{
                       transition: 'all 0.3s ease'
@@ -852,11 +859,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                 cx={scaleX(point.x)}
                 cy={scaleY(point.y)}
                 r={radius}
-                fill={point.label === 'cat' ? 'url(#catGradient)' : 'url(#dogGradient)'}
+                fill={point.label === 'cat' ? `url(#${svgIds.catGradient})` : `url(#${svgIds.dogGradient})`}
                 stroke={color}
                 strokeWidth="2"
                 opacity={animateDataPoints ? 0 : 1}
-                filter={isCurrentTrainingPoint ? "url(#glow)" : ""}
+                filter={isCurrentTrainingPoint ? `url(#${svgIds.glow})` : ""}
                 style={{
                   cursor: interactive ? 'pointer' : 'default',
                   transition: 'all 0.3s ease'
