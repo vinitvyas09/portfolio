@@ -133,7 +133,7 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
 
   // Scale functions
   const xScale = (epoch: number) => (epoch / 100) * chartWidth;
-  const yScale = (error: number) => (error / 40) * chartHeight;
+  const yScale = (error: number) => chartHeight - (error / 40) * chartHeight;
 
   // Create path data for curves
   const trainPath = trainErrors
@@ -403,12 +403,12 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
             <text
               key={`ylabel-${error}`}
               x={-10}
-              y={yScale(40 - error) + 4}
+              y={yScale(error) + 4}
               textAnchor="end"
               fontSize="11"
               fill={colors.textSecondary}
             >
-              {40 - error}%
+              {error}%
             </text>
           ))}
         </g>
