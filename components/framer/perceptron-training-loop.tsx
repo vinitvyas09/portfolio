@@ -99,7 +99,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   const [trainingStep, setTrainingStep] = useState(0);
   const [dataGeneration, setDataGeneration] = useState(0);
   const [speed, setSpeed] = useState<'slow' | 'normal' | 'fast'>(
-    config.speed === 'adjustable' ? 'normal' : (config.speed as any) || 'normal'
+    config.speed === 'adjustable' ? 'normal' : (config.speed as 'slow' | 'normal' | 'fast') || 'normal'
   );
   const [isPaused, setIsPaused] = useState(false);
   const [autoRestart, setAutoRestart] = useState(true);
@@ -108,7 +108,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
 
   // Refs for cleanup
   const trainingTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
   // Perceptron state
   const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
@@ -118,7 +118,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   const [currentErrorRate, setCurrentErrorRate] = useState<number>(1);
 
   // Speed multipliers
-  const speedMultipliers = {
+  const speedMultipliers: Record<'slow' | 'normal' | 'fast', number> = {
     slow: 1.5,
     normal: 1,
     fast: 0.3
@@ -127,7 +127,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   const currentSpeedMultiplier = speedMultipliers[speed];
 
   // Stable SVG ids per component instance to avoid DOM collisions between multiple visualizations
-  const idBaseRef = useRef<string>();
+  const idBaseRef = useRef<string | undefined>(undefined);
   if (!idBaseRef.current) {
     const globalCrypto = typeof globalThis !== 'undefined' && 'crypto' in globalThis
       ? (globalThis as typeof globalThis & { crypto?: { randomUUID?: () => string } }).crypto
