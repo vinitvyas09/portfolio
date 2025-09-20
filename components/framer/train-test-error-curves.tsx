@@ -92,19 +92,21 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
     const test: number[] = [];
 
     for (let i = 0; i <= epochs; i++) {
-      // Training error: exponentially decreasing
-      const trainError = 35 * Math.exp(-i / 15) + 2 + (Math.random() - 0.5) * 0.5;
+      // Training error: exponentially decreasing from 35% to near 2%
+      const baseTrainError = 33 * Math.exp(-i / 15) + 2;
+      const trainError = baseTrainError + (Math.random() - 0.5) * 0.3;
       train.push(Math.max(0, trainError));
 
       // Test error: U-shaped curve (decreases then increases)
       let testError;
       if (i < 25) {
-        // Decreasing phase
-        testError = 35 * Math.exp(-i / 20) + 8 + (Math.random() - 0.5) * 1;
+        // Decreasing phase from 35% to about 8%
+        const baseTestError = 27 * Math.exp(-i / 20) + 8;
+        testError = baseTestError + (Math.random() - 0.5) * 0.5;
       } else {
         // Increasing phase (overfitting)
-        const overfitAmount = Math.pow((i - 25) / 75, 1.5) * 15;
-        testError = 8 + overfitAmount + (Math.random() - 0.5) * 1;
+        const overfitAmount = Math.pow((i - 25) / 75, 1.5) * 12;
+        testError = 8 + overfitAmount + (Math.random() - 0.5) * 0.5;
       }
       test.push(Math.max(0, Math.min(40, testError)));
     }
@@ -131,7 +133,7 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
 
   // Scale functions
   const xScale = (epoch: number) => (epoch / 100) * chartWidth;
-  const yScale = (error: number) => chartHeight - (error / 40) * chartHeight;
+  const yScale = (error: number) => (error / 40) * chartHeight;
 
   // Create path data for curves
   const trainPath = trainErrors
@@ -401,12 +403,12 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
             <text
               key={`ylabel-${error}`}
               x={-10}
-              y={yScale(error) + 4}
+              y={yScale(40 - error) + 4}
               textAnchor="end"
               fontSize="11"
               fill={colors.textSecondary}
             >
-              {error}%
+              {40 - error}%
             </text>
           ))}
         </g>
