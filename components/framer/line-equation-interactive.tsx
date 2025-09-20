@@ -541,7 +541,7 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
           <strong>🎯 Try it yourself:</strong> Drag any point to see how the perceptron classifies it
         </p>
         <p className="text-xs" style={{ color: colors.textMuted }}>
-          Green = correctly classified | Red = misclassified | Cats belong on the negative side (below line) | Dogs on the positive side (above line)
+          Green = correctly classified | Red = misclassified <br />Cats belong on the negative side (below line) | Dogs on the positive side (above line)
         </p>
       </div>
     </div>
