@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback, useRef, useId } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTheme } from 'next-themes';
 
 // Nice number helpers for grid/tick generation
@@ -127,16 +127,23 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   const currentSpeedMultiplier = speedMultipliers[speed];
 
   // Stable SVG ids per component instance to avoid DOM collisions between multiple visualizations
-  const idBase = useId();
-  const svgIds = useMemo(() => {
-    const safeBase = idBase.replace(/[:]/g, '');
-    return {
-      glow: `${safeBase}-glow`,
-      catGradient: `${safeBase}-catGradient`,
-      dogGradient: `${safeBase}-dogGradient`,
-      clipPath: `${safeBase}-chartClip`
-    };
-  }, [idBase]);
+  const idBaseRef = useRef<string>();
+  if (!idBaseRef.current) {
+    const globalCrypto = typeof globalThis !== 'undefined' && 'crypto' in globalThis
+      ? (globalThis as typeof globalThis & { crypto?: { randomUUID?: () => string } }).crypto
+      : undefined;
+    const randomId = globalCrypto && typeof globalCrypto.randomUUID === 'function'
+      ? globalCrypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+    idBaseRef.current = `ptl-${randomId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  }
+
+  const svgIds = useMemo(() => ({
+    glow: `${idBaseRef.current}-glow`,
+    catGradient: `${idBaseRef.current}-catGradient`,
+    dogGradient: `${idBaseRef.current}-dogGradient`,
+    clipPath: `${idBaseRef.current}-chartClip`
+  }), []);
 
   // True separating line
   const trueLine = useMemo(() => {
@@ -620,6 +627,9 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
             <stop offset="0%" stopColor={colors.dogColor} stopOpacity="0.8" />
             <stop offset="100%" stopColor={colors.dogColor} stopOpacity="0.4" />
           </linearGradient>
+          <clipPath id={svgIds.clipPath}>
+            <rect x={padding} y={padding} width={innerWidth} height={innerHeight} />
+          </clipPath>
         </defs>
 
         {/* Grid */}
@@ -658,12 +668,6 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
           stroke={colors.borderColor}
           strokeWidth="2"
         />
-
-        <defs>
-          <clipPath id={svgIds.clipPath}>
-            <rect x={padding} y={padding} width={innerWidth} height={innerHeight} />
-          </clipPath>
-        </defs>
 
         <g clipPath={`url(#${svgIds.clipPath})`}>
           {currentWeights && (
