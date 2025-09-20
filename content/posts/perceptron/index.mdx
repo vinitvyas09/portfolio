@@ -824,11 +824,6 @@ Geometrically, convergence means we've found a hyperplane that puts all positive
 
 But there's a catch. Let me show you two scenarios:
 
-{/*
-
-maybe reuse perceptron playground component somehow?
-
-
 <ConvergenceComparison
 config={{
 datasets: [
@@ -850,7 +845,6 @@ showEpochCount: true,
 maxEpochs: 100
 }}
 />
-*/}
 
 <Caption>Left: Converges in ~20 updates. Right: Still thrashing after 1000 updates</Caption>
 
@@ -949,7 +943,6 @@ Which separator we'll find. The data might be separable with margin 0.9, but the
 How to check if data is linearly separable. If it's not, the perceptron will run forever. There's no general efficient algorithm to check separability beforehand.
 The exact number of iterations. The bound is often pessimistic as real convergence is usually much faster.
 
-{/*
 <ConvergenceBoundVisual
 config={{
 showTheoreticalBound: true,
@@ -958,7 +951,6 @@ varyMargin: true,
 interactive: true
 }}
 />
-*/}
 
 <Caption>Theoretical bound vs. actual convergence: the bound is a worst-case guarantee</Caption>
 
@@ -1011,20 +1003,7 @@ def voted_perceptron_predict(x, weight_history):
     return sign(total_vote)  # Majority wins
 ```
 
-{/*
-<VotedPerceptronDiagram
-config={{
-showWeightHistory: true,
-exampleVotes: [
-{weights: [0.2, 0.3], survivalTime: 50, vote: "+50"},
-{weights: [0.5, -0.1], survivalTime: 300, vote: "+300"},
-{weights: [2.1, 0.8], survivalTime: 1, vote: "-1"},
-{weights: [1.9, 0.7], survivalTime: 150, vote: "+150"}
-],
-totalVote: "+499 → Positive"
-}}
-/>
-*/}
+Please review the Perceptron Variant Comparison animation later
 
 <Caption>Each historical weight vector votes, weighted by how long it survived</Caption>
 
