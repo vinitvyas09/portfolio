@@ -509,7 +509,13 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
         }}>
           <strong>💡 Key insight:</strong> The theoretical bound guarantees convergence in at most {Math.round(theoreticalBound)} iterations
           for margin γ = {margin.toFixed(2)}, but actual convergence happens much faster
-          (around {actualConvergence.findIndex(e => e < 1)} iterations).
+          {(() => {
+            const convergenceIndex = actualConvergence.findIndex(e => e < 1);
+            if (convergenceIndex >= 0) {
+              return ` (around ${convergenceIndex} iterations)`;
+            }
+            return '';
+          })()}.
           Larger margins lead to dramatically faster convergence—notice how both bounds shrink as γ increases.
         </div>
       </div>
