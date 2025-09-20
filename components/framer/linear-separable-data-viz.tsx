@@ -331,6 +331,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const xTicks = useMemo(() => generateTicks(xMin, xMax, 6), [xMin, xMax]);
   const yTicks = useMemo(() => generateTicks(yMin, yMax, 6), [yMin, yMax]);
 
+  // Debug currentWeights changes
+  useEffect(() => {
+    console.log('currentWeights changed to:', currentWeights);
+  }, [currentWeights]);
+
   // Animate points appearing
   useEffect(() => {
     if (!animateDataPoints) {
