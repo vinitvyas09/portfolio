@@ -34,8 +34,9 @@ const ThreeDPerceptronViz: React.FC<ThreeDPerceptronVizProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [rotation, setRotation] = useState({ x: -0.3, y: 0.5 });
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const isDark = mounted && theme === 'dark';
 
   // Generate sample 3D data points
   const generateData = useCallback((): Point3D[] => {
@@ -66,6 +67,11 @@ const ThreeDPerceptronViz: React.FC<ThreeDPerceptronVizProps> = ({
   }, []);
 
   const [data] = useState<Point3D[]>(generateData);
+
+  // Set mounted state for hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 3D to 2D projection
   const project = useCallback((point: Point3D, rotationX: number, rotationY: number, canvasWidth: number, canvasHeight: number) => {
@@ -315,11 +321,11 @@ const ThreeDPerceptronViz: React.FC<ThreeDPerceptronVizProps> = ({
         {/* Legend */}
         <div className="absolute bottom-4 left-4 flex gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`} />
+            <div className={`w-3 h-3 rounded-full ${!mounted ? 'bg-blue-500' : (isDark ? 'bg-blue-400' : 'bg-blue-500')}`} />
             <span className="text-muted-foreground">Class 1</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isDark ? 'bg-red-400' : 'bg-red-500'}`} />
+            <div className={`w-3 h-3 rounded-full ${!mounted ? 'bg-red-500' : (isDark ? 'bg-red-400' : 'bg-red-500')}`} />
             <span className="text-muted-foreground">Class 2</span>
           </div>
         </div>
