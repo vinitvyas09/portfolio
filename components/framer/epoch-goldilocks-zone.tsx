@@ -242,8 +242,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
 
   // Chart dimensions - wider for vertical layout
   const chartWidth = 400;
-  const chartHeight = 180;
-  const padding = 30;
+  const chartHeight = 150;
+  const padding = 25;
 
   // Scale functions
   const scaleX = (epoch: number, maxEpoch: number) =>
@@ -262,18 +262,24 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     const lastMetric = metrics[metrics.length - 1];
 
     return (
-      <div style={{ width: '100%', maxWidth: '500px' }}>
-        <div style={{
-          fontSize: '13px',
-          fontWeight: '600',
-          color: colors.text,
-          marginBottom: '0.5rem',
-          textAlign: 'center'
-        }}>
-          {title}
-        </div>
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '1rem'
+      }}>
+        <div style={{ flex: '1' }}>
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '600',
+            color: colors.text,
+            marginBottom: '0.1rem',
+            textAlign: 'left'
+          }}>
+            {title}
+          </div>
 
-        <svg
+          <svg
           width={chartWidth}
           height={chartHeight}
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
@@ -383,14 +389,16 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
             Error %
           </text>
         </svg>
+        </div>
 
-        {/* Status box */}
+        {/* Status box - now on the right */}
         <div style={{
-          marginTop: '0.75rem',
-          padding: '0.5rem',
+          width: '180px',
+          padding: '0.75rem',
           background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
           borderRadius: '6px',
-          borderLeft: `3px solid ${statusColor}`
+          borderLeft: `3px solid ${statusColor}`,
+          alignSelf: 'center'
         }}>
           <div style={{
             fontSize: '11px',
@@ -448,7 +456,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
 
   return (
     <div style={{
-      padding: '1.5rem',
+      padding: '1rem',
       background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bgSecondary} 100%)`,
       border: `1px solid ${colors.border}`,
       borderRadius: '16px',
@@ -464,7 +472,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
         fontWeight: '700',
         color: colors.text,
         textAlign: 'center',
-        marginBottom: '1.5rem'
+        marginBottom: '0.75rem'
       }}>
         🎯 Finding the Training Sweet Spot
       </div>
@@ -473,9 +481,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.5rem',
-        marginBottom: '1.5rem',
-        alignItems: 'center'
+        gap: '0.25rem',
+        marginBottom: '0.5rem'
       }}>
         {renderChart(
           scenario1Metrics,
@@ -507,8 +514,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
         display: 'flex',
         justifyContent: 'center',
         gap: '2rem',
-        marginBottom: '1rem',
-        padding: '0.75rem',
+        marginBottom: '0.5rem',
+        padding: '0.5rem',
         background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.03)',
         borderRadius: '8px'
       }}>
@@ -533,8 +540,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
       {/* Progress indicator */}
       {isRunning && (
         <div style={{
-          marginBottom: '1rem',
-          padding: '0.5rem',
+          marginBottom: '0.5rem',
+          padding: '0.4rem',
           background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
           borderRadius: '6px',
           textAlign: 'center'
@@ -595,8 +602,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
 
       {/* Key insight */}
       <div style={{
-        marginTop: '1.5rem',
-        padding: '1rem',
+        marginTop: '0.75rem',
+        padding: '0.75rem',
         background: isDark ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.05)',
         border: `1px solid ${colors.optimalColor}`,
         borderRadius: '8px'
