@@ -24,6 +24,7 @@ import OrderMattersDemo from "../../../components/framer/order-matters-demo"
 import EpochGoldilocksZone from "../../../components/framer/epoch-goldilocks-zone"
 import TrainTestErrorCurves from "../../../components/framer/train-test-error-curves"
 import ThreeDPerceptronViz from "../../../components/framer/three-d-perceptron-viz"
+import DimensionScalingFinal from "../../../components/framer/dimension-scaling-final"
 
 // Caption component for styled text
 const Caption = ({ children, ...props }: any) => (
