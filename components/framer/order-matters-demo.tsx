@@ -473,7 +473,6 @@ const OrderMattersDemo: React.FC<OrderMattersDemoProps> = ({
         {/* Data points */}
         {data.map((point, idx) => {
           const isHighlighted = idx === currentPoint;
-          const pointIdx = dataPoints.findIndex(p => p.id === point.id);
 
           return (
             <circle
@@ -756,8 +755,8 @@ const OrderMattersDemo: React.FC<OrderMattersDemoProps> = ({
           color: colors.text,
           lineHeight: '1.6'
         }}>
-          <strong>Fixed order fails because:</strong> When seeing all cats, it learns "everything is a cat" (line moves far right).
-          Then seeing all dogs, it learns "everything is a dog" (line moves far left). It never finds the middle ground!
+          <strong>Fixed order fails because:</strong> When seeing all cats, it learns &ldquo;everything is a cat&rdquo; (line moves far right).
+          Then seeing all dogs, it learns &ldquo;everything is a dog&rdquo; (line moves far left). It never finds the middle ground!
           <br /><br />
           <strong>Shuffling works because:</strong> Each update is balanced by seeing both classes, gradually finding the true boundary.
         </div>
