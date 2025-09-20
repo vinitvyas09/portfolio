@@ -240,10 +240,10 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     };
   }, []);
 
-  // Chart dimensions - wider for vertical layout
-  const chartWidth = 400;
-  const chartHeight = 150;
-  const padding = 25;
+  // Chart dimensions - compact for vertical layout
+  const chartWidth = 320;
+  const chartHeight = 140;
+  const padding = 20;
 
   // Scale functions
   const scaleX = (epoch: number, maxEpoch: number) =>
@@ -264,9 +264,11 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     return (
       <div style={{
         width: '100%',
+        maxWidth: '500px',
+        margin: '0 auto',
         display: 'flex',
         alignItems: 'flex-start',
-        gap: '0.5rem'
+        gap: '0.3rem'
       }}>
         <div style={{ flex: '1' }}>
           <div style={{
@@ -393,8 +395,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
 
         {/* Status box - now on the right */}
         <div style={{
-          width: '160px',
-          padding: '0.4rem',
+          width: '140px',
+          padding: '0.35rem',
           background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
           borderRadius: '6px',
           borderLeft: `3px solid ${statusColor}`,
@@ -481,8 +483,9 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.25rem',
-        marginBottom: '0.5rem'
+        gap: '0.2rem',
+        marginBottom: '0.4rem',
+        alignItems: 'center'
       }}>
         {renderChart(
           scenario1Metrics,
