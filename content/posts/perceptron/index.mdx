@@ -1076,7 +1076,6 @@ The math here is subtle but clever. By keeping track of when each weight was add
 
 Let me show you how these three variants typically perform:
 
-{/*
 <PerceptronVariantComparison
 config={{
 dataset: "noisy_linear",
@@ -1085,7 +1084,6 @@ metrics: ["training_error", "test_error", "storage_cost"],
 showConvergence: true
 }}
 />
-*/}
 
 <Caption>Averaged perceptron: almost as good as voted, almost as cheap as vanilla</Caption>
 
@@ -1147,7 +1145,6 @@ Consider this sentiment analysis scenario. You're classifying product reviews us
 
 The review "excellent product" is positive. The review "not excellent" is negative. Same word, opposite meanings. Now watch what happens when we plot this:
 
-{/*
 <XORProblem
 config={{
 dataset: "sentiment_with_negation",
@@ -1161,7 +1158,6 @@ showFailedAttempts: true,
 animateLineSearch: true
 }}
 />
-*/}
 
 <Caption>Try drawing a single straight line that separates positive from negative. You can't.</Caption>
 
