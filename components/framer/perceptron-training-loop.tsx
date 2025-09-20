@@ -514,6 +514,9 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     };
   }, []);
 
+  // Keep last valid segment to avoid zero-length frames
+  const lastLineRef = useRef<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+
   // Get line points for SVG with robust clipping (handles corner intersections)
   const getLinePoints = (lineParams: { a: number; b: number; c: number }) => {
     const { a, b, c } = lineParams;
@@ -685,7 +688,15 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
           {currentWeights && (
             <g>
               {(() => {
-                const { x1, y1, x2, y2 } = getLinePoints(currentWeights);
+                let { x1, y1, x2, y2 } = getLinePoints(currentWeights);
+                const segLen = Math.hypot(x2 - x1, y2 - y1);
+                if (!Number.isFinite(segLen) || segLen < 2) {
+                  // use last valid segment or derive from true line
+                  const fallback = lastLineRef.current || getLinePoints(trueLine);
+                  x1 = fallback.x1; y1 = fallback.y1; x2 = fallback.x2; y2 = fallback.y2;
+                } else {
+                  lastLineRef.current = { x1, y1, x2, y2 };
+                }
                 return (
                   <line
                     x1={x1}
@@ -1102,6 +1113,8 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
                 setCurrentTrainingPoint(-1);
                 setEpochCount(0);
                 setTotalIterations(0);
+                // reset fallback segment
+                lastLineRef.current = null;
               }}
               style={{
                 padding: '0.5rem 1rem',
