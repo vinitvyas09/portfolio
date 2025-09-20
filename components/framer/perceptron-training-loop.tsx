@@ -64,7 +64,10 @@ interface PerceptronTrainingLoopProps {
     animateLineAdjustment?: boolean;
     highlightCurrentPoint?: boolean;
     showErrorCount?: boolean;
+    showErrorRate?: boolean;
     speed?: 'slow' | 'normal' | 'fast' | 'adjustable';
+    showLineEvolution?: boolean;
+    compareToModernMethods?: boolean;
   };
 }
 
@@ -75,7 +78,10 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     animateLineAdjustment: true,
     highlightCurrentPoint: true,
     showErrorCount: true,
-    speed: "adjustable"
+    showErrorRate: false,
+    speed: "adjustable",
+    showLineEvolution: false,
+    compareToModernMethods: false
   }
 }) => {
   const { resolvedTheme } = useTheme();
@@ -106,9 +112,10 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
 
   // Perceptron state
   const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
-  const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number }>>([]);
+  const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number; errorRate: number }>>([]);
   const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
   const [currentError, setCurrentError] = useState<number>(0);
+  const [currentErrorRate, setCurrentErrorRate] = useState<number>(1);
 
   // Speed multipliers
   const speedMultipliers = {
@@ -280,6 +287,15 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     return () => timeouts.forEach(clearTimeout);
   }, [dataPoints]);
 
+  // Stop training function
+  const stopTraining = useCallback(() => {
+    trainingTimeoutsRef.current.forEach(clearTimeout);
+    trainingTimeoutsRef.current = [];
+    setIsTraining(false);
+    setCurrentTrainingPoint(-1);
+    setIsPaused(false);
+  }, []);
+
   // Training algorithm
   const startTraining = useCallback(() => {
     if (isTraining || visiblePoints < dataPoints.length) return;
@@ -294,6 +310,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     setEpochCount(0);
     setTotalIterations(0);
     setCurrentError(dataPoints.length);
+    setCurrentErrorRate(1);
 
     const totals = dataPoints.reduce(
       (acc, point) => {
@@ -430,9 +447,11 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
           if (pred !== labelVal) epochErrors++;
         }
 
+        const errorRate = dataPoints.length > 0 ? epochErrors / dataPoints.length : 0;
         setCurrentError(epochErrors);
+        setCurrentErrorRate(errorRate);
         const actualWeights = denormalizeWeights(weights);
-        setTrainingHistory(prev => [...prev, { ...actualWeights, error: epochErrors }]);
+        setTrainingHistory(prev => [...prev, { ...actualWeights, error: epochErrors, errorRate }]);
         lastEpochError = epochErrors;
 
         if (epochErrors === 0) {
@@ -651,10 +670,9 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
               })()}
             </g>
           )}
-        </g>
 
-        {/* Data points */}
-        {dataPoints.slice(0, visiblePoints).map((point, index) => {
+          {/* Data points - MUST be inside clipPath to prevent bleeding */}
+          {dataPoints.slice(0, visiblePoints).map((point, index) => {
           const isCurrentPoint = config.highlightCurrentPoint && isTraining && index === currentTrainingPoint;
           const color = point.label === 'cat' ? colors.catColor : colors.dogColor;
           const radius = isCurrentPoint ? 10 : 6;
@@ -705,6 +723,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
             </g>
           );
         })}
+        </g>
 
         {/* Axis labels */}
         <text
@@ -854,7 +873,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
           {/* Metrics display */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateColumns: config.showErrorRate ? 'repeat(5, 1fr)' : 'repeat(4, 1fr)',
             gap: '1rem'
           }}>
             <div>
@@ -877,6 +896,21 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
                   color: currentError === 0 ? colors.lineColor : colors.errorColor
                 }}>
                   {currentError}
+                </div>
+              </div>
+            )}
+
+            {config.showErrorRate && (
+              <div>
+                <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                  Error Rate
+                </div>
+                <div style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: currentErrorRate === 0 ? colors.lineColor : colors.errorColor
+                }}>
+                  {(currentErrorRate * 100).toFixed(1)}%
                 </div>
               </div>
             )}
@@ -925,26 +959,78 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
             marginTop: '1rem',
             display: 'flex',
             gap: '0.5rem',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            flexWrap: 'wrap'
           }}>
-            <button
-              onClick={() => setIsPaused(!isPaused)}
-              style={{
-                padding: '0.5rem 1rem',
-                background: colors.accent,
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              {isPaused ? '▶️ Resume' : '⏸️ Pause'}
-            </button>
+            {isTraining && (
+              <>
+                <button
+                  onClick={() => setIsPaused(!isPaused)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: colors.accent,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  {isPaused ? '▶️ Resume' : '⏸️ Pause'}
+                </button>
+
+                <button
+                  onClick={stopTraining}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: colors.errorColor,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  ⏹️ Stop
+                </button>
+              </>
+            )}
+
+            {!isTraining && (
+              <button
+                onClick={startTraining}
+                disabled={dataPoints.length === 0 || visiblePoints < dataPoints.length}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: dataPoints.length === 0 || visiblePoints < dataPoints.length
+                    ? colors.borderColor
+                    : colors.lineColor,
+                  color: dataPoints.length === 0 || visiblePoints < dataPoints.length
+                    ? colors.textSecondary
+                    : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: dataPoints.length === 0 || visiblePoints < dataPoints.length
+                    ? 'not-allowed'
+                    : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                ▶️ Start Training
+              </button>
+            )}
 
             <button
               onClick={() => {
