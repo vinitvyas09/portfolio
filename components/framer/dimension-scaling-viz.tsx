@@ -590,7 +590,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         border: `1px solid ${colors.border}`,
         borderRadius: "18px",
         margin: "2rem 0",
-        boxShadow: `0 30px 90px ${colors.shadow}`,
         transition: "background 0.3s ease, border 0.3s ease"
       }}
     >
@@ -746,7 +745,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             border: `1px solid ${colors.border}`,
             borderRadius: "14px",
             padding: "1.25rem",
-            boxShadow: `0 18px 50px ${colors.shadow}`,
             transition: "background 0.3s ease, border 0.3s ease"
           }}
         >
@@ -819,7 +817,6 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             border: `1px solid ${colors.border}`,
             borderRadius: "14px",
             padding: "1.25rem",
-            boxShadow: `0 18px 50px ${colors.shadow}`,
             transition: "background 0.3s ease, border 0.3s ease"
           }}
         >
