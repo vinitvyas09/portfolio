@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback, useId } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTheme } from 'next-themes';
 
 // Nice number helpers for grid/tick generation on dynamic scales.
@@ -145,16 +145,23 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
 
   // Stable SVG ids per component instance to avoid DOM collisions between multiple visualizations.
-  const idBase = useId();
-  const svgIds = useMemo(() => {
-    const safeBase = idBase.replace(/[:]/g, '');
-    return {
-      glow: `${safeBase}-glow`,
-      catGradient: `${safeBase}-catGradient`,
-      dogGradient: `${safeBase}-dogGradient`,
-      clipPath: `${safeBase}-chartClip`
-    };
-  }, [idBase]);
+  const idBaseRef = useRef<string>();
+  if (!idBaseRef.current) {
+    const globalCrypto = typeof globalThis !== 'undefined' && 'crypto' in globalThis
+      ? (globalThis as typeof globalThis & { crypto?: { randomUUID?: () => string } }).crypto
+      : undefined;
+    const randomId = globalCrypto && typeof globalCrypto.randomUUID === 'function'
+      ? globalCrypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+    idBaseRef.current = `lsdv-${randomId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  }
+
+  const svgIds = useMemo(() => ({
+    glow: `${idBaseRef.current}-glow`,
+    catGradient: `${idBaseRef.current}-catGradient`,
+    dogGradient: `${idBaseRef.current}-dogGradient`,
+    clipPath: `${idBaseRef.current}-chartClip`
+  }), []);
 
   // True separating line (ground truth) - changes when new data is generated
   const trueLine = useMemo(() => {
