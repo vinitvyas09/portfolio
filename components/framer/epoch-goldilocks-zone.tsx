@@ -266,7 +266,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
         width: '100%',
         display: 'flex',
         alignItems: 'flex-start',
-        gap: '1rem'
+        gap: '0.5rem'
       }}>
         <div style={{ flex: '1' }}>
           <div style={{
@@ -393,8 +393,8 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
 
         {/* Status box - now on the right */}
         <div style={{
-          width: '180px',
-          padding: '0.75rem',
+          width: '160px',
+          padding: '0.4rem',
           background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
           borderRadius: '6px',
           borderLeft: `3px solid ${statusColor}`,
@@ -404,7 +404,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
             fontSize: '11px',
             fontWeight: '600',
             color: statusColor,
-            marginBottom: '0.25rem'
+            marginBottom: '0.15rem'
           }}>
             {status}
           </div>
@@ -412,7 +412,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: '0.5rem',
+              gap: '0.25rem',
               fontSize: '10px',
               color: colors.textSecondary
             }}>
@@ -429,7 +429,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
           <div style={{
             fontSize: '9px',
             color: colors.textSecondary,
-            marginTop: '0.25rem',
+            marginTop: '0.15rem',
             fontStyle: 'italic'
           }}>
             {config.scenarios?.[
