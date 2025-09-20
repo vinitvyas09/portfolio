@@ -543,9 +543,6 @@ New weight₁ = Old weight₁ + 1 × x₁
 New weight₂ = Old weight₂ + 1 × x₂
 New bias = Old bias + 1
 
-
-{/*
-SIMPLE ANIMATION THAT SHOWS WHAT IS DESCRIBED IN THIS SECTION
 <MathProofVisualization
 config={{
 mode: "step-by-step",
@@ -556,7 +553,6 @@ oldActivation: -0.5,
 animateImprovement: true
 }}
 />
-*/}
 
 If we see the same point again, what's our new activation?
 
@@ -572,7 +568,6 @@ Since x₁² and x₂² are always positive, the new activation is always at lea
 
 Here's something that might blow your mind: the order you show examples to your perceptron can make the difference between learning in seconds or never learning at all.
 
-{/*
 <OrderMattersDemo
 config={{
 scenarios: [
@@ -591,7 +586,6 @@ showConvergenceRate: true,
 animateTraining: true
 }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Same data, different order: disaster vs success</p>
 
