@@ -296,11 +296,7 @@ sign(0) = 0 (or we pick a side)
 def predict(x, y, A, B, C):
     """The world's simplest classifier"""
     value = A * x + B * y + C
-    
-    if value > 0:
-        return 1  # Dog
-    else:
-        return 0  # Cat (includes the boundary case)
+    return 1 if value > 0 else 0  # 1 = Dog, 0 = Cat
 ```
 
 ### But Wait, This Is Starting to Look Familiar...
@@ -331,8 +327,6 @@ Our bias is C (the constant term)
 The perceptron isn't doing something magical. It's just finding the right values for A, B, and C (the right line) to separate our data. The "learning" is just adjusting these numbers until the line is in the right place.
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line move as the perceptron adjusts its weights (A, B) and bias (C)</p>
-
-### The Signed Distance (For the Curious)
 
 <InfoBox type="advanced" title="Going Deeper: It's Actually Distance!">
 
