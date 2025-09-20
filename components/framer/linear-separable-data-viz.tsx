@@ -145,7 +145,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
 
   // Stable SVG ids per component instance to avoid DOM collisions between multiple visualizations.
-  const idBaseRef = useRef<string>();
+  const idBaseRef = useRef<string | undefined>(undefined);
   if (!idBaseRef.current) {
     const globalCrypto = typeof globalThis !== 'undefined' && 'crypto' in globalThis
       ? (globalThis as typeof globalThis & { crypto?: { randomUUID?: () => string } }).crypto
