@@ -441,10 +441,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       const actualC =
         normalizedWeights.c - (normalizedWeights.a * meanX) / safeStdX - (normalizedWeights.b * meanY) / safeStdY;
 
-      // More aggressive sanity check based on expected scale
+      // Sanity check based on expected scale (adjusted for actual data ranges)
       if (!Number.isFinite(actualA) || !Number.isFinite(actualB) || !Number.isFinite(actualC) ||
-          Math.abs(actualA) > 100 || Math.abs(actualB) > 1 || Math.abs(actualC) > 5000) {
+          Math.abs(actualA) > 1000 || Math.abs(actualB) > 100 || Math.abs(actualC) > 10000) {
         // Return the true line with slight random variation to show training is happening
+        console.warn('Denormalized weights failed sanity check:', { actualA, actualB, actualC });
         const variation = (Math.random() - 0.5) * 0.2;
         return {
           a: trueLine.a * (1 + variation),
@@ -473,6 +474,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
     const finalizeTraining = () => {
       const finalWeights = denormalizeWeights(weights);
+      console.log('Training finalized with weights:', finalWeights);
       trainingTimeoutsRef.current.forEach(clearTimeout);
       trainingTimeoutsRef.current = [];
       setIsTraining(false);
@@ -546,7 +548,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
     const initialTimeoutId = setTimeout(trainSinglePoint, 500);
     trainingTimeoutsRef.current.push(initialTimeoutId);
-  }, [isTraining, dataPoints, visiblePoints]);
+  }, [isTraining, dataPoints, visiblePoints, trueLine]);
 
   // Calculate line points for SVG with proper clipping
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
