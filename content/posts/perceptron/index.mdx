@@ -671,7 +671,6 @@ Both errors low and stable: Just right!
 
 So far, when we make a mistake, we've been adding the full input values to our weights. But what if we only added a fraction? Enter the learning rate (α).
 
-{/*
 <LearningRateComparison
 config={{
 rates: [
@@ -684,7 +683,6 @@ showConvergence: true,
 dataset: "spiral_data"
 }}
 />
-*/}
 
 With learning rate, our update rule becomes:
 
@@ -705,7 +703,6 @@ Low learning rate: Tiny adjustments after each miss (might take forever to impro
 
 So far we've been working in 2D—easy to visualize, easy to understand. But what about 3D data? Instead of a line, we get a plane: Ax + By + Cz + D = 0
 
-{/*
 <ThreeDPerceptronViz
 config={{
 dataset: "3d_classification",
@@ -715,7 +712,6 @@ animatePlaneAdjustment: true,
 features: ["Height", "Weight", "Age"]
 }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag to rotate: In 3D, we separate with a plane instead of a line</p>
 The awesome part? The math stays exactly the same! Just add another weight:
