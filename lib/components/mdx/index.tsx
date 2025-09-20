@@ -25,6 +25,8 @@ import EpochGoldilocksZone from "../../../components/framer/epoch-goldilocks-zon
 import TrainTestErrorCurves from "../../../components/framer/train-test-error-curves"
 import ThreeDPerceptronViz from "../../../components/framer/three-d-perceptron-viz"
 import DecisionBoundaryGeometry from "../../../components/framer/decision-boundary-geometry"
+import ConvergenceComparison from "../../../components/framer/convergence-comparison"
+import ConvergenceBoundVisual from "../../../components/framer/convergence-bound-visual"
 
 // Caption component for styled text
 const Caption = ({ children, ...props }: any) => (
@@ -61,6 +63,8 @@ export const mdxComponents = {
   TrainTestErrorCurves,
   ThreeDPerceptronViz,
   DecisionBoundaryGeometry,
+  ConvergenceComparison,
+  ConvergenceBoundVisual,
   h1: (props: any) => <h1 {...props} className="text-4xl font-light tracking-tight mt-12 mb-6" />,
   h2: (props: any) => <h2 {...props} className="text-3xl font-light tracking-tight mt-10 mb-4" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h3: (props: any) => <h3 {...props} className="text-2xl font-light tracking-tight mt-8 mb-3" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
