@@ -6,13 +6,11 @@ import { Math } from "./Math"
 import { Code } from "./Code"
 import { Notebook } from "./Notebook"
 import { References } from "./References"
-import ChatGif from "../../../components/framer/chatgif"
-import HeadlineCascade from "../../../components/framer/headline-cascade"
 import MCPWeatherFlow from "../../../components/framer/weather-finder"
 import MCPPort from "../../../components/framer/mcp-port"
 import IntegrationTaxGif from "../../../components/framer/integration-tax"
 // Import components that use framer-motion via dynamic imports with SSR disabled
-import { NeuronVsPerceptron, PerceptronContinuum, InfoBox } from './ClientOnlyWrapper'
+import { NeuronVsPerceptron, PerceptronContinuum, InfoBox, ChatGif, HeadlineCascade } from './ClientOnlyWrapper'
 // Import components that don't use framer-motion directly
 import NeuronAnimation from "../../../components/framer/neuron-animation"
 import InteractivePerceptronPlayground from "../../../components/framer/interactive-perceptron-playground"
@@ -24,6 +22,7 @@ import PerceptronTrainingLoop from "../../../components/framer/perceptron-traini
 import MathProofVisualization from "../../../components/framer/math-proof-visualization"
 import OrderMattersDemo from "../../../components/framer/order-matters-demo"
 import EpochGoldilocksZone from "../../../components/framer/epoch-goldilocks-zone"
+import TrainTestErrorCurves from "../../../components/framer/train-test-error-curves"
 
 // Caption component for styled text
 const Caption = ({ children, ...props }: any) => (
@@ -57,6 +56,7 @@ export const mdxComponents = {
   MathProofVisualization,
   OrderMattersDemo,
   EpochGoldilocksZone,
+  TrainTestErrorCurves,
   h1: (props: any) => <h1 {...props} className="text-4xl font-light tracking-tight mt-12 mb-6" />,
   h2: (props: any) => <h2 {...props} className="text-3xl font-light tracking-tight mt-10 mb-4" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h3: (props: any) => <h3 {...props} className="text-2xl font-light tracking-tight mt-8 mb-3" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
