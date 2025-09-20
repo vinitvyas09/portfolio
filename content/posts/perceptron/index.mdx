@@ -417,21 +417,16 @@ Repeat until the line stops being wrong
 
 That's it. No calculus, no complex optimization, just: "Wrong? Move a bit. Wrong again? Move a bit more."
 
-{/*
-
-no need to create a new component here. maybe just reuse linear-separable-data-viz component but where the 'train perceptron' button is present but on by default, and it goes in a loop
-
 <PerceptronTrainingLoop
-config={{
-dataset: "cats_vs_dogs",
-showSteps: true,
-animateLineAdjustment: true,
-highlightCurrentPoint: true,
-showErrorCount: true,
-speed: "adjustable"
-}}
+  config={{
+    dataset: "cats_vs_dogs",
+    showSteps: true,
+    animateLineAdjustment: true,
+    highlightCurrentPoint: true,
+    showErrorCount: true,
+    speed: "adjustable"
+  }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line stumble its way toward perfection, one mistake at a time</p>
 
@@ -509,17 +504,19 @@ def train_perceptron(data_points, labels, max_iterations=100):
 # That's it!
 ```
 
-{/*
-<TrainingProgressVisualization
-config={{
-showEpochs: true,
-showErrorRate: true,
-showLineEvolution: true,
-dataset: "cats_vs_dogs",
-compareToModernMethods: false  // We'll save this comparison for later
-}}
+<PerceptronTrainingLoop
+  config={{
+    dataset: "cats_vs_dogs",
+    showSteps: true,
+    showErrorCount: true,
+    showErrorRate: true,
+    showLineEvolution: true,
+    animateLineAdjustment: true,
+    highlightCurrentPoint: true,
+    speed: "adjustable",
+    compareToModernMethods: false
+  }}
 />
-*/}
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">From chaos to order: watch the error rate drop as the line finds its place</p>
 
