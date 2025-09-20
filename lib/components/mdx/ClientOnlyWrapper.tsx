@@ -17,3 +17,13 @@ export const InfoBox = dynamic(
   () => import('../../../components/framer/info-box'),
   { ssr: false }
 );
+
+export const ChatGif = dynamic(
+  () => import('../../../components/framer/chatgif'),
+  { ssr: false }
+);
+
+export const HeadlineCascade = dynamic(
+  () => import('../../../components/framer/headline-cascade'),
+  { ssr: false }
+);
