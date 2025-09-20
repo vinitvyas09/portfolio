@@ -482,7 +482,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       setCurrentTrainingPoint(-1);
     };
 
-    setCurrentWeights(denormalizeWeights(weights));
+    const initialWeights = denormalizeWeights(weights);
+    console.log('Starting training with initial weights:', initialWeights);
+    setCurrentWeights(initialWeights);
 
     const trainSinglePoint = () => {
       if (epoch >= maxEpochs || converged) {
