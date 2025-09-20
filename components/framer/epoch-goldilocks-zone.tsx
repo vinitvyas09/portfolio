@@ -240,16 +240,16 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     };
   }, []);
 
-  // Chart dimensions
-  const chartWidth = 250;
-  const chartHeight = 150;
-  const padding = 25;
+  // Chart dimensions - wider for vertical layout
+  const chartWidth = 400;
+  const chartHeight = 180;
+  const padding = 30;
 
   // Scale functions
   const scaleX = (epoch: number, maxEpoch: number) =>
     padding + (epoch / maxEpoch) * (chartWidth - 2 * padding);
   const scaleY = (error: number) =>
-    chartHeight - padding - ((40 - error) / 40) * (chartHeight - 2 * padding);
+    padding + (error / 40) * (chartHeight - 2 * padding);
 
   // Render error curve chart
   const renderChart = (
@@ -262,7 +262,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     const lastMetric = metrics[metrics.length - 1];
 
     return (
-      <div>
+      <div style={{ width: '100%', maxWidth: '500px' }}>
         <div style={{
           fontSize: '13px',
           fontWeight: '600',
@@ -469,12 +469,13 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
         🎯 Finding the Training Sweet Spot
       </div>
 
-      {/* Three scenarios */}
+      {/* Three scenarios - stacked vertically */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '1rem',
-        marginBottom: '1.5rem'
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1.5rem',
+        marginBottom: '1.5rem',
+        alignItems: 'center'
       }}>
         {renderChart(
           scenario1Metrics,
