@@ -93,7 +93,7 @@ interface ActivationFunctionGalleryProps {
 const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
   config = {
     functions: [
-      { name: "Sign (Original)", formula: "sgn(x)", description: "Binary decisions: -1, 0, or 1" },
+      { name: "Sign (Original)", formula: "sgn(x) where x is the input", description: "Binary decisions: -1, 0, or 1" },
       { name: "Sigmoid", formula: "1/(1+e^-x)", description: "Smooth probability between 0 and 1" },
       { name: "Tanh", formula: "tanh(x)", description: "Centered sigmoid, outputs -1 to 1" },
       { name: "ReLU", formula: "max(0, x)", description: "Modern favorite: 0 or positive" },
@@ -179,7 +179,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
   const activationFunctions: ActivationFunction[] = useMemo(() => [
     {
       name: "Sign (Original)",
-      formula: "sgn(x)",
+      formula: "sgn(x) where x is the input",
       description: "Binary decisions: -1, 0, or 1",
       fn: (x: number) => (x > 0 ? 1 : x < 0 ? -1 : 0),
       color: colors.primary,
