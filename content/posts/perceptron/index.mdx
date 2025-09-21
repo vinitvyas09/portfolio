@@ -516,7 +516,7 @@ Think about it:
 
 The product is positive when we're right, negative when we're wrong. Elegant!
 
-### But Does This Actually Work? The Mathematical Proof
+### Why Does This Update Rule Work?
 
 Here's something magical: when we update our weights after a mistake, we're guaranteed to do better on that same point next time. Not necessarily correct, but better. Let me show you why.
 
@@ -737,39 +737,15 @@ def train_perceptron_any_dimension(data_points, labels, learning_rate=1.0):
 
 Whether you're classifying images (784 dimensions for MNIST), text (thousands of word frequencies), or cat videos (millions of pixels), the perceptron uses the exact same algorithm. The only difference is the loop runs longer.
 
-And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature. 
+And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature.
 
-## Decision Boundaries: The Geometry of Classification
+<InfoBox type="insight" title="Geometric Insight: Weights and Boundaries">
 
-So far we've been training our perceptron to find "the right line" to separate cats from dogs. But we've been treating this line like a black box, it magically appears after training and somehow makes the right decisions. Time to crack it open.
+The weight vector [w1, w2] is always perpendicular to the decision boundary. This isn't a coincidence: it's fundamental to how perceptrons work:
 
-### What Even Is a Decision Boundary?
-
-The decision boundary is the fence-sitter's paradise—it's where the perceptron literally cannot decide. Remember our equation:
-
-```
-`activation = w1*x1 + w2*x2 + bias`
-```
-
-On one side of space, this activation is positive (dog territory). On the other side, it's negative (cat territory). The decision boundary is the exact line where activation equals zero—the perceptron's "I genuinely have no idea" zone.
-
-```python
-# Decision boundary definition:
-# All points (x1, x2) where:
-`w1*x1 + w2*x2 + bias = 0`
-
-# Rearranging to standard line form:
-# This is just Ax + By + C = 0 where:
-# A = w1, B = w2, C = bias
-```
-
-We have been calling it a line but this is another way to look at it. 
-
-Here's where it gets interesting. The weights don't just tell us where the boundary is, they tell us its *orientation*. Specifically, the weight vector [w1, w2] is always perpendicular to the decision boundary. Not sometimes. Not usually. Always.
-
-### The Perpendicular Truth
-
-Let me show you why this perpendicular relationship is the key to understanding what weights actually mean.
+- The weight vector points toward the positive class
+- The decision boundary is perpendicular to this direction
+- The dot product w·x measures how aligned an input is with the weight direction
 
 <DecisionBoundaryGeometry
 config={{
@@ -782,16 +758,9 @@ annotation: "The weight vector and decision boundary are always at 90°"
 }}
 />
 
-<Caption>No matter how you rotate the weights, the boundary stays perpendicular</Caption>
+This is why changing weights rotates and shifts the decision boundary.
 
-Think of the weight vector as an arrow pointing from the origin. The decision boundary is the line that would block this arrow at exactly 90 degrees. But here's the nuance that matters: the weight vector doesn't just define the boundary's orientation, it points toward the positive class.
-
-If you have a weight vector [2, 1], it's pointing up and to the right. That means:
-1. Points in that direction (similar direction to weights) → positive activation → classified positive
-2. Points in the opposite direction → negative activation → classified negative
-3. Points perpendicular to the weights → zero activation → on the boundary
-
-This is why the dot product `w·x` gives us the activation. Dot products measure alignment. When your input x points in the same direction as w, you get a positive dot product. When they point in opposite directions, negative. When perpendicular, zero.
+</InfoBox>
 
 # Theory and Convergence
 
@@ -950,21 +919,14 @@ The vanilla perceptron we've been working with has a dirty secret: it's biased t
 
 ## The Late-Update Problem
 
-Imagine this scenario: you're training a perceptron on 10,000 examples. After the first 100 examples, through sheer luck or good initialization, your perceptron has found a fantastic separator. It's so good that it correctly classifies the next 9,899 examples without a single update. Then comes example 10,000—maybe it's noisy, maybe it's mislabeled, or maybe it's just sitting right on the edge of the margin. The perceptron misclassifies it and updates.
-
-That single update just overwrote a weight vector that was correct on 99.99% of your data.
+The vanilla perceptron has a dirty secret: it's biased toward recent examples. If your perceptron correctly classifies 9,999 examples, then misclassifies the 10,000th (maybe it's noisy or mislabeled), that single update overwrites weights that were 99.99% accurate.
 
 ```python
 # The tragedy in code
-weights = [0.5, -0.3]  # Works perfectly for 9,999 examples
-
-# Example 10,000 comes along
-misclassified_point = [8, 2]  # An outlier
-weights = [0.5 + 8, -0.3 + 2]  # Now [8.5, 1.7] - completely different!
-
-# Your beautiful separator is gone, replaced by one that fits that single outlier
+weights = [0.5, -0.3]  # Works for 9,999 examples
+# One outlier appears...
+weights = [8.5, 1.7]    # Completely different!
 ```
-
 This is the perceptron's recency bias. The last example to cause an update has massive influence, regardless of how well the previous weights performed. It's like letting the newest employee completely reorganize the company, ignoring the wisdom of everyone who's been there for years.
 
 ## The Voted Perceptron: Democracy for Hyperplanes
@@ -1071,48 +1033,9 @@ showConvergence: true
 
 <Caption>Averaged perceptron: almost as good as voted, almost as cheap as vanilla</Caption>
 
-The averaged perceptron is almost always better than vanilla. On typical datasets, you'll see:
+**The bottom line:** Always use the averaged perceptron. The tiny computational overhead gives you significantly better generalization. With early stopping (halt when validation accuracy plateaus), it's remarkably effective—simple to implement, fast to run, and competitive with fancier algorithms.
 
-- Vanilla: Fast, simple, but sensitive to ordering and outliers
-- Voted: Best generalization, but requires storing entire history
-- Averaged: 95% of voted's performance with vanilla's efficiency
-
-## Early Stopping: When to Stop Averaging
-
-Even the averaged perceptron will eventually overfit if you let it run forever. The solution is early stopping—halt training when performance on a validation set starts degrading.
-
-```python
-def train_with_early_stopping(train_data, val_data, patience=5):
-    best_val_accuracy = 0
-    patience_counter = 0
-    best_weights = None
-    
-    for epoch in range(max_epochs):
-        # Train for one epoch
-        weights = train_one_epoch(train_data)
-        
-        # Check validation accuracy
-        val_accuracy = evaluate(weights, val_data)
-        
-        if val_accuracy > best_val_accuracy:
-            best_val_accuracy = val_accuracy
-            best_weights = weights.copy()
-            patience_counter = 0
-        else:
-            patience_counter += 1
-            
-        if patience_counter >= patience:
-            print(f"Stopping at epoch {epoch}, val accuracy stopped improving")
-            break
-    
-    return best_weights
-```
-
-The averaged perceptron with early stopping is remarkably effective. It's simple enough to implement in 50 lines of code, fast enough to run on huge datasets, and accurate enough to compete with much fancier algorithms. Not bad for an algorithm from the 1950s with a 2002 twist.
-
-Think of it this way: The vanilla perceptron is like a weather forecast that only considers today's conditions where one unusual day can throw off the entire prediction. The voted perceptron keeps every historical forecast and lets them all vote on tomorrow's weather, so more accurate but requires storing years of data. The averaged perceptron is the practical compromise: it maintains a running average of all past forecasts, capturing historical patterns without the storage overhead. Same wisdom, fraction of the cost.
-
-In practice, I'd always recommend the averaged perceptron. The extra code complexity/computational overhead is minimal and the improvement in generalization is significant. Probably as close to a free lunch as it gets in Machine Learning.
+Think of it this way: vanilla only remembers the last lesson, voted remembers every lesson perfectly (expensive!), and averaged maintains a running wisdom without the storage cost.
 
 # Limitations and Legacy
 
