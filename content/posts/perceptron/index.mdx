@@ -739,8 +739,6 @@ def train_perceptron_any_dimension(data_points, labels, learning_rate=1.0):
 
 Whether you're classifying images (784 dimensions for MNIST), text (thousands of word frequencies), or cat videos (millions of pixels), the perceptron uses the exact same algorithm. The only difference is the loop runs longer.
 
-And that's the magic of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature.
-
 <InfoBox type="insight" title="Geometric Insight: Weights and Boundaries">
 
 The weight vector [w1, w2] is always perpendicular to the decision boundary. This isn't a coincidence: it's fundamental to how perceptrons work:
@@ -763,6 +761,8 @@ annotation: "The weight vector and decision boundary are always at 90°"
 This is why changing weights rotates and shifts the decision boundary.
 
 </InfoBox>
+
+And that's the best part of the perceptron: a simple idea that scales from toy problems to real-world applications without changing its fundamental nature.
 
 # Theory and Convergence
 
