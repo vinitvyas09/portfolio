@@ -477,7 +477,7 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                 const x = 40 + (i / epochs) * 340;
                 const progress = i / data.convergenceEpochs;
                 const error = Math.max(0, 100 - progress * 100);
-                const y = 20 + (error / 100) * 150;
+                const y = 170 - (error / 100) * 150;
                 points.push(`${x},${y}`);
               }
 
