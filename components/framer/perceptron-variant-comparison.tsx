@@ -256,7 +256,7 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
                   }}>
-                    {(data.trainingError * 100).toFixed(1)}%
+                    {isMobile ? Math.round(data.trainingError * 100) : (data.trainingError * 100).toFixed(1)}%
                   </div>
                 </div>
               );
@@ -320,7 +320,7 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
                   }}>
-                    {(data.testError * 100).toFixed(1)}%
+                    {isMobile ? Math.round(data.testError * 100) : (data.testError * 100).toFixed(1)}%
                   </div>
                 </div>
               );
@@ -385,7 +385,7 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
                   }}>
-                    {data.storageScale.toFixed(1)}×
+                    {isMobile ? Math.round(data.storageScale) : data.storageScale.toFixed(1)}×
                   </div>
                 </div>
               );
