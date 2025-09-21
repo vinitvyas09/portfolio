@@ -521,7 +521,7 @@ def train_perceptron(data_points, labels, max_iterations=100):
 
 ### The Clever Trick: Why y × a Tells Us If We're Right
 
-There's a neat trick in line 3 above. Instead of checking if prediction !&#61; true_label, we check if true_label * activation &lt;&#61; 0. Why?
+There's a neat trick in line 3 above. Instead of checking if `prediction != true_label`, we check if `true_label * activation <= 0`. Why?
 
 Think about it:
 
