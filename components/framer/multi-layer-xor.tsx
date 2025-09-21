@@ -137,20 +137,21 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
 
   return (
     <div style={{
-      padding: '1rem',
+      padding: '0.75rem',
       background: colors.bg,
       border: `1px solid ${colors.border}`,
       borderRadius: '16px',
-      margin: '2rem 0',
+      margin: '1rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
-      <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         {/* Left: XOR Grid */}
-        <div style={{ flex: '1 1 300px', maxWidth: '350px' }}>
+        <div style={{ flex: '1 1 280px', maxWidth: '350px', width: '100%' }}>
           <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem' }}>
             XOR Input Space
           </h3>
-          <svg width="280" height="280" viewBox="-40 -40 360 360">
+          <div style={{ width: '100%', maxWidth: '280px', margin: '0 auto' }}>
+            <svg width="100%" height="280" viewBox="-40 -40 360 360" preserveAspectRatio="xMidYMid meet">
             {/* Background grid */}
             {config.showDecisionRegions && (
               <g>
@@ -235,6 +236,7 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
             <text x="-10" y="283" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>0</text>
             <text x="-10" y="5" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>1</text>
           </svg>
+          </div>
 
           <div style={{
             marginTop: '0.75rem',
@@ -250,11 +252,13 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
         </div>
 
         {/* Right: Neural Network */}
-        <div style={{ flex: '1 1 400px', maxWidth: '450px' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem' }}>
+        <div style={{ flex: '1 1 280px', maxWidth: '450px', width: '100%' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             2-Layer Neural Network
           </h3>
-          <svg width="400" height="300" viewBox="0 0 400 300">
+          <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+            <div style={{ minWidth: '320px', maxWidth: '400px', margin: '0 auto' }}>
+              <svg width="100%" height="300" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
             {/* Connections: Input to Hidden */}
             <line x1="80" y1="100" x2="180" y2="80"
               stroke={activeInput && activeInput.x === 1 ? colors.connectionActive : colors.connection}
@@ -381,10 +385,12 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
               </g>
             )}
           </svg>
+            </div>
+          </div>
 
           {/* Logic explanation */}
           <div style={{
-            marginTop: '1rem',
+            marginTop: '0.5rem',
             padding: '0.75rem',
             background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
             borderRadius: '8px',
@@ -394,11 +400,11 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
             <div style={{ fontWeight: '600', marginBottom: '0.25rem', color: colors.text, fontSize: '12px' }}>
               How it solves XOR:
             </div>
-            <div style={{ lineHeight: '1.5' }}>
-              • Hidden 1: &quot;at least one input is 1&quot; (OR)<br/>
-              • Hidden 2: &quot;not both inputs are 1&quot; (NAND)<br/>
-              • Output: both hidden neurons active (AND)<br/>
-              • Result: XOR (exactly one input is 1)
+            <div style={{ lineHeight: '1.6' }}>
+              <div style={{ marginBottom: '0.25rem' }}>• Hidden 1: "at least one input is 1" (OR)</div>
+              <div style={{ marginBottom: '0.25rem' }}>• Hidden 2: "not both inputs are 1" (NAND)</div>
+              <div style={{ marginBottom: '0.25rem' }}>• Output: both hidden neurons active (AND)</div>
+              <div>• Result: XOR (exactly one input is 1)</div>
             </div>
           </div>
         </div>
