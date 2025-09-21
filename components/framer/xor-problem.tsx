@@ -253,16 +253,16 @@ const XORProblem: React.FC<XORProblemProps> = ({
             fill={colors.textSecondary}
             fontStyle="italic"
           >
-            "{point.text}"
+            &quot;{point.text}&quot;
           </text>
         ))}
 
         {/* Axis labels */}
         <text x={size / 2} y={size - 10} textAnchor="middle" fontSize="12" fill={colors.text}>
-          Has "excellent"
+          Has &quot;excellent&quot;
         </text>
         <text x={15} y={size / 2} textAnchor="middle" fontSize="12" fill={colors.text} transform={`rotate(-90, 15, ${size / 2})`}>
-          Has "terrible"
+          Has &quot;terrible&quot;
         </text>
 
         {/* Corner labels */}
