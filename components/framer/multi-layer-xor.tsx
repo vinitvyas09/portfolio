@@ -401,8 +401,8 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
               How it solves XOR:
             </div>
             <div style={{ lineHeight: '1.6' }}>
-              <div style={{ marginBottom: '0.25rem' }}>• Hidden 1: "at least one input is 1" (OR)</div>
-              <div style={{ marginBottom: '0.25rem' }}>• Hidden 2: "not both inputs are 1" (NAND)</div>
+              <div style={{ marginBottom: '0.25rem' }}>• Hidden 1: &quot;at least one input is 1&quot; (OR)</div>
+              <div style={{ marginBottom: '0.25rem' }}>• Hidden 2: &quot;not both inputs are 1&quot; (NAND)</div>
               <div style={{ marginBottom: '0.25rem' }}>• Output: both hidden neurons active (AND)</div>
               <div>• Result: XOR (exactly one input is 1)</div>
             </div>
