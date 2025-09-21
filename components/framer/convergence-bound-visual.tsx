@@ -22,12 +22,23 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [margin, setMargin] = useState(0.5); // γ value (0.1 to 1.0)
   const [hoveredIteration, setHoveredIteration] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     setMounted(true);
+
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -124,10 +135,16 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
     };
   }, [margin]);
 
-  // Chart dimensions
-  const width = 600;
-  const height = 350;
-  const margin_chart = { top: 30, right: 30, bottom: 50, left: 60 };
+  // Chart dimensions - responsive for mobile
+  const width = useMemo(() => {
+    if (!mounted) return 600;
+    return isMobile ? Math.min(window.innerWidth - 60, 320) : 600;
+  }, [isMobile, mounted]);
+
+  const height = isMobile ? 200 : 350;
+  const margin_chart = isMobile
+    ? { top: 15, right: 15, bottom: 35, left: 35 }
+    : { top: 30, right: 30, bottom: 50, left: 60 };
   const chartWidth = width - margin_chart.left - margin_chart.right;
   const chartHeight = height - margin_chart.top - margin_chart.bottom;
 
