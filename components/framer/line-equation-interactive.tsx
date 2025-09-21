@@ -41,7 +41,7 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
     equation: "2x + 3y - 6 = 0",
     showRegions: true,
     testPoints: [
-      { x: 1, y: 0.5, label: "Sleepy cat" },
+      { x: 1, y: 0.5, label: "Quiet cat" },
       { x: 2, y: 2.5, label: "Energetic dog" },
       { x: 1.5, y: 1, label: "On the fence" }
     ],
@@ -309,29 +309,59 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
                 </linearGradient>
               </defs>
 
-              {/* Calculate regions based on line */}
-              <path
-                d={`
-                  M ${toSvgX(linePoints[0].x)} ${toSvgY(linePoints[0].y)}
-                  L ${toSvgX(linePoints[1].x)} ${toSvgY(linePoints[1].y)}
-                  L ${toSvgX(xMax)} ${toSvgY(yMax)}
-                  L ${toSvgX(xMin)} ${toSvgY(yMax)}
-                  Z
-                `}
-                fill="url(#positive-gradient)"
-                opacity="0.5"
-              />
-              <path
-                d={`
-                  M ${toSvgX(linePoints[0].x)} ${toSvgY(linePoints[0].y)}
-                  L ${toSvgX(linePoints[1].x)} ${toSvgY(linePoints[1].y)}
-                  L ${toSvgX(xMax)} ${toSvgY(yMin)}
-                  L ${toSvgX(xMin)} ${toSvgY(yMin)}
-                  Z
-                `}
-                fill="url(#negative-gradient)"
-                opacity="0.5"
-              />
+              {/* Calculate regions based on line - need to check which corners are positive/negative */}
+              {(() => {
+                // Test the four corners to determine which side is which
+                const topLeft = calculateValue(xMin, yMax);
+                const topRight = calculateValue(xMax, yMax);
+                const bottomLeft = calculateValue(xMin, yMin);
+                const bottomRight = calculateValue(xMax, yMin);
+
+                // Create paths for positive and negative regions
+                const positivePath = [];
+                const negativePath = [];
+
+                // Start with the line points
+                const linePathStr = `M ${toSvgX(linePoints[0].x)} ${toSvgY(linePoints[0].y)} L ${toSvgX(linePoints[1].x)} ${toSvgY(linePoints[1].y)}`;
+
+                // Determine which corners belong to which region
+                if (topLeft > 0 && topRight > 0) {
+                  // Top side is positive
+                  positivePath.push(`${linePathStr} L ${toSvgX(xMax)} ${toSvgY(yMax)} L ${toSvgX(xMin)} ${toSvgY(yMax)} Z`);
+                  negativePath.push(`${linePathStr} L ${toSvgX(xMax)} ${toSvgY(yMin)} L ${toSvgX(xMin)} ${toSvgY(yMin)} Z`);
+                } else if (bottomLeft > 0 && bottomRight > 0) {
+                  // Bottom side is positive
+                  positivePath.push(`${linePathStr} L ${toSvgX(xMax)} ${toSvgY(yMin)} L ${toSvgX(xMin)} ${toSvgY(yMin)} Z`);
+                  negativePath.push(`${linePathStr} L ${toSvgX(xMax)} ${toSvgY(yMax)} L ${toSvgX(xMin)} ${toSvgY(yMax)} Z`);
+                } else if (topLeft > 0 && bottomLeft > 0) {
+                  // Left side is positive
+                  positivePath.push(`${linePathStr} L ${toSvgX(xMin)} ${toSvgY(yMin)} L ${toSvgX(xMin)} ${toSvgY(yMax)} Z`);
+                  negativePath.push(`${linePathStr} L ${toSvgX(xMax)} ${toSvgY(yMin)} L ${toSvgX(xMax)} ${toSvgY(yMax)} Z`);
+                } else if (topRight > 0 && bottomRight > 0) {
+                  // Right side is positive
+                  positivePath.push(`${linePathStr} L ${toSvgX(xMax)} ${toSvgY(yMin)} L ${toSvgX(xMax)} ${toSvgY(yMax)} Z`);
+                  negativePath.push(`${linePathStr} L ${toSvgX(xMin)} ${toSvgY(yMin)} L ${toSvgX(xMin)} ${toSvgY(yMax)} Z`);
+                }
+
+                return (
+                  <>
+                    {positivePath.length > 0 && (
+                      <path
+                        d={positivePath[0]}
+                        fill="url(#positive-gradient)"
+                        opacity="0.5"
+                      />
+                    )}
+                    {negativePath.length > 0 && (
+                      <path
+                        d={negativePath[0]}
+                        fill="url(#negative-gradient)"
+                        opacity="0.5"
+                      />
+                    )}
+                  </>
+                );
+              })()}
             </>
           )}
 
@@ -389,13 +419,13 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
 
             // Determine if point is correctly classified
             let isCorrect = false;
-            if (point.label === "Sleepy cat") {
+            if (point.label.toLowerCase().includes("cat")) {
               // Cats should be on negative side (value < 0)
               isCorrect = value < 0;
-            } else if (point.label === "Energetic dog") {
+            } else if (point.label.toLowerCase().includes("dog")) {
               // Dogs should be on positive side (value > 0)
               isCorrect = value > 0;
-            } else if (point.label === "On the fence") {
+            } else if (point.label.toLowerCase().includes("fence")) {
               // Fence should be near the line
               isCorrect = Math.abs(value) < 0.5;
             }
@@ -482,13 +512,13 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
           // Determine if point is correctly classified
           let isCorrect = false;
           let expectedSide = "";
-          if (point.label === "Sleepy cat") {
+          if (point.label.toLowerCase().includes("cat")) {
             isCorrect = value < 0;
             expectedSide = "negative side (cats)";
-          } else if (point.label === "Energetic dog") {
+          } else if (point.label.toLowerCase().includes("dog")) {
             isCorrect = value > 0;
             expectedSide = "positive side (dogs)";
-          } else if (point.label === "On the fence") {
+          } else if (point.label.toLowerCase().includes("fence")) {
             isCorrect = Math.abs(value) < 0.5;
             expectedSide = "on the line";
           }
