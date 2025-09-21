@@ -362,18 +362,18 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
         {showBoundary && (
           <g filter="url(#boundaryGlow)">
             <line
-              x1={centerX + boundaryNormal.y * 200}
-              y1={centerY + boundaryNormal.x * 200}
-              x2={centerX - boundaryNormal.y * 200}
-              y2={centerY - boundaryNormal.x * 200}
+              x1={centerX - boundaryNormal.x * 200}
+              y1={centerY + boundaryNormal.y * 200}
+              x2={centerX + boundaryNormal.x * 200}
+              y2={centerY - boundaryNormal.y * 200}
               stroke={colors.boundary}
               strokeWidth="3"
               strokeDasharray="8,4"
               opacity="0.9"
             />
             <text
-              x={centerX + boundaryNormal.y * 100}
-              y={centerY + boundaryNormal.x * 100 - 10}
+              x={centerX + boundaryNormal.x * 100}
+              y={centerY - boundaryNormal.y * 100 - 10}
               fill={colors.boundary}
               fontSize="11"
               fontWeight="600"
