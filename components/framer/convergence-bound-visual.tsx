@@ -478,21 +478,31 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
         )}
       </div>
 
-      {/* Current values display */}
-      {config.interactive && hoveredIteration !== null && (
-        <div style={{
-          marginTop: '1rem',
-          padding: '1rem',
-          background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '12px', color: colors.text }}>
-            <strong>Iteration {hoveredIteration}:</strong>{' '}
-            Error = {actualConvergence[hoveredIteration]?.toFixed(1)}%
-          </div>
+      {/* Current values display - Always visible for consistent height */}
+      <div style={{
+        marginTop: '1rem',
+        padding: '1rem',
+        background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
+        borderRadius: '8px',
+        textAlign: 'center',
+        minHeight: '44px', // Fixed height to prevent layout shift
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ fontSize: '12px', color: colors.text }}>
+          {config.interactive && hoveredIteration !== null ? (
+            <>
+              <strong>Iteration {hoveredIteration}:</strong>{' '}
+              Error = {actualConvergence[hoveredIteration]?.toFixed(1)}%
+            </>
+          ) : (
+            <span style={{ color: colors.textSecondary }}>
+              Hover over the graph to see iteration details
+            </span>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Key insight */}
       <div style={{
