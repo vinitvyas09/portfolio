@@ -232,20 +232,30 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
 
   return (
     <div className="w-full flex flex-col items-center gap-4 my-8">
-      <div className="relative w-full max-w-[600px]">
-        <svg
-          ref={svgRef}
-          width={svgWidth}
-          height={svgHeight}
-          className="w-full h-auto rounded-xl shadow-lg"
-          style={{
-            background: `linear-gradient(135deg, ${colors.bgGradient1}, ${colors.bgGradient2})`,
-            cursor: isDragging !== null ? 'grabbing' : 'default'
-          }}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={() => setHoveredPoint(null)}
-        >
+      {/* Mobile scroll hint */}
+      <div className="md:hidden text-xs text-center" style={{ color: colors.textMuted }}>
+        ← Swipe horizontally to explore the graph →
+      </div>
+
+      {/* Make the graph container scrollable on mobile */}
+      <div className="relative w-full max-w-[600px] overflow-x-auto md:overflow-visible rounded-xl">
+        <div className="min-w-[500px] md:min-w-0">
+          <svg
+            ref={svgRef}
+            width={svgWidth}
+            height={svgHeight}
+            className="w-full h-auto rounded-xl shadow-lg"
+            viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{
+              background: `linear-gradient(135deg, ${colors.bgGradient1}, ${colors.bgGradient2})`,
+              cursor: isDragging !== null ? 'grabbing' : 'default',
+              minWidth: '500px'
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={() => setHoveredPoint(null)}
+          >
           {/* Grid */}
           <g>
             {/* Vertical grid lines */}
@@ -459,6 +469,7 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
             </text>
           )}
         </svg>
+        </div>
       </div>
 
       {/* Calculations panel */}
