@@ -1133,10 +1133,12 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
               : isTraining
                 ? `0 8px 32px ${colors.accent}15`
                 : 'none',
-            minHeight: '200px',
+            height: '240px',  // Fixed height instead of minHeight
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            position: 'relative',
+            overflow: 'hidden'  // Prevent content from expanding the box
           }}>
             {isTraining ? (
               // Training in progress
@@ -1199,7 +1201,10 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
                 {currentTrainingPoint >= 0 && (
                   <div style={{
-                    marginTop: '0.75rem',
+                    position: 'absolute',
+                    bottom: '10px',
+                    left: '0',
+                    right: '0',
                     fontSize: '12px',
                     color: colors.textSecondary
                   }}>
