@@ -216,11 +216,11 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
 
   return (
     <div style={{
-      padding: '2rem',
+      padding: isMobile ? '1rem' : '2rem',
       background: `linear-gradient(135deg, ${colors.bgGradient1} 0%, ${colors.bgGradient2} 100%)`,
       border: `1px solid ${colors.borderColor}`,
       borderRadius: '12px',
-      margin: '2rem 0',
+      margin: isMobile ? '1rem 0' : '2rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       boxShadow: isDark
         ? '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
@@ -232,17 +232,24 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '2rem'
+        marginBottom: isMobile ? '1rem' : '2rem',
+        flexWrap: isMobile ? 'wrap' : 'nowrap',
+        gap: isMobile ? '0.5rem' : '0'
       }}>
         <h3 style={{
           margin: 0,
           color: colors.textPrimary,
-          fontSize: '1.5rem',
-          fontWeight: '600'
+          fontSize: isMobile ? '1.25rem' : '1.5rem',
+          fontWeight: '600',
+          width: isMobile ? '100%' : 'auto'
         }}>
           Interactive Perceptron
         </h3>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{
+          display: 'flex',
+          gap: '0.5rem',
+          width: isMobile ? '100%' : 'auto'
+        }}>
           <button
             onClick={generateRandomExample}
             style={{
@@ -254,7 +261,8 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
               fontSize: '0.875rem',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flex: isMobile ? '1' : 'auto'
             }}
           >
             🎲 Random
@@ -270,7 +278,8 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
               fontSize: '0.875rem',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flex: isMobile ? '1' : 'auto'
             }}
           >
             🔄 Reset
