@@ -361,9 +361,17 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const xRange = xMax - xMin || 1;
   const yRange = yMax - yMin || 1;
 
-  // Scale functions
-  const scaleX = (x: number) => padding + ((x - xMin) / xRange) * innerWidth;
-  const scaleY = (y: number) => chartHeight - padding - ((y - yMin) / yRange) * innerHeight;
+  // Scale functions with safety checks
+  const scaleX = (x: number) => {
+    if (!Number.isFinite(x)) return padding;
+    const result = padding + ((x - xMin) / xRange) * innerWidth;
+    return Number.isFinite(result) ? result : padding;
+  };
+  const scaleY = (y: number) => {
+    if (!Number.isFinite(y)) return chartHeight - padding;
+    const result = chartHeight - padding - ((y - yMin) / yRange) * innerHeight;
+    return Number.isFinite(result) ? result : chartHeight - padding;
+  };
 
   const xTicks = useMemo(() => generateTicks(xMin, xMax, 6), [xMin, xMax]);
   const yTicks = useMemo(() => generateTicks(yMin, yMax, 6), [yMin, yMax]);
@@ -843,24 +851,37 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
         {/* Data points */}
         {dataPoints.slice(0, visiblePoints).map((point, index) => {
+          // Skip points with invalid coordinates
+          if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+            return null;
+          }
+
           const isCurrentTrainingPoint = isTraining && index === currentTrainingPoint;
           const color = point.label === 'cat' ? colors.catColor : colors.dogColor;
           const radius = isCurrentTrainingPoint ? 9 : 6;
+
+          // Ensure scaled values are valid
+          const scaledX = scaleX(point.x);
+          const scaledY = scaleY(point.y);
+
+          if (!Number.isFinite(scaledX) || !Number.isFinite(scaledY)) {
+            return null;
+          }
 
           return (
             <g key={point.id}>
               {/* Point shadow */}
               <circle
-                cx={scaleX(point.x) + 1}
-                cy={scaleY(point.y) + 1}
+                cx={scaledX + 1}
+                cy={scaledY + 1}
                 r={radius}
                 fill="rgba(0,0,0,0.1)"
               />
 
               {/* Main point */}
               <circle
-                cx={scaleX(point.x)}
-                cy={scaleY(point.y)}
+                cx={scaledX}
+                cy={scaledY}
                 r={radius}
                 fill={point.label === 'cat' ? `url(#${svgIds.catGradient})` : `url(#${svgIds.dogGradient})`}
                 stroke={color}
@@ -895,8 +916,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
               {/* Point emoji */}
               <text
-                x={scaleX(point.x)}
-                y={scaleY(point.y)}
+                x={scaledX}
+                y={scaledY}
                 textAnchor="middle"
                 dy="0.35em"
                 fontSize="12"
