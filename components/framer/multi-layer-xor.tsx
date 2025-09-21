@@ -260,34 +260,34 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
             <div style={{ minWidth: '320px', maxWidth: '400px', margin: '0 auto' }}>
               <svg width="100%" height="300" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
             {/* Connections: Input to Hidden */}
-            <line x1="80" y1="100" x2="180" y2="80"
+            <line x1="80" y1="100" x2="180" y2="100"
               stroke={activeInput && activeInput.x === 1 ? colors.connectionActive : colors.connection}
               strokeWidth={activeInput && activeInput.x === 1 ? "3" : "1.5"}
               opacity={activeInput && activeInput.x === 1 ? "1" : "0.4"}
             />
-            <line x1="80" y1="100" x2="180" y2="180"
+            <line x1="80" y1="100" x2="180" y2="200"
               stroke={activeInput && activeInput.x === 1 ? colors.connectionActive : colors.connection}
               strokeWidth={activeInput && activeInput.x === 1 ? "3" : "1.5"}
               opacity={activeInput && activeInput.x === 1 ? "1" : "0.4"}
             />
-            <line x1="80" y1="200" x2="180" y2="80"
+            <line x1="80" y1="200" x2="180" y2="100"
               stroke={activeInput && activeInput.y === 1 ? colors.connectionActive : colors.connection}
               strokeWidth={activeInput && activeInput.y === 1 ? "3" : "1.5"}
               opacity={activeInput && activeInput.y === 1 ? "1" : "0.4"}
             />
-            <line x1="80" y1="200" x2="180" y2="180"
+            <line x1="80" y1="200" x2="180" y2="200"
               stroke={activeInput && activeInput.y === 1 ? colors.connectionActive : colors.connection}
               strokeWidth={activeInput && activeInput.y === 1 ? "3" : "1.5"}
               opacity={activeInput && activeInput.y === 1 ? "1" : "0.4"}
             />
 
             {/* Connections: Hidden to Output */}
-            <line x1="180" y1="80" x2="300" y2="130"
+            <line x1="180" y1="100" x2="300" y2="150"
               stroke={hiddenActivations[0] === 1 ? colors.connectionActive : colors.connection}
               strokeWidth={hiddenActivations[0] === 1 ? "3" : "1.5"}
               opacity={hiddenActivations[0] === 1 ? "1" : "0.4"}
             />
-            <line x1="180" y1="180" x2="300" y2="130"
+            <line x1="180" y1="200" x2="300" y2="150"
               stroke={hiddenActivations[1] === 1 ? colors.connectionActive : colors.connection}
               strokeWidth={hiddenActivations[1] === 1 ? "3" : "1.5"}
               opacity={hiddenActivations[1] === 1 ? "1" : "0.4"}
@@ -322,42 +322,42 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
 
             {/* Hidden Layer */}
             <g>
-              <circle cx="180" cy="80" r="25"
+              <circle cx="180" cy="100" r="25"
                 fill={hiddenActivations[0] === 1 ? colors.neuronActive : colors.neuronInactive}
                 stroke={colors.border}
                 strokeWidth="2"
               />
-              <text x="180" y="85" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
+              <text x="180" y="105" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
                 {hiddenActivations[0]}
               </text>
-              <text x="180" y="55" textAnchor="middle" fill={colors.textSecondary} fontSize="10">
+              <text x="180" y="75" textAnchor="middle" fill={colors.textSecondary} fontSize="10">
                 x₁ OR x₂
               </text>
 
-              <circle cx="180" cy="180" r="25"
+              <circle cx="180" cy="200" r="25"
                 fill={hiddenActivations[1] === 1 ? colors.neuronActive : colors.neuronInactive}
                 stroke={colors.border}
                 strokeWidth="2"
               />
-              <text x="180" y="185" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
+              <text x="180" y="205" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
                 {hiddenActivations[1]}
               </text>
-              <text x="180" y="215" textAnchor="middle" fill={colors.textSecondary} fontSize="10">
+              <text x="180" y="235" textAnchor="middle" fill={colors.textSecondary} fontSize="10">
                 NOT (x₁ AND x₂)
               </text>
             </g>
 
             {/* Output Layer */}
             <g>
-              <circle cx="300" cy="130" r="30"
+              <circle cx="300" cy="150" r="30"
                 fill={outputActivation === 1 ? colors.positive : colors.negative}
                 stroke={colors.border}
                 strokeWidth="2"
               />
-              <text x="300" y="135" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">
+              <text x="300" y="155" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">
                 {outputActivation}
               </text>
-              <text x="300" y="170" textAnchor="middle" fill={colors.textSecondary} fontSize="11">
+              <text x="300" y="190" textAnchor="middle" fill={colors.textSecondary} fontSize="11">
                 XOR Output
               </text>
             </g>
@@ -376,12 +376,12 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
             {/* Weight annotations */}
             {isAnimating && (
               <g>
-                <text x="130" y="85" fill={colors.connectionActive} fontSize="10">+1</text>
-                <text x="130" y="115" fill={colors.connectionActive} fontSize="10">-1</text>
-                <text x="130" y="175" fill={colors.connectionActive} fontSize="10">+1</text>
+                <text x="130" y="95" fill={colors.connectionActive} fontSize="10">+1</text>
+                <text x="130" y="145" fill={colors.connectionActive} fontSize="10">-1</text>
+                <text x="130" y="155" fill={colors.connectionActive} fontSize="10">+1</text>
                 <text x="130" y="205" fill={colors.connectionActive} fontSize="10">-1</text>
-                <text x="240" y="95" fill={colors.connectionActive} fontSize="10">+1</text>
-                <text x="240" y="165" fill={colors.connectionActive} fontSize="10">+1</text>
+                <text x="240" y="120" fill={colors.connectionActive} fontSize="10">+1</text>
+                <text x="240" y="180" fill={colors.connectionActive} fontSize="10">+1</text>
               </g>
             )}
           </svg>
