@@ -85,7 +85,7 @@ const stageBlueprints: StageBlueprint[] = [
   {
     dims: 6,
     title: "6 features · Human intuition fades",
-    subtitle: "Add ear tilt, paw pressure, vocal pitch… the view from any two axes looks noisy",
+    subtitle: "Add ear tilt, paw pressure… the view from any two axes looks noisy",
     description:
       "Each 2D slice is now cluttered, even though the six-dimensional vectors are still perfectly linearly separable.",
     perceptronNote:
