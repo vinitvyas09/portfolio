@@ -63,9 +63,20 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -241,7 +252,10 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
   }, []);
 
   // Chart dimensions - compact for vertical layout
-  const chartWidth = 320;
+  const chartWidth = useMemo(() => {
+    if (!mounted) return 320;
+    return isMobile ? Math.min(window.innerWidth - 60, 320) : 320;
+  }, [isMobile, mounted]);
   const chartHeight = 140;
   const padding = 20;
 
@@ -264,19 +278,20 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     return (
       <div style={{
         width: '100%',
-        maxWidth: '500px',
+        maxWidth: isMobile ? '100%' : '500px',
         margin: '0 auto',
         display: 'flex',
-        alignItems: 'flex-start',
-        gap: '0.3rem'
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'center' : 'flex-start',
+        gap: isMobile ? '0.5rem' : '0.3rem'
       }}>
-        <div style={{ flex: '1' }}>
+        <div style={{ flex: isMobile ? 'none' : '1', width: isMobile ? '100%' : 'auto' }}>
           <div style={{
             fontSize: '13px',
             fontWeight: '600',
             color: colors.text,
             marginBottom: '0.1rem',
-            textAlign: 'left'
+            textAlign: isMobile ? 'center' : 'left'
           }}>
             {title}
           </div>
@@ -285,7 +300,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
           width={chartWidth}
           height={chartHeight}
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-          style={{ display: 'block', background: colors.bg, borderRadius: '8px' }}
+          style={{ display: 'block', background: colors.bg, borderRadius: '8px', margin: isMobile ? '0 auto' : '0' }}
         >
           {/* Grid lines */}
           {[0, maxEpochs / 2, maxEpochs].map(epoch => (
@@ -393,9 +408,10 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
         </svg>
         </div>
 
-        {/* Status box - now on the right */}
+        {/* Status box - now on the right or below on mobile */}
         <div style={{
-          width: '140px',
+          width: isMobile ? '100%' : '140px',
+          maxWidth: isMobile ? '320px' : '140px',
           padding: '0.35rem',
           background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
           borderRadius: '6px',
