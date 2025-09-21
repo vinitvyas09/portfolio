@@ -1029,6 +1029,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "center",
                   gap: isMobile ? "0.5rem" : "0.75rem",
                   fontSize: isMobile ? "0.75rem" : "0.8rem",
                   color: colors.textSecondary,
@@ -1038,7 +1039,8 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                 <div style={{
                   flex: isMobile ? "1 1 100%" : "0 0 150px",
                   color: colors.textPrimary,
-                  marginBottom: isMobile ? "0.25rem" : "0"
+                  marginBottom: isMobile ? "0.25rem" : "0",
+                  textAlign: isMobile ? "center" : "right"
                 }}>
                   {row.name}
                 </div>
