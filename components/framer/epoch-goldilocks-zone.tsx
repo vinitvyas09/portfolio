@@ -263,7 +263,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
   const scaleX = (epoch: number, maxEpoch: number) =>
     padding + (epoch / maxEpoch) * (chartWidth - 2 * padding);
   const scaleY = (error: number) =>
-    padding + (error / 40) * (chartHeight - 2 * padding);
+    chartHeight - padding - (error / 40) * (chartHeight - 2 * padding);
 
   // Render error curve chart
   const renderChart = (
