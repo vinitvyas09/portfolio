@@ -239,11 +239,9 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     setCurrentWeights(null);
     setTrainingHistory([]);
     setIsTraining(false);
-    setShowLine(false);
     setVisiblePoints(0);
     setCurrentTrainingPoint(-1);
-    // reset fallback segment
-    lastLineRef.current = null;
+    // Don't reset lastLineRef here - keep it as fallback
   }, []);
 
   // Color palette
@@ -352,10 +350,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const xTicks = useMemo(() => generateTicks(xMin, xMax, 6), [xMin, xMax]);
   const yTicks = useMemo(() => generateTicks(yMin, yMax, 6), [yMin, yMax]);
 
-  // Debug currentWeights changes
-  useEffect(() => {
-    console.log('currentWeights changed to:', currentWeights);
-  }, [currentWeights]);
 
   // Animate points appearing
   useEffect(() => {
@@ -423,94 +417,45 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     setTrainingHistory([]);
     setCurrentTrainingPoint(-1);
 
-    const currentDataPoints = dataPoints;
-    if (currentDataPoints.length === 0) {
+    if (dataPoints.length === 0) {
       setIsTraining(false);
       return;
     }
 
-    const totals = currentDataPoints.reduce(
-      (acc, point) => {
-        acc.sumX += point.x;
-        acc.sumY += point.y;
-        acc.sumX2 += point.x * point.x;
-        acc.sumY2 += point.y * point.y;
-        return acc;
-      },
-      { sumX: 0, sumY: 0, sumX2: 0, sumY2: 0 }
-    );
-
-    const pointCount = currentDataPoints.length;
-    const meanX = totals.sumX / pointCount;
-    const meanY = totals.sumY / pointCount;
-    const varianceX = Math.max(totals.sumX2 / pointCount - meanX * meanX, 1);
-    const varianceY = Math.max(totals.sumY2 / pointCount - meanY * meanY, 1);
-    const stdX = Math.sqrt(varianceX);
-    const stdY = Math.sqrt(varianceY);
-
-    // Normalize features so the perceptron sees a centred, unit-variance dataset (faster convergence).
-    const trainingSet = currentDataPoints.map((point, index) => ({
-      ...point,
-      normalizedX: (point.x - meanX) / stdX,
-      normalizedY: (point.y - meanY) / stdY,
-      originalIndex: index
-    }));
-
-    // Convert normalized weights back to chart coordinates for rendering.
-    const denormalizeWeights = (normalizedWeights: { a: number; b: number; c: number }) => {
-      // Guard against division by very small numbers
-      const safeStdX = Math.max(stdX, 0.1);
-      const safeStdY = Math.max(stdY, 10); // Y is in Hz, so ensure minimum scale
-
-      const actualA = normalizedWeights.a / safeStdX;
-      const actualB = normalizedWeights.b / safeStdY;
-      const actualC =
-        normalizedWeights.c - (normalizedWeights.a * meanX) / safeStdX - (normalizedWeights.b * meanY) / safeStdY;
-
-      // Sanity check based on expected scale (adjusted for actual data ranges)
-      if (!Number.isFinite(actualA) || !Number.isFinite(actualB) || !Number.isFinite(actualC) ||
-          Math.abs(actualA) > 1000 || Math.abs(actualB) > 100 || Math.abs(actualC) > 10000) {
-        // Return the true line with slight random variation to show training is happening
-        console.warn('Denormalized weights failed sanity check:', { actualA, actualB, actualC });
-        const variation = (Math.random() - 0.5) * 0.2;
-        return {
-          a: trueLine.a * (1 + variation),
-          b: trueLine.b,
-          c: trueLine.c * (1 + variation)
-        };
-      }
-
-      return { a: actualA, b: actualB, c: actualC };
-    };
-
+    // Start with random weights in a reasonable range
+    // We want the initial line to be visible, so let's start with something close to the true line
     const weights = {
-      a: Math.random() * 2 - 1,
-      b: Math.random() * 2 - 1,
-      c: Math.random() * 2 - 1
+      a: trueLine.a + (Math.random() - 0.5) * 10,
+      b: trueLine.b + (Math.random() - 0.5) * 0.5,
+      c: trueLine.c + (Math.random() - 0.5) * 100
     };
 
-    const learningRate = 0.1;
-    const maxEpochs = 50;
+    // Use a very small learning rate since we're working with raw values
+    const learningRate = 0.001;
+    const maxEpochs = 100;
     let epoch = 0;
     let converged = false;
     let pointIndex = 0;
     let lastEpochError = -1;
 
-    const shuffledPoints = [...trainingSet].sort(() => Math.random() - 0.5);
+    const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
 
     const finalizeTraining = () => {
-      const finalWeights = denormalizeWeights(weights);
-      console.log('Training finalized with weights:', finalWeights);
       trainingTimeoutsRef.current.forEach(clearTimeout);
       trainingTimeoutsRef.current = [];
       setIsTraining(false);
-      setCurrentWeights(finalWeights);
+      setCurrentWeights(weights);
       setCurrentTrainingPoint(-1);
     };
 
-    const initialWeights = denormalizeWeights(weights);
-    console.log('Starting training with initial weights:', initialWeights);
-    setCurrentWeights(initialWeights);
+    // Set initial weights immediately to ensure line is visible
+    setCurrentWeights(weights);
+
+    // Store as fallback
+    const linePoints = getLinePoints(weights);
+    if (linePoints && Number.isFinite(linePoints.x1)) {
+      lastLineRef.current = linePoints;
+    }
 
     const trainSinglePoint = () => {
       if (epoch >= maxEpochs || converged) {
@@ -533,34 +478,39 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       }
 
       const point = shuffledPoints[pointIndex];
-      setCurrentTrainingPoint(point.originalIndex);
+      setCurrentTrainingPoint(pointIndex);
 
-      const activation = weights.a * point.normalizedX + weights.b * point.normalizedY + weights.c;
+      // Use raw values directly
+      const activation = weights.a * point.x + weights.b * point.y + weights.c;
       const prediction = activation >= 0 ? 1 : -1;
+
       // Cats (high freq) should be positive side, dogs (low freq) negative
+      // Based on the true line, if a*x + b*y + c > 0, it's above the line (cat)
       const trueLabel = point.label === 'cat' ? 1 : -1;
 
       let weightChanged = false;
       if (prediction !== trueLabel) {
         weightChanged = true;
-        weights.a += learningRate * trueLabel * point.normalizedX;
-        weights.b += learningRate * trueLabel * point.normalizedY;
+
+        // Scale the update by the learning rate
+        weights.a += learningRate * trueLabel * point.x;
+        weights.b += learningRate * trueLabel * point.y;
         weights.c += learningRate * trueLabel;
 
-        setCurrentWeights(denormalizeWeights(weights));
+        // Update display weights
+        setCurrentWeights({ ...weights });
       }
 
       if (pointIndex === shuffledPoints.length - 1) {
         let epochErrors = 0;
         for (const p of shuffledPoints) {
-          const act = weights.a * p.normalizedX + weights.b * p.normalizedY + weights.c;
+          const act = weights.a * p.x + weights.b * p.y + weights.c;
           const pred = act >= 0 ? 1 : -1;
           const labelVal = p.label === 'cat' ? 1 : -1;
           if (pred !== labelVal) epochErrors++;
         }
 
-        const actualWeights = denormalizeWeights(weights);
-        setTrainingHistory(prev => [...prev, { ...actualWeights, error: epochErrors }]);
+        setTrainingHistory(prev => [...prev, { ...weights, error: epochErrors }]);
         lastEpochError = epochErrors;
 
         if (epochErrors === 0) {
@@ -570,7 +520,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
       pointIndex++;
 
-      const timeoutId = setTimeout(trainSinglePoint, weightChanged ? 400 : 150);
+      const timeoutId = setTimeout(trainSinglePoint, weightChanged ? 200 : 50);
       trainingTimeoutsRef.current.push(timeoutId);
     };
 
@@ -687,6 +637,16 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   // Keep last valid line segment to avoid zero-length/degenerate frames
   const lastLineRef = React.useRef<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
 
+  // Initialize lastLineRef with trueLine on first render
+  useEffect(() => {
+    if (!lastLineRef.current && dataPoints.length > 0) {
+      const initialLine = getLinePoints(trueLine);
+      if (initialLine && Number.isFinite(initialLine.x1)) {
+        lastLineRef.current = initialLine;
+      }
+    }
+  }, [trueLine, dataPoints.length]);
+
   // Placeholder to avoid SSR/CSR theme mismatch flash
   if (!mounted) {
     return (
@@ -789,7 +749,17 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           <g clipPath={`url(#${svgIds.clipPath})`}>
             {(() => {
               const lineToUse = currentWeights || trueLine;
-              const { x1, y1, x2, y2 } = getLinePoints(lineToUse);
+              let { x1, y1, x2, y2 } = getLinePoints(lineToUse);
+
+              // Use fallback if line points are invalid
+              const segLen = Math.hypot(x2 - x1, y2 - y1);
+              if (!Number.isFinite(segLen) || segLen < 2) {
+                const fallback = lastLineRef.current || getLinePoints(trueLine);
+                x1 = fallback.x1;
+                y1 = fallback.y1;
+                x2 = fallback.x2;
+                y2 = fallback.y2;
+              }
 
               return (
                 <>
@@ -811,70 +781,38 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
         {/* Lines (do not clip to avoid edge-case rendering issues) */}
         <g>
-          {/* True separating line (ground truth) */}
-          {((showSeparatingLine && !interactive) || showLine) && !currentWeights && (
-            <g>
-              {(() => {
-                const { x1, y1, x2, y2 } = getLinePoints(trueLine);
-                return (
-                  <line
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke={colors.lineColor}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    filter={`url(#${svgIds.glow})`}
-                    opacity={animateLineDrawing ? 0 : 0.7}
-                    strokeDasharray="5,5"
-                  >
-                    {animateLineDrawing && (
-                      <animate
-                        attributeName="opacity"
-                        from="0"
-                        to="0.7"
-                        dur={`${lineAnimationMs}ms`}
-                        fill="freeze"
-                      />
-                    )}
-                  </line>
-                );
-              })()}
-            </g>
-          )}
+          {/* Render the actual perceptron line */}
+          {(() => {
+            const lineToRender = currentWeights || trueLine;
+            const { x1, y1, x2, y2 } = getLinePoints(lineToRender);
 
-          {/* Current training line (real-time updates) */}
-          {currentWeights && (
-            <g>
-              {(() => {
-                let { x1, y1, x2, y2 } = getLinePoints(currentWeights);
-                const segLen = Math.hypot(x2 - x1, y2 - y1);
-                if (!Number.isFinite(segLen) || segLen < 2) {
-                  const fallback = lastLineRef.current || getLinePoints(trueLine);
-                  x1 = fallback.x1; y1 = fallback.y1; x2 = fallback.x2; y2 = fallback.y2;
-                } else {
-                  lastLineRef.current = { x1, y1, x2, y2 };
-                }
-                return (
-                  <line
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke={isTraining ? "#f59e0b" : colors.lineColor}
-                    strokeWidth={isTraining ? "3" : "4"}
-                    strokeLinecap="round"
-                    filter={`url(#${svgIds.glow})`}
-                    opacity={isTraining ? "0.9" : "1"}
-                    style={{
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                );
-              })()}
-            </g>
-          )}
+            // Determine style based on state
+            const isShowingWeights = !!currentWeights;
+            const strokeColor = isShowingWeights
+              ? (isTraining ? "#f59e0b" : colors.lineColor)
+              : colors.lineColor;
+            const strokeWidth = isShowingWeights && !isTraining ? "4" : "3";
+            const opacity = isShowingWeights ? "0.9" : "0.7";
+            const strokeDasharray = isShowingWeights ? "none" : "5,5";
+
+            return (
+              <line
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={strokeColor}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={strokeDasharray}
+                opacity={opacity}
+                filter={`url(#${svgIds.glow})`}
+                style={{
+                  transition: 'all 0.3s ease'
+                }}
+              />
+            );
+          })()}
         </g>
 
         {/* Data points */}
