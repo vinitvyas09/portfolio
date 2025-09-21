@@ -806,7 +806,7 @@ maxEpochs: 100
 
 <Caption>Left: Converges in ~20 updates. Right: Still thrashing after 1000 updates</Caption>
 
-The perceptron on the left finds a solution and stops. The one on the right keeps changing its mind forever. The difference? The data on the left is linearly separable: a straight line can divide the classes. The data on the right (XOR pattern) isn't, so no straight line will ever work.
+The perceptron on the linearly separable data finds a solution and stops. The other one keeps changing its mind forever. The difference? The data on the left is linearly separable: a straight line can divide the classes. The data on the right (XOR pattern) isn't, so no straight line will ever work.
 
 So our first requirement for convergence: the data must be linearly separable. If it's not, the perceptron will update forever, like Sisyphus pushing his boulder up the hill only to watch it roll back down.
 
