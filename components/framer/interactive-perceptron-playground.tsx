@@ -48,6 +48,7 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
   const [bias, setBias] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showActivation, setShowActivation] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Sophisticated color palette matching neuron animation
   const colors = useMemo(() => {
@@ -134,6 +135,22 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
   }, [weightedSum, threshold, activationFunction]);
 
   const isNeuronActive = activationOutput > 0.5;
+
+  // Handle window resize for responsive layout
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // Set initial value
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Animation trigger
   useEffect(() => {
@@ -261,10 +278,16 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+      <div style={{
+        display: 'flex',
+        gap: '2rem',
+        alignItems: 'flex-start',
+        flexDirection: isMobile ? 'column' : 'row'
+      }}>
         {/* Controls Panel */}
         <div style={{
-          flex: '0 0 300px',
+          flex: isMobile ? '1' : '0 0 300px',
+          width: isMobile ? '100%' : 'auto',
           background: colors.cardBg,
           padding: '1.5rem',
           borderRadius: '8px',
@@ -462,12 +485,20 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
         </div>
 
         {/* Visualization */}
-        <div style={{ flex: 1 }}>
+        <div style={{
+          flex: 1,
+          width: isMobile ? '100%' : 'auto'
+        }}>
           <svg
             width="100%"
-            height="400"
+            height={isMobile ? "350" : "400"}
             viewBox="0 0 600 400"
-            style={{ maxWidth: '600px', margin: '0 auto', display: 'block' }}
+            preserveAspectRatio="xMidYMid meet"
+            style={{
+              maxWidth: isMobile ? '100%' : '600px',
+              margin: '0 auto',
+              display: 'block'
+            }}
           >
             <defs>
               <filter id="glow">
