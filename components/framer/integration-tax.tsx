@@ -249,28 +249,38 @@ export default function IntegrationTaxMcpGif({
         </g>
 
         {/* Nodes: clients (left) */}
-        {clients.map((p, i) => (
-          <g key={`c-${i}`}>
-            {/* Shadow/glow */}
-            <circle cx={p.x} cy={p.y} r={14} fill={C.clientShadow} opacity={0.3} />
-            {/* Main node with gradient */}
-            <circle cx={p.x} cy={p.y} r={11} fill="url(#clientGrad)" filter="url(#shadow)" />
-            {/* Inner highlight */}
-            <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={isDark ? 0.3 : 0.5} />
-          </g>
-        ))}
+        {clients.map((p, i) => {
+          // Skip if coordinates are invalid
+          if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) return null;
+
+          return (
+            <g key={`c-${i}`}>
+              {/* Shadow/glow */}
+              <circle cx={p.x} cy={p.y} r={14} fill={C.clientShadow} opacity={0.3} />
+              {/* Main node with gradient */}
+              <circle cx={p.x} cy={p.y} r={11} fill="url(#clientGrad)" filter="url(#shadow)" />
+              {/* Inner highlight */}
+              <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={isDark ? 0.3 : 0.5} />
+            </g>
+          );
+        })}
 
         {/* Nodes: tools (right) */}
-        {tools.map((p, i) => (
-          <g key={`t-${i}`}>
-            {/* Shadow/glow */}
-            <circle cx={p.x} cy={p.y} r={14} fill={C.toolShadow} opacity={0.3} />
-            {/* Main node with gradient */}
-            <circle cx={p.x} cy={p.y} r={11} fill="url(#toolGrad)" filter="url(#shadow)" />
-            {/* Inner highlight */}
-            <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={isDark ? 0.3 : 0.5} />
-          </g>
-        ))}
+        {tools.map((p, i) => {
+          // Skip if coordinates are invalid
+          if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) return null;
+
+          return (
+            <g key={`t-${i}`}>
+              {/* Shadow/glow */}
+              <circle cx={p.x} cy={p.y} r={14} fill={C.toolShadow} opacity={0.3} />
+              {/* Main node with gradient */}
+              <circle cx={p.x} cy={p.y} r={11} fill="url(#toolGrad)" filter="url(#shadow)" />
+              {/* Inner highlight */}
+              <circle cx={p.x - 2} cy={p.y - 2} r={3} fill="white" opacity={isDark ? 0.3 : 0.5} />
+            </g>
+          );
+        })}
 
         {showLabels && (
           <>
