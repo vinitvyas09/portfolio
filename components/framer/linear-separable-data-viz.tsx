@@ -456,7 +456,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     const learningRate = 0.01;  // Even smaller for better stability
     const maxEpochs = 100;
     let epoch = 0;
-    let converged = false;
+    const converged = false;
     let pointIndex = 0;
 
     const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
