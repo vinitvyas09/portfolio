@@ -81,7 +81,7 @@ Look at that progression:
 
 **Conceptual**: Inputs arrive → weights scale them → everything sums → activation function decides output
 
-**Mathematical**: y = f(Σ(wi × xi) + b) where f is typically a step function
+**Mathematical**: `y = f(Σ(wi × xi) + b)` where `f` is typically a step function
 
 It's the same exact principle, just expressed in different languages. The perceptron takes inputs, multiplies each by a weight (importance), adds them up with a bias term, and decides whether to "fire" (output 1) or stay quiet (output 0).
 
@@ -197,7 +197,7 @@ Now let's get mathematical (but in a fun way, I promise). We need to figure out:
 
 Let's say we've somehow found our magic separating line. In math terms, every line in 2D can be written as:
 
-Ax + By + C = 0
+`Ax + By + C = 0`
 
 Where A, B, and C are just numbers that define the line's position and angle. For example:
 
@@ -265,8 +265,10 @@ So our perceptron's job boils down to this embarrassingly simple task:
    - Zero? → Uh... flip a coin? (In practice, we usually pick one side)
 
 In math notation, we write this as:
-prediction = sign(Ax + By + C)
-Where sign() is just:
+
+`prediction = sign(Ax + By + C)`
+
+Where `sign()` is just:
 
 - sign(positive number) = +1
 - sign(negative number) = -1
@@ -312,13 +314,13 @@ The perceptron isn't doing something magical. It's just finding the right values
 
 Here's something cool: the value of `Ax + By + C` doesn't just tell you which side of the line you're on—it's actually proportional to your distance from the line!
 
-The exact signed distance from point (x₀, y₀) to line Ax + By + C = 0 is:
+The exact signed distance from point (x₀, y₀) to line `Ax + By + C = 0` is:
 
 ```
 d = (Ax₀ + By₀ + C) / √(A² + B²)
 ```
 
-Since √(A² + B²) is always positive, it doesn't affect the sign. That's why we can ignore it for classification and just use Ax + By + C.
+Since `√(A² + B²)` is always positive, it doesn't affect the sign. That's why we can ignore it for classification and just use `Ax + By + C`.
 
 Points far from the line have large absolute values (very positive or very negative), while points near the line have values close to zero. This becomes important later when we talk about "confidence" in predictions!
 
@@ -389,7 +391,7 @@ displayAccuracy: true
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Random initialization: Your perceptron starts life as a terrible classifier</p>
 
-Our line equation Ax + By + C = 0 needs values for A, B, and C. Since we have no idea what they should be, we just... make them up:
+Our line equation `Ax + By + C = 0` needs values for A, B, and C. Since we have no idea what they should be, we just... make them up:
 
 ```python
 import random
@@ -704,13 +706,13 @@ The awesome part? The math stays exactly the same! Just add another weight:
 
 ```python
 # 2D version
-activation = w1*x1 + w2*x2 + bias
+`activation = w1*x1 + w2*x2 + bias`
 
 # 3D version  
-activation = w1*x1 + w2*x2 + w3*x3 + bias
+`activation = w1*x1 + w2*x2 + w3*x3 + bias`
 
 # 4D? 100D? No problem!
-activation = sum(wi*xi for wi, xi in zip(weights, inputs)) + bias
+`activation = sum(wi*xi for wi, xi in zip(weights, inputs)) + bias`
 ```
 
 ## The Universal Perceptron: Any Number of Dimensions
@@ -762,7 +764,7 @@ So far we've been training our perceptron to find "the right line" to separate c
 The decision boundary is the fence-sitter's paradise—it's where the perceptron literally cannot decide. Remember our equation:
 
 ```
-activation = w1*x1 + w2*x2 + bias
+`activation = w1*x1 + w2*x2 + bias`
 ```
 
 On one side of space, this activation is positive (dog territory). On the other side, it's negative (cat territory). The decision boundary is the exact line where activation equals zero—the perceptron's "I genuinely have no idea" zone.
@@ -770,7 +772,7 @@ On one side of space, this activation is positive (dog territory). On the other 
 ```python
 # Decision boundary definition:
 # All points (x1, x2) where:
-w1*x1 + w2*x2 + bias = 0
+`w1*x1 + w2*x2 + bias = 0`
 
 # Rearranging to standard line form:
 # This is just Ax + By + C = 0 where:
@@ -888,23 +890,23 @@ The Two-Speed Race:
 
 Every time we update (say on example (x,y) that was misclassified):
 
-Speed 1: Alignment with w grows linearly
+**Speed 1: Alignment with w* grows linearly**
 ```
 w* · w⁽ᵏ⁾ = w* · (w⁽ᵏ⁻¹⁾ + yx)
          = w* · w⁽ᵏ⁻¹⁾ + y(w* · x)
          ≥ w* · w⁽ᵏ⁻¹⁾ + γ||w*||    [because margin ≥ γ]
 ```
 
-After k updates: w* · w⁽ᵏ⁾ ≥ kγ||w*||
+After k updates: `w* · w⁽ᵏ⁾ ≥ kγ||w*||`
 
-Speed 2: Length of w⁽ᵏ⁾ grows slowly (as square root)
+**Speed 2: Length of w⁽ᵏ⁾ grows slowly (as square root)**
 ```
 ||w⁽ᵏ⁾||² = ||w⁽ᵏ⁻¹⁾ + yx||²
           = ||w⁽ᵏ⁻¹⁾||² + 2y(w⁽ᵏ⁻¹⁾ · x) + ||x||²
           ≤ ||w⁽ᵏ⁻¹⁾||² + ||x||²    [because we misclassified: y(w·x) ≤ 0]
 ```
 
-After k updates: ||w⁽ᵏ⁾||² ≤ k||x||²ₘₐₓ
+After k updates: `||w⁽ᵏ⁾||² ≤ k||x||²ₘₐₓ`
 
 The Punchline:
 
