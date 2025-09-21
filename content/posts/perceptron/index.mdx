@@ -436,8 +436,8 @@ But wait! How exactly do we "nudge" the line?
 
 Let's make this concrete. Say our random line encounters this situation:
 
-- **Point:** (x=2, y=3) - a quiet cat
-- **True label:** -1 (it's a cat)
+- **Point:** `(x=2, y=3)` - a quiet cat
+- **True label:** `-1` (it's a cat)
 - **Our prediction:** `sign(0.73(2) - 0.41(3) + 0.22) = sign(0.45) = 1` (we said dog!)
 
 We're wrong. The point is actually a cat (-1) but we predicted dog (1). How do we fix this?
@@ -446,15 +446,15 @@ The perceptron's learning rule is surprisingly elegant. Here's the rule in all i
 
 - **If correct:** Do absolutely nothing (if it ain't broke...)
 - **If wrong:**
-  - New A = Old A + (true_label × x)
-  - New B = Old B + (true_label × y)
-  - New C = Old C + (true_label × 1)
+  - `New A = Old A + (true_label × x)`
+  - `New B = Old B + (true_label × y)`
+  - `New C = Old C + (true_label × 1)`
 
 In our example:
 
-- New A = 0.73 + (-1 × 2) = -1.27
-- New B = -0.41 + (-1 × 3) = -3.41
-- New C = 0.22 + (-1 × 1) = -0.78
+- `New A = 0.73 + (-1 × 2) = -1.27`
+- `New B = -0.41 + (-1 × 3) = -3.41`
+- `New C = 0.22 + (-1 × 1) = -0.78`
 
 Why does this work? Because we're literally pushing the line away from misclassified points:
 
@@ -511,22 +511,30 @@ There's a neat trick in line 3 above. Instead of checking if `prediction != true
 
 Think about it:
 
-- If `true_label = 1` (dog) and `activation > 0` (we think dog), then `1 × positive = positive` ✓
-- If `true_label = -1` (cat) and `activation < 0` (we think cat), then -1 × negative = positive ✓
-- If `true_label = 1` (dog) and `activation < 0` (we think cat), then `1 × negative = negative` ✗
-- If `true_label = -1` (cat) and `activation > 0` (we think dog), then `-1 × positive = negative` ✗  
+- If `true_label = 1` (dog) and `activation > 0` (we think dog), then<br />`1 × positive = positive` ✓
+- If `true_label = -1` (cat) and `activation < 0` (we think cat), then<br />`-1 × negative = positive` ✓
+- If `true_label = 1` (dog) and `activation < 0` (we think cat), then<br />`1 × negative = negative` ✗
+- If `true_label = -1` (cat) and `activation > 0` (we think dog), then<br />`-1 × positive = negative` ✗  
 
 The product is positive when we're right, negative when we're wrong. Elegant!
 
 ### Why Does This Update Rule Work?
 
-Here's something magical: when we update our weights after a mistake, we're guaranteed to do better on that same point next time. Not necessarily correct, but better. Let me show you why.
+Here's something interesting: when we update our weights after a mistake, we're guaranteed to do better on that same point next time. Not necessarily correct, but better. Let's see why.
 
 Let's say we see a positive example (y = +1) but our activation is negative (a < 0). We're wrong! So we update:
 
 - `New weight₁ = Old weight₁ + 1 × x₁`
 - `New weight₂ = Old weight₂ + 1 × x₂`
 - `New bias = Old bias + 1`
+
+If we see the same point again, what's our new activation?
+
+```
+New activation = (w₁ + x₁) × x₁ + (w₂ + x₂) × x₂ + (bias + 1)
+                = w₁×x₁ + w₂×x₂ + bias + (x₁² + x₂² + 1)
+                = Old activation + (x₁² + x₂² + 1)
+```
 
 <MathProofVisualization
 config={{
@@ -538,14 +546,6 @@ oldActivation: -0.5,
 animateImprovement: true
 }}
 />
-
-If we see the same point again, what's our new activation?
-
-```
-New activation = (w₁ + x₁) × x₁ + (w₂ + x₂) × x₂ + (bias + 1)
-                = w₁×x₁ + w₂×x₂ + bias + (x₁² + x₂² + 1)
-                = Old activation + (x₁² + x₂² + 1)
-```
 
 Since `x₁²` and `x₂²` are always positive, the new activation is always at least the old activation plus 1. We've moved in the right direction! We might not classify it correctly yet (if the old activation was -10, adding 1 only gets us to -9), but we're definitely closer.
 
