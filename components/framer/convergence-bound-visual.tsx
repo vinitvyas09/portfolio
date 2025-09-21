@@ -211,20 +211,22 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
       {config.varyMargin && (
         <div style={{
           marginBottom: '1.5rem',
-          padding: '1rem',
+          padding: isMobile ? '0.75rem' : '1rem',
           background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
-          borderRadius: '8px'
+          borderRadius: '8px',
+          overflow: 'hidden'
         }}>
           <div style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: '1rem'
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'stretch' : 'center',
+            gap: isMobile ? '0.5rem' : '1rem'
           }}>
             <label style={{
-              fontSize: '13px',
+              fontSize: isMobile ? '12px' : '13px',
               color: colors.text,
               fontWeight: '600',
-              minWidth: '140px'
+              minWidth: isMobile ? 'auto' : '140px'
             }}>
               Margin (γ): {margin.toFixed(2)}
             </label>
@@ -237,6 +239,7 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
               onChange={(e) => setMargin(parseFloat(e.target.value))}
               style={{
                 flex: 1,
+                width: isMobile ? '100%' : 'auto',
                 height: '4px',
                 borderRadius: '2px',
                 outline: 'none',
@@ -247,13 +250,13 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
           </div>
           <div style={{
             marginTop: '0.5rem',
-            fontSize: '11px',
+            fontSize: isMobile ? '10px' : '11px',
             color: colors.textSecondary,
             display: 'flex',
             justifyContent: 'space-between'
           }}>
-            <span>Harder problem (small margin)</span>
-            <span>Easier problem (large margin)</span>
+            <span>Harder (small)</span>
+            <span>Easier (large)</span>
           </div>
         </div>
       )}
