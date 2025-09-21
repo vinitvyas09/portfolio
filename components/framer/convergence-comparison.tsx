@@ -156,7 +156,7 @@ const PerceptronVisualization: React.FC<PerceptronVisualizationProps> = ({
   const train = React.useCallback(() => {
     if (!trainingRef.current) return;
 
-    let localWeights = { ...weights };
+    const localWeights = { ...weights };
     let localEpochs = 0;
     let localUpdates = 0;
     let hasConverged = false;
@@ -374,7 +374,7 @@ const PerceptronVisualization: React.FC<PerceptronVisualizationProps> = ({
   );
 };
 
-const ConvergenceComparison: React.FC<{ config?: any }> = () => {
+const ConvergenceComparison: React.FC<{ config?: unknown }> = () => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const isDark = resolvedTheme === 'dark';
