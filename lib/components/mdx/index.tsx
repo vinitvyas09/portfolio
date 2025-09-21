@@ -14,7 +14,6 @@ import { NeuronVsPerceptron, PerceptronContinuum, InfoBox, ChatGif, HeadlineCasc
 // Import components that don't use framer-motion directly
 import NeuronAnimation from "../../../components/framer/neuron-animation"
 import InteractivePerceptronPlayground from "../../../components/framer/interactive-perceptron-playground"
-import LinearSeparableDataViz from "../../../components/framer/linear-separable-data-viz"
 import DimensionScalingViz from "../../../components/framer/dimension-scaling-viz"
 import LineEquationInteractive from "../../../components/framer/line-equation-interactive"
 import ActivationFunctionGallery from "../../../components/framer/activation-function-gallery"
@@ -54,7 +53,6 @@ export const mdxComponents = {
   NeuronAnimation,
   NeuronVsPerceptron,
   InteractivePerceptronPlayground,
-  LinearSeparableDataViz,
   DimensionScalingViz,
   InfoBox,
   LineEquationInteractive,
