@@ -221,7 +221,8 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
             color: colors.textSecondary,
             marginBottom: '1rem',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.05em',
+            lineHeight: 1
           }}>
             Training Error
           </h4>
@@ -236,8 +237,8 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                   style={{
                     position: 'absolute',
                     bottom: 0,
-                    left: `${idx * 33}%`,
-                    width: '25%',
+                    left: `${idx * (isMobile ? 32 : 33)}%`,
+                    width: isMobile ? '22%' : '25%',
                     height: `${barHeight}%`,
                     background: variantColors[variant as keyof typeof variantColors],
                     borderRadius: '4px 4px 0 0',
@@ -247,10 +248,10 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                 >
                   <div style={{
                     position: 'absolute',
-                    top: '-20px',
+                    top: isMobile ? '-18px' : '-20px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    fontSize: '11px',
+                    fontSize: isMobile ? '9px' : '11px',
                     color: colors.textPrimary,
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
@@ -284,11 +285,12 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
             color: colors.textSecondary,
             marginBottom: '1rem',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.05em',
+            lineHeight: 1
           }}>
             Test Error
           </h4>
-          <div style={{ height: '120px', position: 'relative' }}>
+          <div style={{ height: '120px', position: 'relative', verticalAlign: 'bottom' }}>
             {config.variants?.map((variant, idx) => {
               const data = performanceData[variant as keyof typeof performanceData];
               const barHeight = (1 - data.testError) * 100;
@@ -299,8 +301,8 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                   style={{
                     position: 'absolute',
                     bottom: 0,
-                    left: `${idx * 33}%`,
-                    width: '25%',
+                    left: `${idx * (isMobile ? 32 : 33)}%`,
+                    width: isMobile ? '22%' : '25%',
                     height: `${barHeight}%`,
                     background: variantColors[variant as keyof typeof variantColors],
                     borderRadius: '4px 4px 0 0',
@@ -310,10 +312,10 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                 >
                   <div style={{
                     position: 'absolute',
-                    top: '-20px',
+                    top: isMobile ? '-18px' : '-20px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    fontSize: '11px',
+                    fontSize: isMobile ? '9px' : '11px',
                     color: colors.textPrimary,
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
@@ -347,7 +349,8 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
             color: colors.textSecondary,
             marginBottom: '1rem',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.05em',
+            lineHeight: 1
           }}>
             Storage Cost
           </h4>
@@ -363,8 +366,8 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                   style={{
                     position: 'absolute',
                     bottom: 0,
-                    left: `${idx * 33}%`,
-                    width: '25%',
+                    left: `${idx * (isMobile ? 32 : 33)}%`,
+                    width: isMobile ? '22%' : '25%',
                     height: `${barHeight}%`,
                     background: variantColors[variant as keyof typeof variantColors],
                     borderRadius: '4px 4px 0 0',
@@ -374,10 +377,10 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
                 >
                   <div style={{
                     position: 'absolute',
-                    top: '-20px',
+                    top: isMobile ? '-18px' : '-20px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    fontSize: '11px',
+                    fontSize: isMobile ? '9px' : '11px',
                     color: colors.textPrimary,
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
