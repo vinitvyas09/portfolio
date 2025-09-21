@@ -27,12 +27,23 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [hoveredEpoch, setHoveredEpoch] = useState<number | null>(null);
   const [selectedEpoch, setSelectedEpoch] = useState<number>(25);
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     setMounted(true);
+
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -124,10 +135,16 @@ const TrainTestErrorCurves: React.FC<TrainTestErrorCurvesProps> = ({
     return { trainErrors: train, testErrors: test, optimalEpoch: optimal };
   }, []);
 
-  // Chart dimensions
-  const width = 600;
-  const height = 350;
-  const margin = { top: 30, right: 30, bottom: 50, left: 50 };
+  // Chart dimensions - responsive for mobile
+  const width = useMemo(() => {
+    if (!mounted) return 600;
+    return isMobile ? Math.min(window.innerWidth - 60, 320) : 600;
+  }, [isMobile, mounted]);
+
+  const height = isMobile ? 200 : 350;
+  const margin = isMobile
+    ? { top: 15, right: 15, bottom: 35, left: 35 }
+    : { top: 30, right: 30, bottom: 50, left: 50 };
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
