@@ -75,6 +75,7 @@ interface PerceptronTrainingLoopProps {
     xAxis?: string;
     yAxis?: string;
     showSeparatingLine?: boolean;
+    showTrueLine?: boolean;
     animateDataPoints?: boolean;
     pointAppearanceMs?: number;
     showLegend?: boolean;
@@ -92,6 +93,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     xAxis: "Body weight (kg)",
     yAxis: "Vocalization frequency (Hz)",
     showSeparatingLine: false,
+    showTrueLine: false,
     animateDataPoints: true,
     pointAppearanceMs: 25,  // 4x faster (was 100ms)
     showLegend: true,
@@ -116,6 +118,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     xAxis = "Body weight (kg)",
     yAxis = "Vocalization frequency (Hz)",
     showSeparatingLine = false,
+    showTrueLine = false,
     animateDataPoints = true,
     pointAppearanceMs = 25,  // 4x faster
     showLegend = true,
@@ -815,7 +818,29 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
 
         {/* Lines (do not clip to avoid edge-case rendering issues) */}
         <g>
-          {/* Render the actual perceptron line */}
+          {/* Render the true line if enabled */}
+          {showTrueLine && (() => {
+            const { x1, y1, x2, y2 } = getLinePoints(trueLine);
+            return (
+              <line
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={colors.lineColor}
+                strokeWidth="3"
+                strokeLinecap="round"
+                opacity="0.8"
+                strokeDasharray="8,4"
+                filter={`url(#${svgIds.glow})`}
+                style={{
+                  transition: 'all 0.3s ease'
+                }}
+              />
+            );
+          })()}
+
+          {/* Render the perceptron line */}
           {(() => {
             // Don't show any line if showSeparatingLine is false and we're not interactive/training
             if (!showSeparatingLine && !interactive && !isTraining && !hasTrainedForCurrentData) {
@@ -1341,7 +1366,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
           </div>
 
           {/* Legend for lines */}
-          {(showSeparatingLine || currentWeights) && (
+          {(showSeparatingLine || currentWeights || showTrueLine) && (
             <div style={{
               marginTop: '1rem',
               display: 'flex',
@@ -1358,7 +1383,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
               maxWidth: 'fit-content',
               margin: '1rem auto 0'
             }}>
-              {showSeparatingLine && !currentWeights && (
+              {showTrueLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
                     width: '24px',
@@ -1392,7 +1417,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
                   <span style={{ color: '#f59e0b', fontWeight: '600' }}>Learning...</span>
                 </div>
               )}
-              {currentWeights && !isTraining && (
+              {currentWeights && !isTraining && showSeparatingLine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <div style={{
                     width: '24px',
