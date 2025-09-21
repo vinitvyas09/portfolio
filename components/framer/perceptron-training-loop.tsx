@@ -456,7 +456,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
     const learningRate = 0.01;  // Even smaller for better stability
     const maxEpochs = 100;
     let epoch = 0;
-    let converged = false;
+    const converged = false;
     let pointIndex = 0;
 
     const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
@@ -1328,7 +1328,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
                   color: colors.textSecondary,
                   lineHeight: '1.5'
                 }}>
-                  Click "Train Perceptron" to find the optimal<br />
+                  Click &quot;Train Perceptron&quot; to find the optimal<br />
                   decision boundary for this dataset
                 </div>
               </>
