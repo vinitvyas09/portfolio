@@ -53,9 +53,20 @@ const OrderMattersDemo: React.FC<OrderMattersDemoProps> = ({
 }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -186,10 +197,14 @@ const OrderMattersDemo: React.FC<OrderMattersDemoProps> = ({
     return [...dataPoints].sort(() => Math.random() - 0.5);
   }, [dataPoints]);
 
-  // Chart dimensions
-  const chartWidth = 280;
-  const chartHeight = 200;
-  const padding = 30;
+  // Chart dimensions (responsive)
+  const chartWidth = useMemo(() => {
+    if (!mounted) return 280;
+    return isMobile ? Math.min(window.innerWidth - 80, 320) : 280;
+  }, [isMobile, mounted]);
+
+  const chartHeight = isMobile ? 180 : 200;
+  const padding = isMobile ? 25 : 30;
   const innerWidth = chartWidth - 2 * padding;
   const innerHeight = chartHeight - 2 * padding;
 
@@ -530,7 +545,7 @@ const OrderMattersDemo: React.FC<OrderMattersDemoProps> = ({
       {/* Main comparison */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
         gap: '1.5rem',
         marginBottom: '1.5rem'
       }}>
