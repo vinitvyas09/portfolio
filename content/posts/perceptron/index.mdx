@@ -28,22 +28,6 @@ That origin story matters because it reveals the core insight that makes everyth
 <br />
 So we're starting at the real beginning. Not with equations or Python classes, but with the moment a psychologist in 1958 looked at a brain cell and thought, "I can build that with wires and motors."
 
-## A Taste of What's Coming
-
-Before we dive into the history and theory, let's play with what we're building toward. Below is a live perceptron - the exact same algorithm that will take us from biological inspiration to modern AI. Adjust the inputs and weights to see how this simple mathematical neuron makes decisions in real-time. Don't worry if it seems abstract now; by the end of this post, you'll understand every slider and number here.
-
-<InteractivePerceptronPlayground
-  config={{
-    numInputs: 3,
-    showMath: true,
-    activationFunction: "step",
-    threshold: 0
-  }}
-/>
-
-<p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the inputs and weights to see how the perceptron makes decisions. We'll explain exactly what's happening here as we go.</p>
-
-Now let's start from the beginning and build up to understanding what you just played with.
 
 # The Origin Story: From Biology to Silicon
 
@@ -115,9 +99,7 @@ def perceptron(inputs, weights, bias):
 ```
 That's it. A brain cell in 4 lines of Python.
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">Try it yourself: Adjust the inputs and weights to see how the perceptron makes decisions in real-time</p>
-
-Now that we have gotten a high level intuition for what a perceptron is, let's now dive deeper!
+Now that we have gotten a high level intuition for what a perceptron is, let's dive deeper!
 
 # Understanding the Perceptron
 
@@ -305,6 +287,25 @@ Look at that! They're the same thing!
 - Our bias is `C` (the constant term)
 
 The perceptron isn't doing something magical. It's just finding the right values for A, B, and C (the right line) to separate our data. The "learning" is just adjusting these numbers until the line is in the right place.
+
+## Try It Yourself: The Interactive Perceptron
+
+Now that you understand the connection - that a perceptron is just computing `Ax + By + C` and checking if it's positive - let's play with one! Below is a live perceptron where:
+- **Inputs (x)** are your coordinates [x, y] from our cat/dog example
+- **Weights (w)** are the coefficients [A, B] that define the line
+- **Bias (b)** is the constant term C
+- The **output** tells you which side of the line you're on (1 for dog, 0 for cat)
+
+<InteractivePerceptronPlayground
+  config={{
+    numInputs: 3,
+    showMath: true,
+    activationFunction: "step",
+    threshold: 0
+  }}
+/>
+
+<p className="text-sm text-gray-600 text-center mt-2 italic">Now you can see it in action: adjust inputs (your data point), weights (line orientation), and bias (line position) to control the perceptron's decision</p>
 
 <InfoBox type="advanced" title="Going Deeper: It's Actually Distance!">
 
