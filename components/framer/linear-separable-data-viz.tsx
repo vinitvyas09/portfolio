@@ -176,6 +176,21 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     return { a, b, c };
   }, [dataGeneration]);
 
+  // Initialize with random weights that are visible but wrong
+  const getRandomInitialWeights = useCallback(() => {
+    // Start with random perturbation of the true line
+    // This ensures the line is visible but clearly incorrect
+    const angleVariation = (Math.random() - 0.5) * 30;  // Rotate the line ±15 degrees worth
+    const positionVariation = (Math.random() - 0.5) * 600;  // Move the line up/down
+
+    // Apply rotation-like effect by varying both a and b
+    const randomA = trueLine.a + angleVariation;
+    const randomB = trueLine.b + (Math.random() - 0.5) * 2;  // More variation for angle change
+    const randomC = trueLine.c + positionVariation;
+
+    return { a: randomA, b: randomB, c: randomC };
+  }, [trueLine]);
+
   // Generate linearly separable data based on the true line
   const dataPoints = useMemo<DataPoint[]>(() => {
     const points: DataPoint[] = [];
