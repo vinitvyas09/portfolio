@@ -325,10 +325,21 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
 
   const currentFunction = activationFunctions[selectedFunction];
 
-  // SVG dimensions - larger graph
-  const svgWidth = 600;
-  const svgHeight = 400;
-  const padding = 50;
+  // SVG dimensions - responsive for mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const svgWidth = isMobile ? 320 : 600;
+  const svgHeight = isMobile ? 240 : 400;
+  const padding = isMobile ? 35 : 50;
   const graphWidth = svgWidth - 2 * padding;
   const graphHeight = svgHeight - 2 * padding;
   const currentDomain = currentFunction.domain ?? DEFAULT_DOMAIN;
@@ -512,16 +523,19 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
               Function Graph
             </h3>
             <div
-              className="rounded-lg p-4 mx-auto"
+              className="rounded-lg p-2 sm:p-4 mx-auto overflow-x-auto"
               style={{
                 backgroundColor: colors.cardBg,
-                border: `1px solid ${colors.borderColor}`
+                border: `1px solid ${colors.borderColor}`,
+                maxWidth: '100%'
               }}
             >
               <svg
                 width={svgWidth}
                 height={svgHeight}
-                className={`transition-opacity duration-300 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}
+                viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                className={`transition-opacity duration-300 ${isAnimating ? 'opacity-50' : 'opacity-100'} ${isMobile ? 'w-full h-auto' : ''}`}
+                style={isMobile ? { maxWidth: '100%', height: 'auto' } : {}}
               >
                 {/* Grid */}
                 <g opacity="0.3">
@@ -582,7 +596,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                           x={svgWidth - padding + 5}
                           y={svgY + 4}
                           fill={colors.textMuted}
-                          fontSize="10"
+                          fontSize={isMobile ? "8" : "10"}
                           fontFamily="monospace"
                           opacity="0.8"
                         >
@@ -643,7 +657,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       x={svgWidth - padding + 5}
                       y={toSvgY(0) + 5}
                       fill={colors.textSecondary}
-                      fontSize="10"
+                      fontSize={isMobile ? "8" : "10"}
                       fontFamily="monospace"
                     >
                       x
@@ -654,7 +668,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                       x={toSvgX(0) - 10}
                       y={padding - 5}
                       fill={colors.textSecondary}
-                      fontSize="10"
+                      fontSize={isMobile ? "8" : "10"}
                       fontFamily="monospace"
                     >
                       y
@@ -685,7 +699,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                           x={xPos}
                           y={xTickLabelY}
                           fill={colors.textSecondary}
-                          fontSize="10"
+                          fontSize={isMobile ? "8" : "10"}
                           fontFamily="monospace"
                           textAnchor="middle"
                         >
@@ -719,7 +733,7 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                           x={yAxisX - tickLength - 4}
                           y={yPos + 3}
                           fill={colors.textSecondary}
-                          fontSize="10"
+                          fontSize={isMobile ? "8" : "10"}
                           fontFamily="monospace"
                           textAnchor="end"
                         >
@@ -801,13 +815,13 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                         fill={currentFunction.color}
                       />
                       <text
-                        x={padding - 35}
+                        x={padding - (isMobile ? 25 : 35)}
                         y={toSvgY(currentFunction.name === "Sigmoid" ? 0 : -1) + 5}
                         fill={colors.textMuted}
-                        fontSize="11"
+                        fontSize={isMobile ? "8" : "11"}
                         fontFamily="monospace"
                       >
-                        x→-∞
+                        {isMobile ? "→-∞" : "x→-∞"}
                       </text>
                     </g>
                     {/* Right side arrow approaching asymptote */}
@@ -825,13 +839,13 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                         fill={currentFunction.color}
                       />
                       <text
-                        x={svgWidth - padding + 10}
+                        x={svgWidth - padding + (isMobile ? 5 : 10)}
                         y={toSvgY(currentFunction.name === "Sigmoid" ? 1 : 1) + 5}
                         fill={colors.textMuted}
-                        fontSize="11"
+                        fontSize={isMobile ? "8" : "11"}
                         fontFamily="monospace"
                       >
-                        x→+∞
+                        {isMobile ? "→+∞" : "x→+∞"}
                       </text>
                     </g>
                   </>
@@ -859,10 +873,10 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                           fill={currentFunction.color}
                         />
                         <text
-                          x={svgWidth - padding + 10}
+                          x={svgWidth - padding + (isMobile ? 5 : 10)}
                           y={rightSvgY + 5}
                           fill={colors.textMuted}
-                          fontSize="12"
+                          fontSize={isMobile ? "9" : "12"}
                           fontFamily="monospace"
                         >
                           →∞
@@ -894,10 +908,10 @@ const ActivationFunctionGallery: React.FC<ActivationFunctionGalleryProps> = ({
                           fill={currentFunction.color}
                         />
                         <text
-                          x={padding - 25}
+                          x={padding - (isMobile ? 18 : 25)}
                           y={leftSvgY + 5}
                           fill={colors.textMuted}
-                          fontSize="12"
+                          fontSize={isMobile ? "9" : "12"}
                           fontFamily="monospace"
                         >
                           -∞
