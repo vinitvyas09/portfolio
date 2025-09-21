@@ -137,20 +137,20 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
 
   return (
     <div style={{
-      padding: '1.5rem',
+      padding: '1rem',
       background: colors.bg,
       border: `1px solid ${colors.border}`,
       borderRadius: '16px',
       margin: '2rem 0',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
-      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         {/* Left: XOR Grid */}
         <div style={{ flex: '1 1 300px', maxWidth: '350px' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem' }}>
             XOR Input Space
           </h3>
-          <svg width="280" height="280" viewBox="0 0 280 280">
+          <svg width="280" height="280" viewBox="-40 -40 360 360">
             {/* Background grid */}
             {config.showDecisionRegions && (
               <g>
@@ -214,7 +214,7 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
                   </text>
                   <text
                     x={cx}
-                    y={cy + 35}
+                    y={cy - 30}
                     textAnchor="middle"
                     fill={colors.textSecondary}
                     fontSize="11"
@@ -226,26 +226,32 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
             })}
 
             {/* Axis labels */}
-            <text x="140" y="270" textAnchor="middle" fontSize="12" fill={colors.text}>x₁</text>
-            <text x="10" y="145" textAnchor="middle" fontSize="12" fill={colors.text}>x₂</text>
+            <text x="140" y="305" textAnchor="middle" fontSize="12" fill={colors.text}>x₁</text>
+            <text x="-20" y="145" textAnchor="middle" fontSize="12" fill={colors.text}>x₂</text>
+
+            {/* Axis ticks */}
+            <text x="0" y="295" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>0</text>
+            <text x="280" y="295" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>1</text>
+            <text x="-10" y="283" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>0</text>
+            <text x="-10" y="5" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>1</text>
           </svg>
 
           <div style={{
-            marginTop: '1rem',
-            padding: '0.75rem',
+            marginTop: '0.75rem',
+            padding: '0.5rem',
             background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
             borderRadius: '8px',
-            fontSize: '12px',
+            fontSize: '11px',
             color: colors.textSecondary,
             textAlign: 'center'
           }}>
-            Click any point to see how it flows through the network
+            Click any point to see signal flow
           </div>
         </div>
 
         {/* Right: Neural Network */}
         <div style={{ flex: '1 1 400px', maxWidth: '450px' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem' }}>
             2-Layer Neural Network
           </h3>
           <svg width="400" height="300" viewBox="0 0 400 300">
@@ -378,21 +384,21 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
 
           {/* Logic explanation */}
           <div style={{
-            marginTop: '1.5rem',
-            padding: '1rem',
+            marginTop: '1rem',
+            padding: '0.75rem',
             background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
             borderRadius: '8px',
-            fontSize: '12px',
+            fontSize: '11px',
             color: colors.textSecondary
           }}>
-            <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: colors.text }}>
+            <div style={{ fontWeight: '600', marginBottom: '0.25rem', color: colors.text, fontSize: '12px' }}>
               How it solves XOR:
             </div>
-            <div style={{ lineHeight: '1.6' }}>
-              • Hidden neuron 1 detects "at least one input is 1" (OR gate)<br/>
-              • Hidden neuron 2 detects "not both inputs are 1" (NAND gate)<br/>
-              • Output neuron fires when both hidden neurons are active (AND gate)<br/>
-              • Result: XOR logic! (exactly one input is 1)
+            <div style={{ lineHeight: '1.5' }}>
+              • Hidden 1: "at least one input is 1" (OR)<br/>
+              • Hidden 2: "not both inputs are 1" (NAND)<br/>
+              • Output: both hidden neurons active (AND)<br/>
+              • Result: XOR (exactly one input is 1)
             </div>
           </div>
         </div>
