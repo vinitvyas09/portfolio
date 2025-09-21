@@ -139,21 +139,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   // Ref to store timeout IDs for cleanup
   const trainingTimeoutsRef = React.useRef<NodeJS.Timeout[]>([]);
 
-  // Initialize with random weights that are visible but wrong
-  const getRandomInitialWeights = useCallback(() => {
-    // Start with random perturbation of the true line
-    // This ensures the line is visible but clearly incorrect
-    const angleVariation = (Math.random() - 0.5) * 30;  // Rotate the line ±15 degrees worth
-    const positionVariation = (Math.random() - 0.5) * 600;  // Move the line up/down
-
-    // Apply rotation-like effect by varying both a and b
-    const randomA = trueLine.a + angleVariation;
-    const randomB = trueLine.b + (Math.random() - 0.5) * 2;  // More variation for angle change
-    const randomC = trueLine.c + positionVariation;
-
-    return { a: randomA, b: randomB, c: randomC };
-  }, [trueLine]);
-
   // Perceptron training state - initialize with random weights
   const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
   const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number }>>([]);
