@@ -138,18 +138,25 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
 
   // Handle window resize for responsive layout
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+    // Set initial value on mount
+    setIsMobile(window.innerWidth <= 768);
 
-    // Set initial value
-    handleResize();
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth <= 768);
+      }, 150); // Debounce resize events
+    };
 
     // Add event listener
     window.addEventListener('resize', handleResize);
 
     // Cleanup
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   // Animation trigger

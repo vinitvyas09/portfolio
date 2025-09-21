@@ -241,8 +241,32 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   const { animationSpeed = 16000, autoPlay = true } = config;
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  // Handle window resize for responsive layout
+  useEffect(() => {
+    // Set initial value on mount
+    setIsMobile(window.innerWidth <= 768);
+
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth <= 768);
+      }, 150); // Debounce resize events
+    };
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const stageData = useMemo<StageData[]>(() => {
     return stageBlueprints.map(stage => {
@@ -585,11 +609,11 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   return (
     <div
       style={{
-        padding: "2rem",
+        padding: isMobile ? "1rem" : "2rem",
         background: colors.background,
         border: `1px solid ${colors.border}`,
         borderRadius: "18px",
-        margin: "2rem 0",
+        margin: isMobile ? "1rem 0" : "2rem 0",
         transition: "background 0.3s ease, border 0.3s ease"
       }}
     >
@@ -868,18 +892,18 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
 
       <div
         style={{
-          marginTop: "1.6rem",
+          marginTop: isMobile ? "1rem" : "1.6rem",
           background: colors.surface,
           border: `1px solid ${colors.border}`,
           borderRadius: "14px",
-          padding: "1.25rem",
+          padding: isMobile ? "1rem" : "1.25rem",
           boxShadow: `0 18px 50px ${colors.shadow}`,
           transition: "background 0.3s ease, border 0.3s ease",
-          minHeight: "320px",
+          minHeight: isMobile ? "auto" : "320px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          gap: "1rem"
+          gap: isMobile ? "0.75rem" : "1rem"
         }}
       >
         <div
@@ -896,13 +920,20 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            gap: "1rem",
+            flexDirection: isMobile ? "column" : "row",
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            justifyContent: isMobile ? "flex-start" : "space-between",
+            gap: isMobile ? "1.5rem" : "1rem",
             marginBottom: "1.2rem"
           }}
         >
-          <div>
+          <div style={{
+            flex: isMobile ? "none" : "1",
+            padding: isMobile ? "1rem" : "0",
+            background: isMobile ? colors.track : "transparent",
+            borderRadius: isMobile ? "8px" : "0",
+            width: isMobile ? "100%" : "auto"
+          }}>
             <div
               style={{
                 fontSize: "0.75rem",
@@ -923,7 +954,13 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             </div>
           </div>
 
-          <div>
+          <div style={{
+            flex: isMobile ? "none" : "1",
+            padding: isMobile ? "1rem" : "0",
+            background: isMobile ? colors.track : "transparent",
+            borderRadius: isMobile ? "8px" : "0",
+            width: isMobile ? "100%" : "auto"
+          }}>
             <div
               style={{
                 fontSize: "0.75rem",
@@ -944,7 +981,13 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             </div>
           </div>
 
-          <div>
+          <div style={{
+            flex: isMobile ? "none" : "1",
+            padding: isMobile ? "1rem" : "0",
+            background: isMobile ? colors.track : "transparent",
+            borderRadius: isMobile ? "8px" : "0",
+            width: isMobile ? "100%" : "auto"
+          }}>
             <div
               style={{
                 fontSize: "0.75rem",
@@ -976,7 +1019,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           {contributionRows.map(row => {
             const magnitude = Math.abs(row.value);
             const ratio = Math.min(magnitude / maxAbsContribution, 1);
-            const trackWidth = 160;
+            const trackWidth = isMobile ? 120 : 160;
             const positiveWidth = row.value > 0 ? ratio * (trackWidth / 2) : 0;
             const negativeWidth = row.value < 0 ? ratio * (trackWidth / 2) : 0;
 
@@ -986,12 +1029,17 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.75rem",
-                  fontSize: "0.8rem",
-                  color: colors.textSecondary
+                  gap: isMobile ? "0.5rem" : "0.75rem",
+                  fontSize: isMobile ? "0.75rem" : "0.8rem",
+                  color: colors.textSecondary,
+                  flexWrap: isMobile ? "wrap" : "nowrap"
                 }}
               >
-                <div style={{ flex: "0 0 150px", color: colors.textPrimary }}>
+                <div style={{
+                  flex: isMobile ? "1 1 100%" : "0 0 150px",
+                  color: colors.textPrimary,
+                  marginBottom: isMobile ? "0.25rem" : "0"
+                }}>
                   {row.name}
                 </div>
                 <div
@@ -1000,7 +1048,8 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                     width: `${trackWidth}px`,
                     height: "6px",
                     background: colors.track,
-                    borderRadius: "999px"
+                    borderRadius: "999px",
+                    flex: isMobile ? "1" : "none"
                   }}
                 >
                   <div
@@ -1041,9 +1090,11 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                 </div>
                 <div
                   style={{
-                    width: "60px",
+                    width: isMobile ? "50px" : "60px",
                     textAlign: "right",
-                    color: colors.textPrimary
+                    color: colors.textPrimary,
+                    fontSize: isMobile ? "0.7rem" : "0.8rem",
+                    fontWeight: 600
                   }}
                 >
                   {row.value >= 0 ? "+" : ""}
