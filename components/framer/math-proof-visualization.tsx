@@ -45,7 +45,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
   const steps = [
     {
       title: "Initial State: Misclassified",
-      subtitle: `Point (${x1}, ${x2}) should be positive, but activation = ${oldAct}`,
+      subtitle: `Point (${x1}, ${x2}) should be +, but activation = ${oldAct}`,
     },
     {
       title: "Update Rule Applied",
@@ -65,7 +65,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
     },
     {
       title: "Result: Line Moved Correctly",
-      subtitle: "The decision boundary adjusted toward the misclassified point",
+      subtitle: "Boundary moves towards misclassified point",
     }
   ];
 
@@ -104,7 +104,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
     switch (stepIndex) {
       case 0: // Initial misclassification
         return (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
             {/* Coordinate system */}
             <line x1={padding} y1={height/2} x2={width-padding} y2={height/2}
                   stroke={colors.neutral} strokeWidth="1" opacity="0.3"/>
@@ -143,7 +143,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
 
       case 1: // Update rule
         return (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
             {/* Update equations */}
             <text x={width/2} y={80} fill={colors.text} fontSize="16"
                   textAnchor="middle" fontFamily="monospace">
@@ -168,7 +168,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
 
       case 2: // New activation
         return (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
             <text x={width/2} y={60} fill={colors.textMuted} fontSize="14"
                   textAnchor="middle" fontFamily="system-ui">
               New activation when seeing same point:
@@ -196,7 +196,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
 
       case 3: // Expansion
         return (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
             {/* Components breakdown */}
             <rect x={50} y={100} width={150} height={80}
                   fill={colors.negative} fillOpacity="0.05"
@@ -234,7 +234,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
 
       case 4: // Final improvement
         return (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
             {/* Number line */}
             <line x1={padding} y1={height/2} x2={width-padding} y2={height/2}
                   stroke={colors.text} strokeWidth="2" opacity="0.3"/>
@@ -294,7 +294,7 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
 
       case 5: // Visual proof: line moved
         return (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
             {/* Coordinate system */}
             <line x1={padding} y1={height/2} x2={width-padding} y2={height/2}
                   stroke={colors.neutral} strokeWidth="1" opacity="0.3"/>
@@ -469,59 +469,51 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
 
         {/* Visualization area */}
         <div style={{
-          padding: '2rem',
+          padding: '1rem',
           background: colors.mathBg,
-          minHeight: '300px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          {renderStepVisualization(currentStep)}
+          <div style={{
+            width: '100%',
+            maxWidth: '600px',
+            aspectRatio: '2 / 1',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {renderStepVisualization(currentStep)}
+          </div>
         </div>
 
         {/* Controls */}
         <div style={{
-          padding: '1.5rem',
-          display: 'flex',
-          justifyContent: 'space-between',
+          padding: '1rem',
           borderTop: `1px solid ${colors.border}`,
           background: isDark ? '#080808' : '#fbfbfb'
         }}>
-          <button
-            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-            disabled={currentStep === 0}
-            style={{
-              padding: '0.5rem 1.25rem',
-              background: currentStep === 0 ? colors.neutral : (isDark ? '#18181b' : '#f4f4f5'),
-              color: currentStep === 0 ? colors.textFaint : colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '6px',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
-              opacity: currentStep === 0 ? 0.5 : 1,
-              transition: 'all 0.2s'
-            }}
-          >
-            ← Previous
-          </button>
-
+          {/* Step buttons - responsive grid */}
           <div style={{
-            display: 'flex',
-            gap: '0.5rem'
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(40px, 1fr))',
+            gap: '0.5rem',
+            marginBottom: '1rem',
+            maxWidth: '320px',
+            margin: '0 auto 1rem'
           }}>
             {steps.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentStep(idx)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  minWidth: '40px',
+                  height: '40px',
                   borderRadius: '50%',
                   border: idx === currentStep ? `2px solid ${colors.highlight}` : `1px solid ${colors.border}`,
                   background: idx === currentStep ? colors.activeBg : 'transparent',
                   color: idx === currentStep ? colors.highlight : colors.textMuted,
-                  fontSize: '0.75rem',
+                  fontSize: '0.875rem',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
@@ -532,24 +524,54 @@ const MathProofVisualization: React.FC<MathProofVisualizationProps> = ({
             ))}
           </div>
 
-          <button
-            onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
-            disabled={currentStep === steps.length - 1}
-            style={{
-              padding: '0.5rem 1.25rem',
-              background: currentStep === steps.length - 1 ? colors.neutral : (isDark ? '#18181b' : '#f4f4f5'),
-              color: currentStep === steps.length - 1 ? colors.textFaint : colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '6px',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              cursor: currentStep === steps.length - 1 ? 'not-allowed' : 'pointer',
-              opacity: currentStep === steps.length - 1 ? 0.5 : 1,
-              transition: 'all 0.2s'
-            }}
-          >
-            Next →
-          </button>
+          {/* Navigation buttons */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: '0.75rem'
+          }}>
+            <button
+              onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              disabled={currentStep === 0}
+              style={{
+                flex: '1',
+                padding: '0.625rem 0.75rem',
+                background: currentStep === 0 ? colors.neutral : (isDark ? '#18181b' : '#f4f4f5'),
+                color: currentStep === 0 ? colors.textFaint : colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
+                opacity: currentStep === 0 ? 0.5 : 1,
+                transition: 'all 0.2s',
+                minWidth: '0'
+              }}
+            >
+              ← Prev
+            </button>
+
+            <button
+              onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+              disabled={currentStep === steps.length - 1}
+              style={{
+                flex: '1',
+                padding: '0.625rem 0.75rem',
+                background: currentStep === steps.length - 1 ? colors.neutral : (isDark ? '#18181b' : '#f4f4f5'),
+                color: currentStep === steps.length - 1 ? colors.textFaint : colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                cursor: currentStep === steps.length - 1 ? 'not-allowed' : 'pointer',
+                opacity: currentStep === steps.length - 1 ? 0.5 : 1,
+                transition: 'all 0.2s',
+                minWidth: '0'
+              }}
+            >
+              Next →
+            </button>
+          </div>
         </div>
       </div>
     </div>
