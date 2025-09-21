@@ -443,7 +443,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     const weights = currentWeights ? { ...currentWeights } : getRandomInitialWeights();
 
     // Use a very small learning rate since we're working with raw values
-    const learningRate = 0.0005;  // Even smaller for better stability
+    const learningRate = 0.01;  // Even smaller for better stability
     const maxEpochs = 100;
     let epoch = 0;
     let converged = false;
@@ -456,7 +456,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       trainingTimeoutsRef.current.forEach(clearTimeout);
       trainingTimeoutsRef.current = [];
       setIsTraining(false);
-      setCurrentWeights(weights);
+      // Don't change weights at all - just change the color by setting isTraining to false
       setCurrentTrainingPoint(-1);
     };
 
@@ -481,6 +481,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
         if (lastEpochError === 0) {
           converged = true;
+          // Don't pass weights - they're already set correctly
           finalizeTraining();
           return;
         }
@@ -509,7 +510,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         weights.b += learningRate * trueLabel * point.y;
         weights.c += learningRate * trueLabel;
 
-        // Update display weights
+        // Update display weights when they change
         setCurrentWeights({ ...weights });
       }
 
@@ -527,6 +528,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
         if (epochErrors === 0) {
           converged = true;
+          // Weights are already set correctly from the last update
         }
       }
 
