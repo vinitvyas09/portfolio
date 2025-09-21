@@ -118,7 +118,7 @@ Imagine you're a veterinarian with a very specific (and slightly ridiculous) dia
 
 Dogs tend to be heavier (10-40 kg typically) and bark at lower frequencies (100-500 Hz). Cats are lighter (3-7 kg usually) and meow at much higher frequencies (700-1500 Hz). Plot a bunch of examples, and something very interesting happens:
 
-<LinearSeparableDataViz
+<PerceptronTrainingLoop
 config={{
 dataset: "cats_vs_dogs",
 xAxis: "Body weight (kg)",
@@ -135,7 +135,7 @@ interactive: false
 
 Now watch what happens when we draw a single line:
 
-<LinearSeparableDataViz
+<PerceptronTrainingLoop
 config={{
 dataset: "cats_vs_dogs",
 xAxis: "Body weight (kg)",
@@ -405,15 +405,20 @@ Training a perceptron is beautifully dumb. Here's the entire algorithm:
 
 That's it. No calculus, no complex optimization, just: "Wrong? Move a bit. Wrong again? Move a bit more."
 
+Let's try this again with the animation from earlier, but this time, let's focus on how the line is updated:
+
 <PerceptronTrainingLoop
-  config={{
-    dataset: "cats_vs_dogs",
-    showSteps: true,
-    animateLineAdjustment: true,
-    highlightCurrentPoint: true,
-    showErrorCount: true,
-    speed: "adjustable"
-  }}
+config={{
+dataset: "cats_vs_dogs",
+xAxis: "Body weight (kg)",
+yAxis: "Vocalization frequency (Hz)",
+showSeparatingLine: true,
+animateLineDrawing: true,
+lineAnimationMs: 2000,
+highlightRegions: true,
+regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
+interactive: true
+}}
 />
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line stumble its way toward perfection, one mistake at a time</p>
@@ -490,20 +495,6 @@ def train_perceptron(data_points, labels, max_iterations=100):
 
 # That's it!
 ```
-
-<PerceptronTrainingLoop
-  config={{
-    dataset: "cats_vs_dogs",
-    showSteps: true,
-    showErrorCount: true,
-    showErrorRate: true,
-    showLineEvolution: true,
-    animateLineAdjustment: true,
-    highlightCurrentPoint: true,
-    speed: "adjustable",
-    compareToModernMethods: false
-  }}
-/>
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">From chaos to order: watch the error rate drop as the line finds its place</p>
 
