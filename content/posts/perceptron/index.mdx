@@ -44,9 +44,9 @@ Before we meet the perceptron (our star of the show), we need a 30-second neuros
 />
 <Caption>Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!</Caption>
 
-A biological neuron is basically nature's tiny decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). Here's where it gets interesting: the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold—BOOM—it fires its own signal down the axon to the next neurons in line.
+A biological neuron is basically nature's tiny decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). However, the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold - BOOM - it fires its own signal down the axon to the next neurons in line.
 
-That's it. That's the magic. Input → weighted sum → threshold → output. This ridiculously simple mechanism, chained together 86 billion times in your brain, somehow produces consciousness, creativity, and your ability to understand this sentence.
+And that's all! Input → weighted sum → threshold → output. This ridiculously simple mechanism, chained together 86 billion times in your brain, somehow produces consciousness, creativity, and your ability to understand this sentence.
 
 ## 1943: The "What If We Built One?" Moment
 
@@ -56,11 +56,11 @@ Warren McCulloch (a neurophysiologist) and Walter Pitts (a homeless teenager who
 
 But that one idea was enough. If neurons were just biological switches that turned on when enough input arrived, then maybe, just maybe, you could build thinking machines.
 
-## 1958: Enter the Perceptron—The "Hold My Beer" Moment of AI
+## 1958: Enter the Perceptron: The "Hold My Beer" Moment of AI
 
-Fast forward to 1958. The Space Race is in full swing, computers still use punch cards, and Frank Rosenblatt (a psychologist at Cornell Aeronautical Laboratory) announces something that makes headlines worldwide. He hasn't just modeled a neuron mathematically. He's built one. In hardware. With actual wires and motors.
+Fast forward to 1958. The Space Race is in full swing, computers still use punch cards, and Frank Rosenblatt (a psychologist at Cornell Aeronautical Laboratory) announces something that makes headlines worldwide. He hasn't just modeled a neuron mathematically. He's built one in hardware! With actual wires and motors.
 
-It allowed The New York Times to be absolutely dramatic, calling it "the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence.".
+It allowed this dramatic New York Times article, calling it "the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence.".
 
 <img src="/Mark1.jpg" alt="The Mark 1 Perceptron - Frank Rosenblatt's original hardware implementation from 1958" className="w-full max-w-2xl mx-auto my-8 rounded-lg shadow-lg" />
 <Caption>The Mark 1 Perceptron - Frank Rosenblatt's original hardware implementation from 1958</Caption>
@@ -136,7 +136,7 @@ interactive: false
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Each point represents one animal. Notice how they naturally cluster into two groups?</p>
 
-Now watch what happens when we draw a single line:
+As they cluster into 2 groups, we should be able to separate them with one line. Here's how it looks:
 
 <PerceptronTrainingLoop
 config={{
@@ -148,13 +148,13 @@ animateLineDrawing: true,
 lineAnimationMs: 2000,
 highlightRegions: true,
 regionLabels: ["Team Dog 🐕", "Team Cat 🐈"],
-interactive: true
+interactive: false
 }}
 />
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">Click "🧠 Train Perceptron" to watch it learn the decision boundary using the actual perceptron learning algorithm!</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Drawing a line that separates the 2 regions in 2D space</p>
 
-This is what we're asking the perceptron to do: find that line. Given a new animal's weight and vocalization frequency, tell us which side of the line it falls on. Cat or dog. That's it.
+This is what we're asking the perceptron to do: find that line. Given a new animal's weight and vocalization frequency, tell us which side of the line it falls on. Cat or dog. That's it. And that is also our ML model! Nothing fancy, just a region-separating line!
 
 ## Err... But Why Do We Need a Perceptron for This?
 
@@ -167,14 +167,14 @@ You might be thinking: "I can literally see where to draw that line. Why do we n
   }}
 />
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">Scan a single 2D slice on the left, then watch how the perceptron collapses everything onto w · x + b and reveals the per-feature contributions at the bottom — good luck "eyeballing" that in 50,000 dimensions.</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Scan a single 2D slice on the left, then watch how the perceptron collapses everything onto w · x + b and reveals the per-feature contributions at the bottom. Good luck "eyeballing" that in 50,000 dimensions!</p>
 Real-world data doesn't come in neat 2D packages. When you're classifying:
 
 - **Emails as spam/not spam:** Hundreds of word frequencies as dimensions
 - **Images of handwritten digits:** Each pixel is a dimension (784 for a 28×28 image)
 - **Medical diagnoses:** Dozens of test results, symptoms, and patient history
 
-Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care—the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
+Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care: the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
 
 <InfoBox type="insight" title="The Hyperplane Pattern" visual="hyperplane">
 
@@ -188,7 +188,7 @@ It's like how a piece of paper (2D) can divide a room (3D) into two halves, or h
 
 <InfoBox type="warning" title="The Perceptron's Kryptonite">
 
-**Spoiler alert:** The perceptron is amazing at finding these linear separations, but it has one fatal weakness that almost killed AI research for decades. It can't handle data that isn't linearly separable—imagine trying to separate a bullseye pattern with a straight line.
+**Spoiler alert:** The perceptron is amazing at finding these linear separations, but it has one fatal weakness that almost killed AI research for decades. It can't handle data that isn't linearly separable; imagine trying to separate a bullseye pattern with a straight line.
 
 There's a famous example called XOR that's so simple a toddler could solve it, but it stumped the perceptron and caused what we now call the "first AI winter." We'll dive into that drama later.
 
@@ -315,7 +315,7 @@ The perceptron isn't doing something magical. It's just finding the right values
 
 <InfoBox type="advanced" title="Going Deeper: It's Actually Distance!">
 
-Here's something cool: the value of `Ax + By + C` doesn't just tell you which side of the line you're on—it's actually proportional to your distance from the line!
+Here's something cool: the value of `Ax + By + C` doesn't just tell you which side of the line you're on, it's actually proportional to your distance from the line!
 
 The exact signed distance from point (x₀, y₀) to line `Ax + By + C = 0` is:
 
@@ -352,7 +352,7 @@ highlightCurrent: "Sign"
 }}
 />
 
-<p className="text-sm text-gray-600 text-center mt-2 italic">Different activation functions give neurons different "personalities"—decisive, probabilistic, or selective</p>
+<p className="text-sm text-gray-600 text-center mt-2 italic">Different activation functions give neurons different "personalities": decisive, probabilistic, or selective</p>
 
 Think of activation functions like different types of judges:
 
@@ -428,7 +428,7 @@ interactive: true
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Watch the line stumble its way toward perfection, one mistake at a time</p>
 
-But wait—how exactly do we "nudge" the line? This is where it gets clever.
+But wait! How exactly do we "nudge" the line?
 
 ## The Update Rule: How to Nudge a Line
 
@@ -599,7 +599,7 @@ for epoch in range(num_epochs):
 
 ### Critical Nuance #2: How Many Times Should We Loop? (The Epochs Dilemma)
 
-A hyperparameter is a setting you choose before training starts (as opposed to parameters like weights, which the algorithm learns). The most important one? How many times to loop through your data—called epochs.
+A hyperparameter is a setting you choose before training starts (as opposed to parameters like weights, which the algorithm learns). The most important one? How many times to loop through your data, called epochs.
 
 <EpochGoldilocksZone
 config={{
@@ -673,7 +673,7 @@ Think of it like learning to throw darts:
 
 ## Beyond 2D: When Lines Become Planes (and Hyperplanes)
 
-So far we've been working in 2D—easy to visualize, easy to understand. But what about 3D data? Instead of a line, we get a plane: Ax + By + Cz + D = 0
+So far we've been working in 2D, easy to visualize, easy to understand. But what about 3D data? Instead of a line, we get a plane: Ax + By + Cz + D = 0
 
 <ThreeDPerceptronViz
 config={{
