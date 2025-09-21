@@ -95,8 +95,19 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
     }
 
     // Determine the x-axis range to show both theoretical bound and convergence clearly
-    // Always show at least a bit more than the theoretical bound
-    const displayIterations = Math.min(200, Math.ceil(theoreticalMax * 1.2));
+    // We need to ensure:
+    // 1. The theoretical bound is visible (with some padding)
+    // 2. The convergence point is visible (with some padding)
+    // 3. The chart doesn't look too empty
+
+    // Take the max of theoretical bound * 1.2 or convergence point * 1.5
+    const minRange = Math.max(
+      Math.ceil(theoreticalMax * 1.2),  // Show theoretical bound with 20% padding
+      Math.ceil(convergencePoint * 1.5), // Show convergence point with 50% padding
+      20  // Minimum of 20 iterations for reasonable chart appearance
+    );
+
+    const displayIterations = Math.min(200, minRange);
 
     // Generate actual convergence data up to display range
     const actualData: number[] = [];
