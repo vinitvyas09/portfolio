@@ -817,7 +817,12 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
         <g>
           {/* Render the actual perceptron line */}
           {(() => {
-            // Always show currentWeights (which are initialized randomly)
+            // Don't show any line if showSeparatingLine is false and we're not interactive/training
+            if (!showSeparatingLine && !interactive && !isTraining && !hasTrainedForCurrentData) {
+              return null;
+            }
+
+            // Always show currentWeights (which are initialized randomly) when interactive or training
             // Only fall back to trueLine if somehow we have no weights
             const lineToRender = currentWeights || trueLine;
             const { x1, y1, x2, y2 } = getLinePoints(lineToRender);
