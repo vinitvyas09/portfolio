@@ -1103,155 +1103,209 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
             </button>
           </div>
 
-          {/* Training progress */}
-          {isTraining && (
-            <div style={{
-              marginTop: '1.5rem',
-              padding: '1.25rem',
-              background: isDark
-                ? 'rgba(23, 23, 23, 0.6)'
-                : 'rgba(255, 255, 255, 0.9)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '12px',
-              border: `1px solid ${colors.borderColor}`,
-              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                fontSize: '14px',
-                fontWeight: '600',
-                color: colors.textPrimary,
-                marginBottom: '0.75rem'
-              }}>
-                🔄 Training Progress
-              </div>
-
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                marginBottom: '1rem'
-              }}>
-                <div>
-                  <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
-                    Epoch
-                  </div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: colors.textPrimary }}>
-                    {trainingStep}
-                    <span style={{ fontSize: '14px', fontWeight: '400', color: colors.textSecondary }}>/50</span>
-                  </div>
+          {/* Combined Training/Results box - Always visible for consistent height */}
+          <div style={{
+            marginTop: '1.5rem',
+            padding: '1.5rem',
+            background: hasTrainedForCurrentData && !isTraining
+              ? `linear-gradient(135deg,
+                ${isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.05)'},
+                ${isDark ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)'})`
+              : isTraining
+                ? isDark
+                  ? 'rgba(245, 158, 11, 0.1)'
+                  : 'rgba(245, 158, 11, 0.05)'
+                : isDark
+                  ? 'rgba(23, 23, 23, 0.4)'
+                  : 'rgba(255, 255, 255, 0.6)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '14px',
+            border: hasTrainedForCurrentData && !isTraining
+              ? `2px solid ${colors.lineColor}`
+              : isTraining
+                ? `2px solid ${colors.accent}`
+                : `1px solid ${colors.borderColor}`,
+            textAlign: 'center',
+            maxWidth: '450px',
+            margin: '1.5rem auto 0',
+            boxShadow: hasTrainedForCurrentData && !isTraining
+              ? `0 8px 32px ${colors.lineColor}15`
+              : isTraining
+                ? `0 8px 32px ${colors.accent}15`
+                : 'none',
+            minHeight: '200px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}>
+            {isTraining ? (
+              // Training in progress
+              <>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  color: colors.accent,
+                  marginBottom: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
+                }}>
+                  🔄 Training in Progress
                 </div>
 
-                {trainingHistory.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  marginBottom: '1rem'
+                }}>
                   <div>
                     <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
-                      Errors
+                      Epoch
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: '700', color: colors.accent }}>
-                      {trainingHistory[trainingHistory.length - 1]?.error || 0}
+                    <div style={{ fontSize: '18px', fontWeight: '700', color: colors.textPrimary }}>
+                      {trainingStep}
+                      <span style={{ fontSize: '14px', fontWeight: '400', color: colors.textSecondary }}>/100</span>
                     </div>
+                  </div>
+
+                  {trainingHistory.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                        Errors
+                      </div>
+                      <div style={{ fontSize: '18px', fontWeight: '700', color: colors.accent }}>
+                        {trainingHistory[trainingHistory.length - 1]?.error || 0}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {currentWeights && (
+                  <div style={{
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    background: isDark
+                      ? 'rgba(0, 0, 0, 0.3)'
+                      : 'rgba(0, 0, 0, 0.05)',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    color: colors.textPrimary,
+                    fontWeight: '500'
+                  }}>
+                    {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
                   </div>
                 )}
-              </div>
 
-              {currentWeights && (
+                {currentTrainingPoint >= 0 && (
+                  <div style={{
+                    marginTop: '0.75rem',
+                    fontSize: '12px',
+                    color: colors.textSecondary
+                  }}>
+                    Processing: Point {currentTrainingPoint + 1} ({dataPoints[currentTrainingPoint]?.label})
+                  </div>
+                )}
+              </>
+            ) : hasTrainedForCurrentData ? (
+              // Training completed
+              <>
                 <div style={{
-                  fontSize: '13px',
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  color: colors.lineColor,
+                  marginBottom: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '20px' }}>✨</span>
+                  Perceptron Converged!
+                  <span style={{ fontSize: '20px' }}>✨</span>
+                </div>
+
+                <div style={{
+                  fontSize: '14px',
                   fontFamily: 'monospace',
                   background: isDark
-                    ? 'rgba(0, 0, 0, 0.3)'
-                    : 'rgba(0, 0, 0, 0.05)',
-                  padding: '0.75rem',
+                    ? 'rgba(0, 0, 0, 0.4)'
+                    : 'rgba(255, 255, 255, 0.7)',
+                  padding: '1rem',
                   borderRadius: '8px',
+                  marginBottom: '1rem',
                   color: colors.textPrimary,
-                  fontWeight: '500'
+                  fontWeight: '600',
+                  letterSpacing: '0.025em'
                 }}>
-                  {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
+                  {currentWeights ? `${currentWeights.a.toFixed(2)}x + ${currentWeights.b.toFixed(2)}y + ${currentWeights.c.toFixed(2)} = 0` : 'Calculating...'}
                 </div>
-              )}
 
-              {currentTrainingPoint >= 0 && (
                 <div style={{
-                  marginTop: '0.75rem',
-                  fontSize: '12px',
-                  color: colors.textSecondary
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '2rem'
                 }}>
-                  Processing: Point {currentTrainingPoint + 1} ({dataPoints[currentTrainingPoint]?.label})
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Training results */}
-          {currentWeights && !isTraining && (
-            <div style={{
-              marginTop: '1.5rem',
-              padding: '1.5rem',
-              background: `linear-gradient(135deg,
-                ${isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.05)'},
-                ${isDark ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)'})`,
-              backdropFilter: 'blur(10px)',
-              borderRadius: '14px',
-              border: `2px solid ${colors.lineColor}`,
-              textAlign: 'center',
-              maxWidth: '450px',
-              margin: '1.5rem auto 0',
-              boxShadow: `0 8px 32px ${colors.lineColor}15`
-            }}>
-              <div style={{
-                fontSize: '16px',
-                fontWeight: '700',
-                color: colors.lineColor,
-                marginBottom: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem'
-              }}>
-                <span style={{ fontSize: '20px' }}>✨</span>
-                Perceptron Converged!
-                <span style={{ fontSize: '20px' }}>✨</span>
-              </div>
-
-              <div style={{
-                fontSize: '14px',
-                fontFamily: 'monospace',
-                background: isDark
-                  ? 'rgba(0, 0, 0, 0.4)'
-                  : 'rgba(255, 255, 255, 0.7)',
-                padding: '1rem',
-                borderRadius: '8px',
-                marginBottom: '1rem',
-                color: colors.textPrimary,
-                fontWeight: '600',
-                letterSpacing: '0.025em'
-              }}>
-                {currentWeights.a.toFixed(2)}x + {currentWeights.b.toFixed(2)}y + {currentWeights.c.toFixed(2)} = 0
-              </div>
-
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: '2rem'
-              }}>
-                <div>
-                  <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
-                    Epochs
+                  <div>
+                    <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                      Epochs
+                    </div>
+                    <div style={{ fontSize: '20px', fontWeight: '700', color: colors.textPrimary }}>
+                      {trainingHistory.length}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '20px', fontWeight: '700', color: colors.textPrimary }}>
-                    {trainingHistory.length}
+                  <div>
+                    <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
+                      Accuracy
+                    </div>
+                    <div style={{ fontSize: '20px', fontWeight: '700', color: colors.lineColor }}>
+                      100%
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '0.25rem' }}>
-                    Accuracy
-                  </div>
-                  <div style={{ fontSize: '20px', fontWeight: '700', color: colors.lineColor }}>
-                    100%
-                  </div>
+              </>
+            ) : (
+              // Ready to train
+              <>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: colors.textSecondary,
+                  marginBottom: '0.75rem'
+                }}>
+                  🧠 Ready to Train
                 </div>
-              </div>
-            </div>
-          )}
+
+                <div style={{
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  background: isDark
+                    ? 'rgba(0, 0, 0, 0.2)'
+                    : 'rgba(0, 0, 0, 0.05)',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1rem',
+                  color: colors.textSecondary,
+                  fontStyle: 'italic',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  Decision boundary equation will appear here
+                </div>
+
+                <div style={{
+                  fontSize: '13px',
+                  color: colors.textSecondary,
+                  lineHeight: '1.5'
+                }}>
+                  Click "Train Perceptron" to find the optimal<br />
+                  decision boundary for this dataset
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Legend for lines */}
           {(showSeparatingLine || currentWeights) && (
