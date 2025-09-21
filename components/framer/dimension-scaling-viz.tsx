@@ -922,17 +922,18 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             flexWrap: isMobile ? "nowrap" : "wrap",
-            justifyContent: isMobile ? "flex-start" : "space-between",
-            gap: isMobile ? "1.5rem" : "1rem",
+            justifyContent: "center",
+            gap: isMobile ? "1.5rem" : "2rem",
             marginBottom: "1.2rem"
           }}
         >
           <div style={{
-            flex: isMobile ? "none" : "1",
-            padding: isMobile ? "1rem" : "0",
+            flex: isMobile ? "none" : "0 0 auto",
+            padding: isMobile ? "1rem" : "0.75rem 1.5rem",
             background: isMobile ? colors.track : "transparent",
             borderRadius: isMobile ? "8px" : "0",
-            width: isMobile ? "100%" : "auto"
+            width: isMobile ? "100%" : "auto",
+            textAlign: "center"
           }}>
             <div
               style={{
@@ -955,11 +956,12 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           </div>
 
           <div style={{
-            flex: isMobile ? "none" : "1",
-            padding: isMobile ? "1rem" : "0",
+            flex: isMobile ? "none" : "0 0 auto",
+            padding: isMobile ? "1rem" : "0.75rem 1.5rem",
             background: isMobile ? colors.track : "transparent",
             borderRadius: isMobile ? "8px" : "0",
-            width: isMobile ? "100%" : "auto"
+            width: isMobile ? "100%" : "auto",
+            textAlign: "center"
           }}>
             <div
               style={{
@@ -982,11 +984,12 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
           </div>
 
           <div style={{
-            flex: isMobile ? "none" : "1",
-            padding: isMobile ? "1rem" : "0",
+            flex: isMobile ? "none" : "0 0 auto",
+            padding: isMobile ? "1rem" : "0.75rem 1.5rem",
             background: isMobile ? colors.track : "transparent",
             borderRadius: isMobile ? "8px" : "0",
-            width: isMobile ? "100%" : "auto"
+            width: isMobile ? "100%" : "auto",
+            textAlign: "center"
           }}>
             <div
               style={{
