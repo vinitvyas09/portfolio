@@ -259,7 +259,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
     statusColor: string,
     status: string
   ) => {
-    const lastMetric = metrics[metrics.length - 1];
+    const lastMetric = metrics.length > 0 ? metrics[metrics.length - 1] : null;
 
     return (
       <div style={{
