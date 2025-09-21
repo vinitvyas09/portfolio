@@ -23,9 +23,16 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [animationStep, setAnimationStep] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -164,9 +171,12 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
       {/* Legend */}
       <div style={{
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         justifyContent: 'center',
-        gap: '2rem',
-        marginBottom: '2rem'
+        alignItems: isMobile ? 'flex-start' : 'center',
+        gap: isMobile ? '0.5rem' : '2rem',
+        marginBottom: '2rem',
+        paddingLeft: isMobile ? '1rem' : 0
       }}>
         {config.variants?.map(variant => (
           <div key={variant} style={{
@@ -195,12 +205,12 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '2rem',
+        gap: isMobile ? '0.5rem' : '2rem',
         marginBottom: '2rem'
       }}>
         {/* Training Error */}
         <div style={{
-          padding: '1rem',
+          padding: isMobile ? '0.5rem' : '1rem',
           background: colors.bg,
           borderRadius: '8px',
           border: `1px solid ${colors.borderColor}`
@@ -263,7 +273,7 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
 
         {/* Test Error */}
         <div style={{
-          padding: '1rem',
+          padding: isMobile ? '0.5rem' : '1rem',
           background: colors.bg,
           borderRadius: '8px',
           border: `1px solid ${colors.borderColor}`
@@ -326,7 +336,7 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
 
         {/* Storage Cost */}
         <div style={{
-          padding: '1rem',
+          padding: isMobile ? '0.5rem' : '1rem',
           background: colors.bg,
           borderRadius: '8px',
           border: `1px solid ${colors.borderColor}`
@@ -516,28 +526,28 @@ const PerceptronVariantComparison: React.FC<PerceptronVariantComparisonProps> = 
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: isMobile ? '0.5rem' : '1rem',
           fontSize: '13px',
           color: colors.textPrimary
         }}>
           <div>
-            <span style={{ fontWeight: '600', color: colors.vanilla }}>Vanilla:</span>
-            <span style={{ color: colors.textSecondary, marginLeft: '0.5rem' }}>
+            <div style={{ fontWeight: '600', color: colors.vanilla }}>Vanilla</div>
+            <div style={{ color: colors.textSecondary, marginTop: '0.25rem', fontSize: '12px' }}>
               Fast, simple, sensitive to order
-            </span>
+            </div>
           </div>
           <div>
-            <span style={{ fontWeight: '600', color: colors.voted }}>Voted:</span>
-            <span style={{ color: colors.textSecondary, marginLeft: '0.5rem' }}>
+            <div style={{ fontWeight: '600', color: colors.voted }}>Voted</div>
+            <div style={{ color: colors.textSecondary, marginTop: '0.25rem', fontSize: '12px' }}>
               Best accuracy, high storage
-            </span>
+            </div>
           </div>
           <div>
-            <span style={{ fontWeight: '600', color: colors.averaged }}>Averaged:</span>
-            <span style={{ color: colors.textSecondary, marginLeft: '0.5rem' }}>
+            <div style={{ fontWeight: '600', color: colors.averaged }}>Averaged</div>
+            <div style={{ color: colors.textSecondary, marginTop: '0.25rem', fontSize: '12px' }}>
               Good balance, practical choice
-            </span>
+            </div>
           </div>
         </div>
       </div>
