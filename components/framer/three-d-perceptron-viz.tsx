@@ -74,7 +74,7 @@ const ThreeDPerceptronViz: React.FC<ThreeDPerceptronVizProps> = ({
   }, []);
 
   // 3D to 2D projection
-  const project = useCallback((point: Point3D, rotationX: number, rotationY: number, canvasWidth: number, canvasHeight: number) => {
+  const project = useCallback((point: { x: number; y: number; z: number }, rotationX: number, rotationY: number, canvasWidth: number, canvasHeight: number) => {
     // Rotate around Y axis
     const cosY = Math.cos(rotationY);
     const sinY = Math.sin(rotationY);
