@@ -852,7 +852,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         {/* Data points */}
         {dataPoints.slice(0, visiblePoints).map((point, index) => {
           // Skip points with invalid coordinates
-          if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+          if (point.x === undefined || point.y === undefined ||
+              !Number.isFinite(point.x) || !Number.isFinite(point.y)) {
             return null;
           }
 
@@ -864,7 +865,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
           const scaledX = scaleX(point.x);
           const scaledY = scaleY(point.y);
 
-          if (!Number.isFinite(scaledX) || !Number.isFinite(scaledY)) {
+          if (scaledX === undefined || scaledY === undefined ||
+              !Number.isFinite(scaledX) || !Number.isFinite(scaledY)) {
             return null;
           }
 
