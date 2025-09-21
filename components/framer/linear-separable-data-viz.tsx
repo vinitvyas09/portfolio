@@ -139,7 +139,22 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   // Ref to store timeout IDs for cleanup
   const trainingTimeoutsRef = React.useRef<NodeJS.Timeout[]>([]);
 
-  // Perceptron training state
+  // Initialize with random weights that are visible but wrong
+  const getRandomInitialWeights = useCallback(() => {
+    // Start with random perturbation of the true line
+    // This ensures the line is visible but clearly incorrect
+    const angleVariation = (Math.random() - 0.5) * 30;  // Rotate the line ±15 degrees worth
+    const positionVariation = (Math.random() - 0.5) * 600;  // Move the line up/down
+
+    // Apply rotation-like effect by varying both a and b
+    const randomA = trueLine.a + angleVariation;
+    const randomB = trueLine.b + (Math.random() - 0.5) * 2;  // More variation for angle change
+    const randomC = trueLine.c + positionVariation;
+
+    return { a: randomA, b: randomB, c: randomC };
+  }, [trueLine]);
+
+  // Perceptron training state - initialize with random weights
   const [currentWeights, setCurrentWeights] = useState<{ a: number; b: number; c: number } | null>(null);
   const [trainingHistory, setTrainingHistory] = useState<Array<{ a: number; b: number; c: number; error: number }>>([]);
   const [currentTrainingPoint, setCurrentTrainingPoint] = useState<number>(-1);
@@ -236,7 +251,8 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     trainingTimeoutsRef.current = [];
 
     setDataGeneration(prev => prev + 1);
-    setCurrentWeights(null);
+    // Don't set to null - generate new random weights instead
+    // This will be set after trueLine updates
     setTrainingHistory([]);
     setIsTraining(false);
     setVisiblePoints(0);
@@ -422,16 +438,12 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       return;
     }
 
-    // Start with random weights in a reasonable range
-    // We want the initial line to be visible, so let's start with something close to the true line
-    const weights = {
-      a: trueLine.a + (Math.random() - 0.5) * 10,
-      b: trueLine.b + (Math.random() - 0.5) * 0.5,
-      c: trueLine.c + (Math.random() - 0.5) * 100
-    };
+    // Use the current weights as starting point (they're already random)
+    // Clone the weights so we can modify them
+    const weights = currentWeights ? { ...currentWeights } : getRandomInitialWeights();
 
     // Use a very small learning rate since we're working with raw values
-    const learningRate = 0.001;
+    const learningRate = 0.0005;  // Even smaller for better stability
     const maxEpochs = 100;
     let epoch = 0;
     let converged = false;
@@ -647,6 +659,15 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     }
   }, [trueLine, dataPoints.length]);
 
+  // Initialize or update random weights when data changes
+  useEffect(() => {
+    if (dataPoints.length > 0 && !isTraining) {
+      // Generate new random initial weights whenever we get new data
+      const newRandomWeights = getRandomInitialWeights();
+      setCurrentWeights(newRandomWeights);
+    }
+  }, [dataPoints, isTraining, getRandomInitialWeights]);
+
   // Placeholder to avoid SSR/CSR theme mismatch flash
   if (!mounted) {
     return (
@@ -783,17 +804,17 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         <g>
           {/* Render the actual perceptron line */}
           {(() => {
+            // Always show currentWeights (which are initialized randomly)
+            // Only fall back to trueLine if somehow we have no weights
             const lineToRender = currentWeights || trueLine;
             const { x1, y1, x2, y2 } = getLinePoints(lineToRender);
 
             // Determine style based on state
-            const isShowingWeights = !!currentWeights;
-            const strokeColor = isShowingWeights
-              ? (isTraining ? "#f59e0b" : colors.lineColor)
-              : colors.lineColor;
-            const strokeWidth = isShowingWeights && !isTraining ? "4" : "3";
-            const opacity = isShowingWeights ? "0.9" : "0.7";
-            const strokeDasharray = isShowingWeights ? "none" : "5,5";
+            // Since we always have currentWeights now, adjust styling
+            const strokeColor = isTraining ? "#f59e0b" : colors.lineColor;
+            const strokeWidth = isTraining ? "3" : "3";
+            const opacity = isTraining ? "0.9" : "0.8";
+            const strokeDasharray = "none";  // No dashes since we're showing actual weights
 
             return (
               <line
