@@ -26,14 +26,14 @@ That origin story matters because it reveals the core insight that makes everyth
   }}
 />
 <br />
-So we're starting at the real beginning. Not with equations or Python classes, but with the moment a psychologist in 1958 looked at a brain cell and thought, "I can build that with wires and motors."
+So let's start at the real beginning. Not with equations or Python classes, but with the moment a psychologist in 1958 looked at a brain cell and thought, "I can build that with wires and motors."
 
 
 # The Origin Story: From Biology to Silicon
 
 ## First, Let's Peek Inside The Brain
 
-Before we meet the perceptron (our star of the show), we need a 30-second neuroscience lesson. Don't worry, I'm not going to make you memorize dendrites and axons. Just the fun parts.
+Before we meet the perceptron (our star of the show), we need a 30-second neuroscience lesson. Don't worry, no memorizing dendrites and axons. Just the fun parts.
 
 <NeuronAnimation
   config={{
@@ -45,7 +45,7 @@ Before we meet the perceptron (our star of the show), we need a 30-second neuros
 />
 <Caption>Watch signals arrive at different strengths (thickness = importance). When enough strong signals align, the neuron fires!</Caption>
 
-A biological neuron is basically nature's tiny decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). However, the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold - BOOM - it fires its own signal down the axon to the next neurons in line.
+A biological neuron is nature's decision-maker. It sits there, receiving chemical signals from thousands of other neurons through its dendrites (think of them as the neuron's inbox). However, the neuron doesn't treat all inputs equally. Some signals get amplified (excitatory), others get dampened (inhibitory). The neuron adds everything up, and if the total crosses a threshold - BOOM - it fires its own signal down the axon to the next neurons in line.
 
 And that's all! Input → weighted sum → threshold → output. This ridiculously simple mechanism, chained together 86 billion times in your brain, somehow produces consciousness, creativity, and your ability to understand this sentence.
 
@@ -61,7 +61,7 @@ But that one idea was enough. If neurons were just biological switches that turn
 
 Fast forward to 1958. The Space Race is in full swing, computers still use punch cards, and Frank Rosenblatt (a psychologist at Cornell Aeronautical Laboratory) announces something that makes headlines worldwide. He hasn't just modeled a neuron mathematically. He's built one in hardware! With actual wires and motors.
 
-It allowed this dramatic New York Times article, calling it "the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence.".
+This led to a dramatic New York Times article calling it "the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence.".
 
 <img src="/Mark1.jpg" alt="The Mark 1 Perceptron - Frank Rosenblatt's original hardware implementation from 1958" className="w-full max-w-2xl mx-auto my-8 rounded-lg shadow-lg" />
 <Caption>The Mark 1 Perceptron - Frank Rosenblatt's original hardware implementation from 1958</Caption>
@@ -72,7 +72,7 @@ But here's the kicker: it could learn. Show it enough examples of letters, and i
 
 ## The Parallel: Biology → Circuit → Math → Code → LLM
 
-Now let's check this out. Strip away all the motors and wires, and the perceptron is just math doing exactly what neurons do:
+Strip away the motors and wires, and the perceptron is just math doing exactly what neurons do:
 
 <PerceptronContinuum className="mt-12" />
 <br />
@@ -99,7 +99,7 @@ def perceptron(inputs, weights, bias):
 ```
 That's it. A brain cell in 4 lines of Python.
 
-Now that we have gotten a high level intuition for what a perceptron is, let's dive deeper!
+Now that we have the intuition, let's dive deeper.
 
 # Understanding the Perceptron
 
@@ -168,7 +168,7 @@ Real-world data doesn't come in neat 2D packages. When you're classifying:
 
 <InfoBox type="insight" title="The Hyperplane Pattern" visual="hyperplane">
 
-**Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern?
+**Key insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern?
 
 To separate data in n dimensions, you need an (n-1) dimensional hyperplane.
 
@@ -188,7 +188,7 @@ There's a famous example called XOR that's so simple a toddler could solve it, b
 
 ## The Math: Which Side Are You On?
 
-Now let's get mathematical (but in a fun way, I promise). We need to figure out: given a line and a point, which side is the point on?
+Let's get mathematical. We need to figure out: given a line and a point, which side is the point on?
 
 Let's say we've somehow found our magic separating line. In math terms, every line in 2D can be written as:
 
@@ -217,7 +217,7 @@ showDistanceFormula: false
 />
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag points around to see how the equation's value changes. Notice the pattern?</p>
-The trick is stupidly simple:
+The trick is simple:
 
 - `Ax + By + C > 0`: Point is on one side (let's say "dogs")
 - `Ax + By + C = 0`: Point is exactly on the line (confused veterinarian)
@@ -235,14 +235,14 @@ The y-coordinate increased from 1 to 3, and our equation's result went from nega
 
 ## Making Predictions: The Sign Function
 
-So our perceptron's job boils down to this embarrassingly simple task:
+So our perceptron's job boils down to this simple task:
 
 1. Take a point (x, y)
 2. Calculate `Ax + By + C`
 3. Check the sign:
    - Positive? → Class 1 (dog)
    - Negative? → Class 0 (cat)
-   - Zero? → Uh... flip a coin? (In practice, we usually pick one side)
+   - Zero? → Pick a side (in practice, we default to one class)
 
 In math notation, we write this as:
 
@@ -325,7 +325,7 @@ Points far from the line have large absolute values (very positive or very negat
 
 ## The Activation Function: Teaching Our Perceptron to Make Decisions
 
-So far we've been casually using phrases like "if the sum is positive, output 1" without really talking about the middleman that makes this decision. Enter the activation function: the perceptron's decision-making personality.
+So far we've been casually using phrases like "if the sum is positive, output 1" without discussing the function that makes this decision. Enter the activation function: the perceptron's decision-making personality.
 
 Remember our basic flow: inputs → weighted sum → ??? → output.
 
@@ -370,13 +370,13 @@ def sign(x):
         return 0    # Right on the line (rare!)
 ```
 
-Dead simple. No probabilities, no gradients, just a hard decision. This binary nature is both the perceptron's strength (clear decisions) and its weakness (can't express uncertainty). But for now, it's perfect for our cat/dog classifier.
+Simple. No probabilities, no gradients, just a hard decision. This binary nature is both the perceptron's strength (clear decisions) and its weakness (can't express uncertainty). But for now, it's perfect for our cat/dog classifier.
 
 # How Perceptrons Learn
 
 ## Training: Teaching a Random Line to Find Its Purpose
 
-Here's where the main thing happens. We don't start with the perfect line that separates cats from dogs. We start with absolute chaos: a random line that's probably wrong about everything.
+Here's where it gets interesting. We don't start with the perfect line that separates cats from dogs. We start with absolute chaos: a random line that's probably wrong about everything.
 
 Our line equation `Ax + By + C = 0` needs values for A, B, and C. Since we have no idea what they should be, we just... make them up:
 
@@ -396,7 +396,7 @@ These numbers (A, B, and C) are our parameters (also called weights and bias). T
 
 ## The Training Loop: Nudge, Check, Repeat
 
-Training a perceptron is beautifully dumb. Here's the entire algorithm:
+Training a perceptron is beautifully simple. Here's the entire algorithm:
 
 1. Start with a random line
 2. Show it a data point
@@ -436,7 +436,7 @@ Let's make this concrete. Say our random line encounters this situation:
 
 We're wrong. The point is actually a cat (-1) but we predicted dog (1). How do we fix this?
 
-The perceptron's learning rule is surprisingly elegant. Here's the rule in all its glory:
+The perceptron's learning rule is elegant:
 
 - **If correct:** Do absolutely nothing (if it ain't broke...)
 - **If wrong:**
@@ -457,7 +457,7 @@ Why does this work? Because we're literally pushing the line away from misclassi
 
 ## The Complete Training Algorithm
 
-Let's break down what's actually happening when a perceptron learns. As I said before, the algorithm maintains a "guess" at good parameters (weights and bias) and improves them one mistake at a time. Here's the interesting part: it only changes when it's wrong. When it's right, it has the confidence to do absolutely nothing. Let's put it all together in actual code:
+Let's break down what's actually happening when a perceptron learns. The algorithm maintains a "guess" at good parameters (weights and bias) and improves them one mistake at a time. Here's the interesting part: it only changes when it's wrong. When it's right, it has the confidence to do absolutely nothing. Let's put it all together in actual code:
 
 ```python
 def train_perceptron(data_points, labels, max_iterations=100):
@@ -501,7 +501,7 @@ That's the entire learning algorithm - elegantly simple yet powerful enough to b
 
 ### The Clever Trick: Why y × a Tells Us If We're Right
 
-There's a neat trick in line 3 above. Instead of checking if `prediction != true_label`, we check if `true_label * activation <= 0`. Why?
+There's a neat trick we can use. Instead of checking if `prediction != true_label`, we check if `true_label * activation <= 0`. Why?
 
 Think about it:
 
@@ -514,7 +514,7 @@ The product is positive when we're right, negative when we're wrong. Elegant!
 
 ### Why Does This Update Rule Work?
 
-Here's something interesting: when we update our weights after a mistake, we're guaranteed to do better on that same point next time. Not necessarily correct, but better. Let's see why.
+When we update our weights after a mistake, we're guaranteed to do better on that same point next time. Not necessarily correct, but better. Let's see why.
 
 Let's say we see a positive example (y = +1) but our activation is negative (a < 0). We're wrong! So we update:
 
@@ -545,7 +545,7 @@ Since `x₁²` and `x₂²` are always positive, the new activation is always at
 
 ### Critical Nuance #1: The Order Matters (A Lot!)
 
-Here's something that might blow your mind: the order you show examples to your perceptron can make the difference between learning in seconds or never learning at all.
+The order you show examples to your perceptron can make the difference between learning in seconds or never learning at all.
 
 <OrderMattersDemo
 config={{
@@ -640,7 +640,7 @@ annotations: [
 />
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">The classic curves: training error always drops, but test error has a sweet spot</p>
-How do you find the magic number? Experimentally! Plot training vs test error and look for:
+How do you find the right number? Experimentally. Plot training vs test error and look for:
 
 - Both errors high: Underfitting (need more epochs)
 - Training error near zero, test error high: Overfitting (too many epochs)
@@ -682,7 +682,7 @@ features: ["Height", "Weight", "Age"]
 />
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag to rotate: In 3D, we separate with a plane instead of a line</p>
-The awesome part? The math stays exactly the same! Just add another weight:
+The math stays exactly the same. Just add another weight:
 
 ```python
 # 2D version
@@ -697,7 +697,7 @@ The awesome part? The math stays exactly the same! Just add another weight:
 
 ## The Universal Perceptron: Any Number of Dimensions
 
-Here's where you'll see its elegance. That same simple update rule works whether you have 2 features or 2,000:
+That same simple update rule works whether you have 2 features or 2,000:
 
 ```python
 def train_perceptron_any_dimension(data_points, labels, learning_rate=1.0):
@@ -907,13 +907,13 @@ But for a simple algorithm from 1958, a mathematical guarantee of convergence is
 
 # Modern Perceptron Variations
 
-Now we're almost done with perceptrons! Just a few little details remain. No deep-dive on perceptron can wrap up without giving a practical insight on its usage (no matter its usage numbers hah!). 
+Let's look at some practical improvements to the basic perceptron that address its limitations. 
 
-The vanilla perceptron we've been working with has a dirty secret: it's biased toward recent examples. This makes it vulnerable to a particularly annoying failure mode that I'll show you in a second. Fortunately, there are two clever fixes: one beautiful but impractical (voted perceptron), and one slightly less beautiful but actually usable (averaged perceptron).
+The vanilla perceptron we've been working with has a weakness: it's biased toward recent examples. This makes it vulnerable to a failure mode worth understanding. Fortunately, there are two clever fixes: one beautiful but impractical (voted perceptron), and one slightly less beautiful but actually usable (averaged perceptron).
 
 ## The Late-Update Problem
 
-The vanilla perceptron has a dirty secret: it's biased toward recent examples. If your perceptron correctly classifies 9,999 examples, then misclassifies the 10,000th (maybe it's noisy or mislabeled), that single update overwrites weights that were 99.99% accurate.
+The vanilla perceptron is biased toward recent examples. If your perceptron correctly classifies 9,999 examples, then misclassifies the 10,000th (maybe it's noisy or mislabeled), that single update overwrites weights that were 99.99% accurate.
 
 ```python
 # The tragedy in code
@@ -943,11 +943,10 @@ def voted_perceptron_predict(x, weight_history):
     return sign(total_vote)  # Majority wins
 ```
 
-Please review the Perceptron Variant Comparison animation later
 
 <Caption>Each historical weight vector votes, weighted by how long it survived</Caption>
 
-The best part: there's solid theory proving the voted perceptron generalizes better than vanilla. The tragic part: it's completely impractical.
+There's solid theory proving the voted perceptron generalizes better than vanilla. But it's completely impractical.
 
 If your perceptron makes 1,000 updates during training, you need to store 1,000 weight vectors. Prediction becomes 1,000× slower because you need to compute 1,000 dot products instead of one. For high-dimensional data, this quickly becomes absurd. Imagine storing 1,000 copies of a million-dimensional weight vector.
 
@@ -1014,7 +1013,7 @@ The math here is subtle but clever. By keeping track of when each weight was add
 
 ## Empirical Comparison
 
-Let me show you how these three variants typically perform:
+Here's how these three variants typically perform:
 
 <PerceptronVariantComparison
 config={{
@@ -1075,7 +1074,7 @@ This isn't some contrived mathematical curiosity. Language is full of modifiers 
 
 In 1969, Marvin Minsky and Seymour Papert published a book called "Perceptrons" that proved mathematically what we just saw visually: perceptrons cannot learn XOR. The proof was elegant, devastating, and completely correct.
 
-The impact was nuclear. Funding dried up. Researchers abandoned neural networks. The field entered what we now call the "First AI Winter", a decade where mentioning perceptrons at a conference seemed like a career suicide.
+The impact was nuclear. Funding dried up. Researchers abandoned neural networks. The field entered what we now call the "First AI Winter", a decade where mentioning perceptrons at a conference seemed like career suicide.
 
 The tragedy? The solution was staring them in the face: more perceptrons.
 
@@ -1093,7 +1092,7 @@ def xor_solved(x1, x2):
     return sign(hidden1 - hidden2)    # XOR logic!
 ```
 
-Interestingly, Minsky/Papert acknowledged this, but dismissed it thinking it would be computationally intractible.
+Interestingly, Minsky/Papert acknowledged this, but dismissed it thinking it would be computationally intractable.
 
 <MultiLayerXOR
 config={{
@@ -1118,7 +1117,7 @@ After thousands of words, the perceptron boils down to four steps:
 
 A weighted sum and a threshold. You could teach it to a middle schooler in five minutes.
 
-Yet this embarrassingly simple operation is the atomic unit of artificial intelligence. Every large language model, every image generator, every game-playing AI: they're all vast networks of this same basic operation. GPT-5 isn't doing anything fundamentally different from Rosenblatt's 1958 machine. It's doing it a trillion times in parallel with better organization, but the core remains unchanged.
+Yet this simple operation is the atomic unit of artificial intelligence. Every large language model, every image generator, every game-playing AI: they're all vast networks of this same basic operation. GPT-5 isn't doing anything fundamentally different from Rosenblatt's 1958 machine. It's doing it a trillion times in parallel with better organization, but the core remains unchanged.
 
 The perceptron reveals something profound about intelligence: maybe it's not about complex reasoning units but simple units, properly connected, at massive scale. A single perceptron can only cut space with a straight line. Compose enough straight cuts and you can carve any shape. One brick can't build a house, but millions can build a cathedral.
 
