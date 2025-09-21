@@ -337,6 +337,15 @@ Remember our basic flow: inputs → weighted sum → ??? → output.
 
 That ??? is the activation function, and it determines how our artificial neuron responds to its inputs.
 
+Think of activation functions like different types of judges. Here are the common ones:
+
+1. Sign function: The harsh binary judge: you're either guilty or innocent, no middle ground  
+2. Sigmoid: The probability judge: "I'm 73% sure you're guilty"  
+3. ReLU: The optimist: only cares about positive evidence  
+4. Tanh: The balanced judge: considers both positive and negative equally  
+
+Activation functions are a rabbit hole we could spend hours exploring (and we will, in a future post).
+
 <ActivationFunctionGallery
 config={{
 functions: [
@@ -354,14 +363,7 @@ highlightCurrent: "Sign"
 
 <p className="text-sm text-gray-600 text-center mt-2 italic">Different activation functions give neurons different "personalities": decisive, probabilistic, or selective</p>
 
-Think of activation functions like different types of judges:
-
-1. Sign function: The harsh binary judge: you're either guilty or innocent, no middle ground  
-2. Sigmoid: The probability judge: "I'm 73% sure you're guilty"  
-3. ReLU: The optimist: only cares about positive evidence  
-4. Tanh: The balanced judge: considers both positive and negative equally  
-
-Activation functions are a rabbit hole we could spend hours exploring (and we will, in a future post). But for the original perceptron, we're using the simplest one: the sign function.
+But for the original perceptron, we're using the simplest one: the sign function.
 
 ```python
 def sign(x):
