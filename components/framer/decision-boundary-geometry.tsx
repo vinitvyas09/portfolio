@@ -127,7 +127,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
     }
 
     return {
-      weightVector: { x: w1 * 4, y: w2 * 4 }, // Scale for visibility
+      weightVector: { x: w1 * 6, y: w2 * 6 }, // Scale for visibility - increased for zoomed out view
       boundaryNormal,
       dataPoints: points
     };
@@ -216,7 +216,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
   const svgHeight = 400;
   const centerX = svgWidth / 2;
   const centerY = svgHeight / 2;
-  const scale = 30; // Scale factor for coordinates
+  const scale = 20; // Scale factor for coordinates - reduced for better mobile view
 
   return (
     <div style={{
@@ -403,7 +403,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
               fontSize="12"
               fontWeight="600"
             >
-              w = [{(weightVector.x / 4).toFixed(1)}, {(weightVector.y / 4).toFixed(1)}]
+              w = [{(weightVector.x / 6).toFixed(1)}, {(weightVector.y / 6).toFixed(1)}]
             </text>
           </g>
         )}
