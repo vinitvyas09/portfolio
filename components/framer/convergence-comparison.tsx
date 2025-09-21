@@ -266,6 +266,7 @@ const PerceptronVisualization: React.FC<PerceptronVisualizationProps> = ({
     <div style={{
       display: 'flex',
       flexDirection: 'column',
+      alignItems: 'center',
       gap: '0.5rem',
       flex: 1
     }}>
@@ -409,6 +410,7 @@ const ConvergenceComparison: React.FC<{ config?: unknown }> = () => {
         display: 'flex',
         gap: '2rem',
         justifyContent: 'center',
+        alignItems: 'center',
         flexWrap: 'wrap'
       }}>
         <PerceptronVisualization
