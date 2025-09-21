@@ -113,8 +113,8 @@ Now that we have gotten a high level intuition for what a perceptron is, let's n
 
 Imagine you're a veterinarian with a very specific (and slightly ridiculous) diagnostic tool. You've discovered that you can tell cats from dogs using just two measurements:
 
-Body weight in kg (x-axis)
-Vocalization frequency in Hz (y-axis)
+- Body weight in kg (x-axis)
+- Vocalization frequency in Hz (y-axis)
 
 Dogs tend to be heavier (10-40 kg typically) and bark at lower frequencies (100-500 Hz). Cats are lighter (3-7 kg usually) and meow at much higher frequencies (700-1500 Hz). Plot a bunch of examples, and something very interesting happens:
 
@@ -167,9 +167,9 @@ You might be thinking: "I can literally see where to draw that line. Why do we n
 <p className="text-sm text-gray-600 text-center mt-2 italic">Scan a single 2D slice on the left, then watch how the perceptron collapses everything onto w · x + b and reveals the per-feature contributions at the bottom — good luck "eyeballing" that in 50,000 dimensions.</p>
 Real-world data doesn't come in neat 2D packages. When you're classifying:
 
-Emails as spam/not spam: Hundreds of word frequencies as dimensions
-Images of handwritten digits: Each pixel is a dimension (784 for a 28×28 image)
-Medical diagnoses: Dozens of test results, symptoms, and patient history
+- **Emails as spam/not spam:** Hundreds of word frequencies as dimensions
+- **Images of handwritten digits:** Each pixel is a dimension (784 for a 28×28 image)
+- **Medical diagnoses:** Dozens of test results, symptoms, and patient history
 
 Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care—the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
 
@@ -201,9 +201,9 @@ Ax + By + C = 0
 
 Where A, B, and C are just numbers that define the line's position and angle. For example:
 
-2x + 3y - 6 = 0 might be our cat/dog separator
-Points where 2x + 3y - 6 = 0 are exactly on the line
-But what about points that are NOT on the line?
+- `2x + 3y - 6 = 0` might be our cat/dog separator
+- Points where `2x + 3y - 6 = 0` are exactly on the line
+- But what about points that are NOT on the line?
 
 Here's the interesting part: if you plug any point's coordinates into that equation, the result tells you everything:
 
@@ -224,9 +224,9 @@ showDistanceFormula: false
 <p className="text-sm text-gray-600 text-center mt-2 italic">Drag points around to see how the equation's value changes. Notice the pattern?</p>
 The trick is stupidly simple:
 
-Ax + By + C > 0: Point is on one side (let's say "dogs")
-Ax + By + C = 0: Point is exactly on the line (confused veterinarian)
-Ax + By + C < 0: Point is on the other side ("cats")
+- `Ax + By + C > 0`: Point is on one side (let's say "dogs")
+- `Ax + By + C = 0`: Point is exactly on the line (confused veterinarian)
+- `Ax + By + C < 0`: Point is on the other side ("cats")
 
 Let me show you why this works with a concrete example:
 
@@ -247,9 +247,9 @@ highlightPattern: true
 
 See the pattern? We have three points with the same x-coordinate (0) but different y-coordinates:
 
-Point at (0, 2): Plugging in gives 2(0) + 3(2) - 6 = 0 → On the line
-Point at (0, 3): Plugging in gives 2(0) + 3(3) - 6 = 3 → Positive, above the line
-Point at (0, 1): Plugging in gives 2(0) + 3(1) - 6 = -3 → Negative, below the line
+- **Point at (0, 2):** Plugging in gives `2(0) + 3(2) - 6 = 0` → On the line
+- **Point at (0, 3):** Plugging in gives `2(0) + 3(3) - 6 = 3` → Positive, above the line
+- **Point at (0, 1):** Plugging in gives `2(0) + 3(1) - 6 = -3` → Negative, below the line
 
 The y-coordinate increased from 1 to 3, and our equation's result went from negative to positive. That's not a coincidence: it's exactly how the math works!
 
@@ -257,13 +257,12 @@ The y-coordinate increased from 1 to 3, and our equation's result went from nega
 
 So our perceptron's job boils down to this embarrassingly simple task:
 
-Take a point (x, y)
-Calculate Ax + By + C
-Check the sign:
-
-Positive? → Class 1 (dog)
-Negative? → Class 0 (cat)
-Zero? → Uh... flip a coin? (In practice, we usually pick one side)
+1. Take a point (x, y)
+2. Calculate `Ax + By + C`
+3. Check the sign:
+   - Positive? → Class 1 (dog)
+   - Negative? → Class 0 (cat)
+   - Zero? → Uh... flip a coin? (In practice, we usually pick one side)
 
 In math notation, we write this as:
 prediction = sign(Ax + By + C)
@@ -301,9 +300,9 @@ def classify(x, y, A, B, C):
 
 Look at that! They're the same thing!
 
-Our inputs are [x, y] (the coordinates)
-Our weights are [A, B] (the line's coefficients)
-Our bias is C (the constant term)
+- Our inputs are `[x, y]` (the coordinates)
+- Our weights are `[A, B]` (the line's coefficients)
+- Our bias is `C` (the constant term)
 
 The perceptron isn't doing something magical. It's just finding the right values for A, B, and C (the right line) to separate our data. The "learning" is just adjusting these numbers until the line is in the right place.
 
@@ -410,11 +409,11 @@ These numbers (A, B, and C) are our parameters (also called weights and bias). T
 
 Training a perceptron is beautifully dumb. Here's the entire algorithm:
 
-Start with a random line
-Show it a data point
-If it gets it right: do nothing (good job, line!)
-If it gets it wrong: nudge the line toward the correct answer
-Repeat until the line stops being wrong
+1. Start with a random line
+2. Show it a data point
+3. If it gets it right: do nothing (good job, line!)
+4. If it gets it wrong: nudge the line toward the correct answer
+5. Repeat until the line stops being wrong
 
 That's it. No calculus, no complex optimization, just: "Wrong? Move a bit. Wrong again? Move a bit more."
 
@@ -437,9 +436,9 @@ But wait—how exactly do we "nudge" the line? This is where it gets clever.
 
 Let's make this concrete. Say our random line encounters this situation:
 
-Point: (x=2, y=3) - a quiet cat
-True label: -1 (it's a cat)
-Our prediction: sign(0.73(2) - 0.41(3) + 0.22) = sign(0.45) = 1 (we said dog!)
+- **Point:** (x=2, y=3) - a quiet cat
+- **True label:** -1 (it's a cat)
+- **Our prediction:** `sign(0.73(2) - 0.41(3) + 0.22) = sign(0.45) = 1` (we said dog!)
 
 We're wrong. The point is actually a cat (-1) but we predicted dog (1). How do we fix this?
 
