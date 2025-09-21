@@ -174,8 +174,6 @@ Real-world data doesn't come in neat 2D packages. When you're classifying:
 - **Images of handwritten digits:** Each pixel is a dimension (784 for a 28×28 image)
 - **Medical diagnoses:** Dozens of test results, symptoms, and patient history
 
-Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care: the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
-
 <InfoBox type="insight" title="The Hyperplane Pattern" visual="hyperplane">
 
 **Here's a mind-bending insight:** In our 2D example, we separate data with a 1D line. In 3D, we'd use a 2D plane. In 4D, a 3D hyperplane. The pattern?
@@ -185,6 +183,8 @@ To separate data in n dimensions, you need an (n-1) dimensional hyperplane.
 It's like how a piece of paper (2D) can divide a room (3D) into two halves, or how a line (1D) divides a paper (2D). The perceptron is just finding the right orientation for that dividing surface, regardless of how many dimensions we're working in.
 
 </InfoBox>
+
+Suddenly you're not looking for a line in 2D space. You're looking for a hyperplane in n-dimensional space, where n could be thousands. And that's where our human intuition completely falls apart, but math doesn't care: the perceptron works exactly the same way whether it's 2 dimensions or 2,000.
 
 <InfoBox type="warning" title="The Perceptron's Kryptonite">
 
