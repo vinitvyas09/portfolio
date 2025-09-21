@@ -135,6 +135,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
   const [isTraining, setIsTraining] = useState(false);
   const [trainingStep, setTrainingStep] = useState(0);
   const [dataGeneration, setDataGeneration] = useState(0);
+  const [hasTrainedForCurrentData, setHasTrainedForCurrentData] = useState(false);
 
   // Ref to store timeout IDs for cleanup
   const trainingTimeoutsRef = React.useRef<NodeJS.Timeout[]>([]);
@@ -257,6 +258,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     setIsTraining(false);
     setVisiblePoints(0);
     setCurrentTrainingPoint(-1);
+    setHasTrainedForCurrentData(false);  // Reset training flag for new data
     // Don't reset lastLineRef here - keep it as fallback
   }, []);
 
@@ -455,6 +457,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       trainingTimeoutsRef.current.forEach(clearTimeout);
       trainingTimeoutsRef.current = [];
       setIsTraining(false);
+      setHasTrainedForCurrentData(true);  // Mark that we've completed training for this data
       // Don't change weights at all - just change the color by setting isTraining to false
       setCurrentTrainingPoint(-1);
     };
@@ -663,12 +666,12 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
   // Initialize or update random weights when data changes
   useEffect(() => {
-    if (dataPoints.length > 0 && !isTraining) {
-      // Generate new random initial weights whenever we get new data
+    if (dataPoints.length > 0 && !isTraining && !hasTrainedForCurrentData) {
+      // Generate new random initial weights only for new untrained data
       const newRandomWeights = getRandomInitialWeights();
       setCurrentWeights(newRandomWeights);
     }
-  }, [dataPoints, isTraining, getRandomInitialWeights]);
+  }, [dataPoints, isTraining, hasTrainedForCurrentData, getRandomInitialWeights]);
 
   // Placeholder to avoid SSR/CSR theme mismatch flash
   if (!mounted) {
