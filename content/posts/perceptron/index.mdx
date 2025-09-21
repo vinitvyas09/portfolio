@@ -807,7 +807,7 @@ If you have a weight vector [2, 1], it's pointing up and to the right. That mean
 2. Points in the opposite direction → negative activation → classified negative
 3. Points perpendicular to the weights → zero activation → on the boundary
 
-This is why the dot product w·x gives us the activation. Dot products measure alignment. When your input x points in the same direction as w, you get a positive dot product. When they point in opposite directions, negative. When perpendicular, zero.
+This is why the dot product `w·x` gives us the activation. Dot products measure alignment. When your input x points in the same direction as w, you get a positive dot product. When they point in opposite directions, negative. When perpendicular, zero.
 
 ## The Convergence Theorem: Will It Ever Stop Learning?
 
@@ -1016,8 +1016,8 @@ The averaged perceptron takes the voting idea and makes one crucial simplificati
 The prediction rule changes in this way:
 
 ```python
-voted:    sign(Σ survival_count × sign(w·x))
-averaged: sign((Σ survival_count × w) · x)
+voted:    `sign(Σ survival_count × sign(w·x))`
+averaged: `sign((Σ survival_count × w) · x)`
 ```
 
 That movement of the sign function outside makes all the difference. Now we can pre-compute the averaged weight vector:
