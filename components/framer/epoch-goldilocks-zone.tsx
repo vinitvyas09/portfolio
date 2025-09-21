@@ -540,37 +540,39 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
         </div>
       </div>
 
-      {/* Progress indicator */}
-      {isRunning && (
+      {/* Progress indicator - Always visible for consistent height */}
+      <div style={{
+        marginBottom: '0.5rem',
+        padding: '0.4rem',
+        background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
+        borderRadius: '6px',
+        textAlign: 'center',
+        minHeight: '52px', // Fixed height to prevent layout shift
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
+      }}>
         <div style={{
-          marginBottom: '0.5rem',
-          padding: '0.4rem',
-          background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)',
-          borderRadius: '6px',
-          textAlign: 'center'
+          fontSize: '12px',
+          color: colors.textSecondary
+        }}>
+          {isRunning ? `Training Epoch: ${currentEpoch} / 100` : 'Click "Run Training" to start'}
+        </div>
+        <div style={{
+          marginTop: '0.5rem',
+          height: '4px',
+          background: colors.grid,
+          borderRadius: '2px',
+          overflow: 'hidden'
         }}>
           <div style={{
-            fontSize: '12px',
-            color: colors.textSecondary
-          }}>
-            Training Epoch: {currentEpoch} / 100
-          </div>
-          <div style={{
-            marginTop: '0.5rem',
-            height: '4px',
-            background: colors.grid,
-            borderRadius: '2px',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              width: `${(currentEpoch / 100) * 100}%`,
-              height: '100%',
-              background: colors.optimalColor,
-              transition: 'width 0.1s ease'
-            }} />
-          </div>
+            width: isRunning ? `${(currentEpoch / 100) * 100}%` : '0%',
+            height: '100%',
+            background: colors.optimalColor,
+            transition: 'width 0.1s ease'
+          }} />
         </div>
-      )}
+      </div>
 
       {/* Control button */}
       <div style={{
