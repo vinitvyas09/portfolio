@@ -1014,11 +1014,20 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
 
         <div
           style={{
-            display: "grid",
-            gap: "0.75rem",
-            flexGrow: 1
+            display: "flex",
+            justifyContent: "center",
+            flexGrow: 1,
+            paddingLeft: isMobile ? "0" : "0px"
           }}
         >
+          <div
+            style={{
+              display: "grid",
+              gap: "0.75rem",
+              width: "auto",
+              marginLeft: isMobile ? "0" : "-85px"
+            }}
+          >
           {contributionRows.map(row => {
             const magnitude = Math.abs(row.value);
             const ratio = Math.min(magnitude / maxAbsContribution, 1);
@@ -1032,7 +1041,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent: "flex-start",
                   gap: isMobile ? "0.5rem" : "0.75rem",
                   fontSize: isMobile ? "0.75rem" : "0.8rem",
                   color: colors.textSecondary,
@@ -1108,6 +1117,7 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
               </div>
             );
           })}
+          </div>
         </div>
 
         <p
