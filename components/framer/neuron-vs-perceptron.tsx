@@ -579,10 +579,12 @@ const NeuronVsPerceptron: React.FC<NeuronVsPerceptronProps> = ({
 
         {/* Animated pulse */}
         <motion.circle
+          cx={60}
+          cy={95}
           r={3}
           fill={colors.perceptronPrimary}
           filter="url(#perceptron-glow)"
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 0, cx: 60, cy: 95 }}
           animate={{
             opacity: [0, 1, 1, 1, 0],
             cx: [60, 110, 160, 245, 320],
