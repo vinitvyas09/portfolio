@@ -929,18 +929,15 @@ That's it! The number of updates is bounded. After at most ||x||²ₘₐₓ/γ²
 
 The bound tells us three things:
 
-1. Convergence is guaranteed (for linearly separable data)
-
-2. Larger margins → faster convergence (γ in the denominator)
-
-3. Longer input vectors → slower convergence (||x||² in the numerator)
+1. **Convergence is guaranteed** (for linearly separable data)
+2. **Larger margins → faster convergence** (γ in the denominator)
+3. **Longer input vectors → slower convergence** (||x||² in the numerator)
 
 But here's what it doesn't tell us:
 
-Which separator we'll find. The data might be separable with margin 0.9, but the perceptron might find a boundary with margin 0.00001. It just needs to find some separator.
-
-How to check if data is linearly separable. If it's not, the perceptron will run forever. There's no general efficient algorithm to check separability beforehand.
-The exact number of iterations. The bound is often pessimistic as real convergence is usually much faster.
+- **Which separator we'll find.** The data might be separable with margin 0.9, but the perceptron might find a boundary with margin 0.00001. It just needs to find some separator.
+- **How to check if data is linearly separable.** If it's not, the perceptron will run forever. There's no general efficient algorithm to check separability beforehand.
+- **The exact number of iterations.** The bound is often pessimistic as real convergence is usually much faster.
 
 <ConvergenceBoundVisual
 config={{
