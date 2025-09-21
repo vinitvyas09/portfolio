@@ -339,10 +339,10 @@ That ??? is the activation function, and it determines how our artificial neuron
 
 Think of activation functions like different types of judges. Here are the common ones:
 
-1. Sign function: The harsh binary judge: you're either guilty or innocent, no middle ground  
-2. Sigmoid: The probability judge: "I'm 73% sure you're guilty"  
-3. ReLU: The optimist: only cares about positive evidence  
-4. Tanh: The balanced judge: considers both positive and negative equally  
+1. **Sign function**: The harsh binary judge: you're either guilty or innocent, no middle ground  
+2. **Sigmoid**: The probability judge: "I'm 73% sure you're guilty"  
+3. **ReLU**: The optimist: only cares about positive evidence  
+4. **Tanh**: The balanced judge: considers both positive and negative equally  
 
 Activation functions are a rabbit hole we could spend hours exploring (and we will, in a future post).
 
@@ -412,7 +412,7 @@ Training a perceptron is beautifully dumb. Here's the entire algorithm:
 
 That's it. No calculus, no complex optimization, just: "Wrong? Move a bit. Wrong again? Move a bit more."
 
-Let's try this again with the animation from earlier, but this time, let's focus on how the line is updated:
+Let's try this again with the animation from earlier, but this time, let's also train it!
 
 <PerceptronTrainingLoop
 config={{
