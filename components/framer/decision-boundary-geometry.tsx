@@ -41,6 +41,17 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
   const [angle, setAngle] = useState(45); // Initial angle in degrees
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Colors
   const colors = useMemo(() => {
@@ -109,9 +120,11 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
     const points = [];
     const numPoints = 20;
 
+    // Increase spread significantly to push points further from origin
+    const spread = isMobile ? 15 : 10;
+
     for (let i = 0; i < numPoints; i++) {
       // Generate points in a pattern
-      const spread = 3;
       const offsetAngle = (i / numPoints) * Math.PI * 2;
       const distance = 1 + (i % 3) * 0.5;
 
@@ -126,12 +139,15 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
       points.push({ x, y, label });
     }
 
+    // Adjust weight vector length based on viewport
+    const vectorScale = isMobile ? 6 : 10;
+
     return {
-      weightVector: { x: w1 * 15, y: w2 * 15 }, // Scale for visibility - greatly increased for zoomed out mobile view
+      weightVector: { x: w1 * vectorScale, y: w2 * vectorScale },
       boundaryNormal,
       dataPoints: points
     };
-  }, [angle]);
+  }, [angle, isMobile]);
 
   // Mouse handlers for rotation
   const handleMouseDown = useCallback((e: React.MouseEvent<SVGElement>) => {
@@ -216,7 +232,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
   const svgHeight = 400;
   const centerX = svgWidth / 2;
   const centerY = svgHeight / 2;
-  const scale = 8; // Scale factor for coordinates - greatly reduced for mobile zoom out (2.5x zoom out)
+  const scale = isMobile ? 2.5 : 5; // Smaller scale for more zoom out
 
   return (
     <div style={{
@@ -232,11 +248,12 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
         : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
     }}>
       <svg
-        width={svgWidth}
-        height={svgHeight}
+        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+        preserveAspectRatio="xMidYMid meet"
         style={{
           width: '100%',
           height: 'auto',
+          maxHeight: '400px',
           cursor: allowRotation ? (isDragging ? 'grabbing' : 'grab') : 'default',
           userSelect: 'none'
         }}
@@ -280,7 +297,10 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
 
         {/* Grid */}
         <g opacity="0.3">
-          {[-12, -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12].map(i => (
+          {(isMobile ?
+            [-40, -35, -30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40] :
+            [-20, -16, -12, -8, -4, 0, 4, 8, 12, 16, 20]
+          ).map(i => (
             <g key={`grid-${i}`}>
               <line
                 x1={0}
@@ -403,7 +423,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
               fontSize="12"
               fontWeight="600"
             >
-              w = [{(weightVector.x / 15).toFixed(1)}, {(weightVector.y / 15).toFixed(1)}]
+              w = [{(weightVector.x / (isMobile ? 6 : 10)).toFixed(1)}, {(weightVector.y / (isMobile ? 6 : 10)).toFixed(1)}]
             </text>
           </g>
         )}
