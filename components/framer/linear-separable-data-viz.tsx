@@ -448,7 +448,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     let epoch = 0;
     let converged = false;
     let pointIndex = 0;
-    let lastEpochError = -1;
 
     const shuffledPoints = [...dataPoints].sort(() => Math.random() - 0.5);
 
@@ -479,12 +478,11 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         pointIndex = 0;
         epoch++;
 
-        if (lastEpochError === 0) {
-          converged = true;
-          // Don't pass weights - they're already set correctly
-          finalizeTraining();
-          return;
-        }
+        // Ensure display is synced at epoch boundary
+        setCurrentWeights({ ...weights });
+
+        // Convergence is now checked at the end of each epoch
+        // No need to check lastEpochError here
 
         shuffledPoints.sort(() => Math.random() - 0.5);
         setTrainingStep(epoch);
@@ -510,7 +508,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         weights.b += learningRate * trueLabel * point.y;
         weights.c += learningRate * trueLabel;
 
-        // Update display weights when they change
+        // Update display when weights change
         setCurrentWeights({ ...weights });
       }
 
@@ -524,11 +522,13 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         }
 
         setTrainingHistory(prev => [...prev, { ...weights, error: epochErrors }]);
-        lastEpochError = epochErrors;
 
         if (epochErrors === 0) {
-          converged = true;
-          // Weights are already set correctly from the last update
+          // We've converged! Sync weights and stop immediately
+          setCurrentWeights({ ...weights });
+          // Call finalize immediately instead of waiting for next iteration
+          setTimeout(() => finalizeTraining(), 100);
+          return;  // Stop processing
         }
       }
 
