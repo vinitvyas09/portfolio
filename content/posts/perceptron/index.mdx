@@ -377,20 +377,6 @@ Dead simple. No probabilities, no gradients, just a hard decision. This binary n
 
 Here's where the magic happens. We don't start with the perfect line that separates cats from dogs. We start with absolute chaos: a random line that's probably wrong about everything.
 
-{/*
-<RandomLineInitialization
-config={{
-dataset: "cats_vs_dogs",
-showMisclassifications: true,
-animateRandomLines: true,
-numberOfAttempts: 3,
-displayAccuracy: true
-}}
-/>
-*/}
-
-<p className="text-sm text-gray-600 text-center mt-2 italic">Random initialization: Your perceptron starts life as a terrible classifier</p>
-
 Our line equation `Ax + By + C = 0` needs values for A, B, and C. Since we have no idea what they should be, we just... make them up:
 
 ```python
