@@ -72,7 +72,7 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
   }, [isDark, mounted]);
 
   // Generate convergence data based on margin
-  const { theoreticalBound, actualConvergence, maxIterations } = useMemo(() => {
+  const { theoreticalBound, actualConvergence, maxIterations, actualConvergencePoint } = useMemo(() => {
     // ||x||²_max assumed to be 10 for normalization
     const xMaxSquared = 10;
     const gammaSquared = margin * margin;
@@ -80,31 +80,36 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
     // Theoretical bound: k ≤ ||x||²_max / γ²
     const theoreticalMax = xMaxSquared / gammaSquared;
 
-    // Generate actual convergence data (usually much faster)
+    // Find actual convergence point first to determine data generation range
     // Actual convergence follows an exponential decay pattern
-    const actualData: number[] = [];
-    const iterations = Math.min(Math.ceil(theoreticalMax), 200); // Cap for visualization
+    let convergencePoint = 0;
+    const maxDataPoints = 200;
 
-    for (let i = 0; i <= iterations; i++) {
-      // Actual errors decay exponentially and converge much faster
-      const actualError = 100 * Math.exp(-i * margin * 0.3); // Faster with larger margin
-      actualData.push(actualError);
-    }
-
-    // Find actual convergence point (where error < 1%)
-    let actualConvergencePoint = iterations;
-    for (let i = 0; i < actualData.length; i++) {
-      if (actualData[i] < 1) {
-        actualConvergencePoint = i;
+    // Find convergence point
+    for (let i = 0; i <= maxDataPoints; i++) {
+      const actualError = 100 * Math.exp(-i * margin * 0.3);
+      if (actualError < 1) {
+        convergencePoint = i;
         break;
       }
+    }
+
+    // Determine the x-axis range to show both theoretical bound and convergence clearly
+    // Always show at least a bit more than the theoretical bound
+    const displayIterations = Math.min(200, Math.ceil(theoreticalMax * 1.2));
+
+    // Generate actual convergence data up to display range
+    const actualData: number[] = [];
+    for (let i = 0; i <= displayIterations; i++) {
+      const actualError = 100 * Math.exp(-i * margin * 0.3);
+      actualData.push(actualError);
     }
 
     return {
       theoreticalBound: Math.min(theoreticalMax, 200),
       actualConvergence: actualData,
-      maxIterations: iterations,
-      actualConvergencePoint
+      maxIterations: displayIterations,
+      actualConvergencePoint: convergencePoint
     };
   }, [margin]);
 
@@ -337,35 +342,28 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
           )}
 
           {/* Actual convergence point */}
-          {config.showActualConvergence && (() => {
-            const convergenceIndex = actualConvergence.findIndex(e => e < 1);
-            // Only show if convergence actually happened within our visualization range
-            if (convergenceIndex >= 0 && convergenceIndex <= maxIterations) {
-              return (
-                <>
-                  <circle
-                    cx={xScale(convergenceIndex)}
-                    cy={yScale(1)}
-                    r="5"
-                    fill={colors.convergencePoint}
-                    stroke={colors.bg}
-                    strokeWidth="2"
-                  />
-                  <text
-                    x={xScale(convergenceIndex)}
-                    y={yScale(1) - 10}
-                    textAnchor="middle"
-                    fontSize="10"
-                    fontWeight="600"
-                    fill={colors.convergencePoint}
-                  >
-                    Converged!
-                  </text>
-                </>
-              );
-            }
-            return null;
-          })()}
+          {config.showActualConvergence && actualConvergencePoint > 0 && actualConvergencePoint <= maxIterations && (
+            <>
+              <circle
+                cx={xScale(actualConvergencePoint)}
+                cy={yScale(1)}
+                r="5"
+                fill={colors.convergencePoint}
+                stroke={colors.bg}
+                strokeWidth="2"
+              />
+              <text
+                x={xScale(actualConvergencePoint)}
+                y={yScale(1) - 10}
+                textAnchor="middle"
+                fontSize="10"
+                fontWeight="600"
+                fill={colors.convergencePoint}
+              >
+                Converged!
+              </text>
+            </>
+          )}
 
           {/* Interactive hover */}
           {config.interactive && hoveredIteration !== null && (
@@ -519,13 +517,7 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
         }}>
           <strong>💡 Key insight:</strong> The theoretical bound guarantees convergence in at most {Math.round(theoreticalBound)} iterations
           for margin γ = {margin.toFixed(2)}, but actual convergence happens much faster
-          {(() => {
-            const convergenceIndex = actualConvergence.findIndex(e => e < 1);
-            if (convergenceIndex >= 0) {
-              return ` (around ${convergenceIndex} iterations)`;
-            }
-            return '';
-          })()}.
+          {actualConvergencePoint < maxIterations ? ` (around ${actualConvergencePoint} iterations)` : ''}.
           Larger margins lead to dramatically faster convergence—notice how both bounds shrink as γ increases.
         </div>
       </div>
