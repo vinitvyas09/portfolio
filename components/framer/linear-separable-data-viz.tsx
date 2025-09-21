@@ -1328,7 +1328,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
                   color: colors.textSecondary,
                   lineHeight: '1.5'
                 }}>
-                  Click "Train Perceptron" to find the optimal<br />
+                  Click &quot;Train Perceptron&quot; to find the optimal<br />
                   decision boundary for this dataset
                 </div>
               </>
