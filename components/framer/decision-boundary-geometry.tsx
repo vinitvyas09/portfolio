@@ -40,7 +40,6 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
   // State for interactive rotation
   const [angle, setAngle] = useState(45); // Initial angle in degrees
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile viewport
