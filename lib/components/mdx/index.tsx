@@ -101,7 +101,7 @@ export const mdxComponents = {
   blockquote: (props: any) => (
     <blockquote {...props} className="border-l-4 border-muted-foreground/20 pl-6 italic my-8 text-muted-foreground" />
   ),
-  hr: (props: any) => <hr {...props} className="my-12 border-border" />,
+  hr: (props: any) => <hr {...props} className="my-12 border-t border-gray-200 dark:border-gray-800" />,
   a: (props: any) => (
     <a {...props} className="text-foreground underline underline-offset-4 hover:opacity-80 transition-opacity" />
   ),
@@ -116,9 +116,9 @@ export const mdxComponents = {
       <table {...props} className="w-full border-collapse" />
     </div>
   ),
-  thead: (props: any) => <thead {...props} className="border-b-2 border-border" />,
+  thead: (props: any) => <thead {...props} className="border-b-2 border-gray-200 dark:border-gray-800" />,
   tbody: (props: any) => <tbody {...props} />,
-  tr: (props: any) => <tr {...props} className="border-b border-border" />,
+  tr: (props: any) => <tr {...props} className="border-b border-gray-200 dark:border-gray-800" />,
   th: (props: any) => <th {...props} className="text-left p-3 font-medium" />,
   td: (props: any) => <td {...props} className="p-3" />,
 }
