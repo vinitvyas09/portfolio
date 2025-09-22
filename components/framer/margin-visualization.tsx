@@ -168,8 +168,6 @@ const MarginVisualization: React.FC<MarginVisualizationProps> = ({
     const toSvgY = (y: number) => padding + ((yMax - y) / (yMax - yMin)) * graphSize;
 
     // Calculate line endpoints
-    const lineY1 = (-boundary.C - boundary.A * xMin) / (boundary.B || 1);
-    const lineY2 = (-boundary.C - boundary.A * xMax) / (boundary.B || 1);
 
     const isHovered = hoveredDataset === index;
 
