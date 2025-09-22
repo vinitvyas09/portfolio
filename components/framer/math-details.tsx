@@ -58,40 +58,40 @@ const MathDetails: React.FC<MathDetailsProps> = ({
         style={{
           background: 'none',
           border: 'none',
-          padding: '0.5rem 0',
+          padding: '0.75rem 0',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
-          fontSize: '14px',
-          fontWeight: '500',
-          color: colors.secondaryText,
+          gap: '0.75rem',
+          fontSize: '16px',
+          fontWeight: '600',
+          color: colors.text,
           fontFamily: 'system-ui, -apple-system, sans-serif',
           textAlign: 'left',
-          transition: 'color 0.2s ease',
-          marginBottom: isOpen ? '0.5rem' : '0'
+          transition: 'all 0.2s ease',
+          marginBottom: isOpen ? '0.5rem' : '0',
+          opacity: 0.9
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.color = colors.text;
+          e.currentTarget.style.opacity = '1';
+          e.currentTarget.style.transform = 'translateX(2px)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.color = colors.secondaryText;
+          e.currentTarget.style.opacity = '0.9';
+          e.currentTarget.style.transform = 'translateX(0)';
         }}
         aria-expanded={isOpen}
         aria-controls="math-details-content"
       >
         <span style={{
-          fontSize: '12px',
+          fontSize: '14px',
           transition: 'transform 0.2s ease',
           transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
           display: 'inline-block'
         }}>
           ▶
         </span>
-        <span style={{
-          borderBottom: `1px dashed ${colors.border}`,
-          paddingBottom: '1px'
-        }}>
+        <span>
           {title}
         </span>
       </button>
