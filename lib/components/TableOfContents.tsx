@@ -276,8 +276,8 @@ export function TableOfContents() {
               "toc-item relative flex-1 py-0.5 px-1.5 -mx-1 rounded-md",
               "leading-snug transition-colors duration-200 ease-out",
               "hover:bg-gradient-to-r hover:from-muted/20 hover:to-transparent",
-              !hasChildren && depth === 0 && "ml-4",
-              !hasChildren && depth > 0 && "ml-0.5",
+              !hasChildren && depth === 0 && "ml-3",
+              !hasChildren && depth > 0 && "ml-0",
               heading.level === 1 && "text-[13px] font-semibold tracking-tight",
               heading.level === 2 && "text-[12px] font-medium",
               heading.level === 3 && "text-[11px]",
@@ -305,20 +305,20 @@ export function TableOfContents() {
         {hasChildren && isExpanded && (
           <ul className={cn(
             "relative mt-0",
-            depth === 0 ? "ml-2.5" : "ml-3"
+            depth === 0 ? "ml-1" : "ml-1.5"
           )}>
             {heading.children!.map((child, index) => (
               <li key={child.id} className="relative">
                 {/* Connector line */}
                 <div className={cn(
-                  "absolute left-[6px] w-[1px] pointer-events-none",
+                  "absolute left-[3px] w-[1px] pointer-events-none",
                   "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
                   index === 0 ? "top-0" : "-top-0.5",
                   index === heading.children!.length - 1 ? "h-3" : "h-full"
                 )} />
                 {/* Horizontal branch */}
-                <div className="absolute left-[6px] top-3 w-2.5 h-[1px] bg-border/30 pointer-events-none" />
-                <div className="pl-4">
+                <div className="absolute left-[3px] top-3 w-1.5 h-[1px] bg-border/30 pointer-events-none" />
+                <div className="pl-2">
                   {renderHeading(child, depth + 1)}
                 </div>
               </li>
