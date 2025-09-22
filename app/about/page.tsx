@@ -7,7 +7,7 @@ export default function AboutPage() {
       <div className="mx-auto max-w-3xl">
         <div className="animate-slideUp">
           <div className="flex justify-center mb-8">
-            <div className="p-4 rounded-full border border-border">
+            <div className="p-4 rounded-full">
               <IconMark className="h-12 w-12 text-foreground/80" />
             </div>
           </div>
@@ -27,7 +27,7 @@ export default function AboutPage() {
                 href="https://github.com/vinitvyas09" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
+                className="p-3 rounded-full text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="GitHub"
               >
                 <SiGithub className="h-5 w-5" size={20} />
@@ -36,7 +36,7 @@ export default function AboutPage() {
                 href="https://x.com/vinitvyas09" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
+                className="p-3 rounded-full text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="Twitter"
               >
                 <SiX className="h-5 w-5" size={20} />
@@ -45,7 +45,7 @@ export default function AboutPage() {
                 href="https://www.linkedin.com/in/vinitvyas" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-3 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
+                className="p-3 rounded-full text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="LinkedIn"
               >
                 <SiLinkedin className="h-5 w-5" size={20} />
