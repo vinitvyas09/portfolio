@@ -228,21 +228,30 @@ export function TableOfContents() {
 
     return (
       <li key={heading.id} className="relative">
-        <div className="flex items-center group">
+        <div className={cn(
+          "relative flex items-center group",
+          "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px]",
+          "before:transition-all before:duration-300 before:ease-out",
+          isActive && "before:bg-gradient-to-b before:from-blue-500/70 before:to-blue-500/30 before:shadow-[0_0_8px_rgba(59,130,246,0.5)]",
+          !isActive && "before:bg-transparent"
+        )}>
           {hasChildren && (
             <button
               onClick={(e) => toggleSection(heading.id, e)}
               className={cn(
-                "p-0.5 mr-0.5 rounded-sm hover:bg-muted/30 transition-all",
-                "text-muted-foreground/60 hover:text-muted-foreground",
-                depth === 0 ? "-ml-0.5" : ""
+                "relative z-10 p-1 mr-1.5 rounded-md",
+                "transition-all duration-200 ease-out",
+                "hover:bg-gradient-to-br hover:from-muted/50 hover:to-muted/30",
+                "text-muted-foreground/60 hover:text-foreground",
+                isActive && "text-blue-500/80",
+                depth === 0 ? "ml-0" : "ml-0.5"
               )}
               aria-label={isExpanded ? "Collapse section" : "Expand section"}
             >
               <ChevronRight
                 className={cn(
-                  "h-2.5 w-2.5 transition-transform duration-200",
-                  isExpanded && "rotate-90"
+                  "h-3 w-3 transition-all duration-300 ease-out",
+                  isExpanded && "rotate-90 scale-110"
                 )}
               />
             </button>
@@ -251,21 +260,30 @@ export function TableOfContents() {
             href={`#${heading.id}`}
             onClick={(e) => scrollToHeading(heading.id, e)}
             className={cn(
-              "toc-item flex-1 py-0.5 leading-snug transition-all duration-200",
-              "hover:text-foreground",
-              !hasChildren && "ml-4",
-              heading.level === 1 && "text-[13px] font-medium",
-              heading.level === 2 && "text-xs",
+              "toc-item relative flex-1 py-1.5 px-2 -mx-1 rounded-md",
+              "leading-snug transition-all duration-200 ease-out",
+              "hover:bg-gradient-to-r hover:from-muted/20 hover:to-transparent",
+              !hasChildren && depth === 0 && "ml-5",
+              !hasChildren && depth > 0 && "ml-1",
+              heading.level === 1 && "text-[13px] font-semibold tracking-tight",
+              heading.level === 2 && "text-[12px] font-medium",
               heading.level === 3 && "text-[11px]",
-              heading.level >= 4 && "text-[11px] opacity-80",
-              isActive ? "text-foreground font-medium" : "text-muted-foreground/70 hover:text-muted-foreground",
-              (isChildActive && !isActive) && "text-muted-foreground/85"
+              heading.level >= 4 && "text-[10px] opacity-90",
+              isActive ? [
+                "text-blue-600 dark:text-blue-400 font-semibold",
+                "bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-transparent",
+                "shadow-[inset_0_1px_0_rgba(59,130,246,0.1)]"
+              ].join(" ") : "text-muted-foreground/80 hover:text-foreground",
+              (isChildActive && !isActive) && "text-muted-foreground"
             )}
           >
-            <span className="relative block">
+            <span className="relative z-10 block">
               {heading.text}
               {isActive && (
-                <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-[2px] h-3.5 bg-foreground rounded-full" />
+                <>
+                  <span className="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
+                  <span className="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-1 bg-blue-500/50 rounded-full animate-ping" />
+                </>
               )}
             </span>
           </a>
@@ -273,10 +291,25 @@ export function TableOfContents() {
 
         {hasChildren && isExpanded && (
           <ul className={cn(
-            "border-l border-border/30",
-            depth === 0 ? "ml-1.5 pl-2" : "ml-3 pl-1.5"
+            "relative mt-0.5",
+            depth === 0 ? "ml-3.5" : "ml-4"
           )}>
-            {heading.children!.map(child => renderHeading(child, depth + 1))}
+            {heading.children!.map((child, index) => (
+              <div key={child.id} className="relative">
+                {/* Connector line */}
+                <div className={cn(
+                  "absolute left-[7px] w-[1px]",
+                  "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
+                  index === 0 ? "top-0" : "-top-0.5",
+                  index === heading.children!.length - 1 ? "h-4" : "h-full"
+                )} />
+                {/* Horizontal branch */}
+                <div className="absolute left-[7px] top-4 w-3 h-[1px] bg-border/30" />
+                <div className="pl-5">
+                  {renderHeading(child, depth + 1)}
+                </div>
+              </div>
+            ))}
           </ul>
         )}
       </li>
@@ -287,15 +320,20 @@ export function TableOfContents() {
 
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
-      <div className="relative">
-        <ul className="pb-4">
+      <div className="relative p-3 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm border border-border/10">
+        {/* Header */}
+        <div className="mb-3 pb-2 border-b border-border/20">
+          <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Contents</h3>
+        </div>
+
+        <ul className="space-y-0.5">
           {headings.map(heading => renderHeading(heading))}
         </ul>
       </div>
 
       <style jsx>{`
         nav::-webkit-scrollbar {
-          width: 3px;
+          width: 4px;
         }
 
         nav::-webkit-scrollbar-track {
@@ -303,12 +341,21 @@ export function TableOfContents() {
         }
 
         nav::-webkit-scrollbar-thumb {
-          background: hsl(var(--border) / 0.5);
-          border-radius: 1.5px;
+          background: linear-gradient(to bottom, hsl(var(--border) / 0.3), hsl(var(--border) / 0.5));
+          border-radius: 2px;
         }
 
         nav::-webkit-scrollbar-thumb:hover {
-          background: hsl(var(--border));
+          background: linear-gradient(to bottom, hsl(var(--border) / 0.5), hsl(var(--border) / 0.7));
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
         }
       `}</style>
     </nav>
