@@ -48,11 +48,16 @@ export function TableOfContents() {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const observerRef = useRef<IntersectionObserver | null>(null)
   const headingElementsRef = useRef<Map<string, HTMLElement>>(new Map())
+  const mutationObserverRef = useRef<MutationObserver | null>(null)
 
-  useEffect(() => {
-    const elements = document.querySelectorAll("article h1, article h2, article h3, article h4, article h5")
+  const scanAndObserveHeadings = useCallback(() => {
+    const elements = document.querySelectorAll("article h1, article h2, article h3, article h4, article h5, .math-details-content h1, .math-details-content h2, .math-details-content h3, .math-details-content h4, .math-details-content h5")
     const flatHeadings: FlatHeading[] = Array.from(elements)
       .filter((elem) => !elem.closest('header')) // Exclude headings inside header (like blog title)
+      .filter((elem) => {
+        // Include all headings that have an id or can generate one
+        return elem.id || elem.textContent?.trim()
+      })
       .map((elem) => ({
         id: elem.id || elem.textContent?.toLowerCase().replace(/\s+/g, "-") || "",
         text: elem.textContent || "",
@@ -64,6 +69,32 @@ export function TableOfContents() {
 
     const allHeadingIds = new Set(flatHeadings.map(h => h.id))
     setExpandedSections(allHeadingIds)
+
+    // Update heading elements reference
+    headingElementsRef.current.clear()
+    Array.from(elements)
+      .filter((elem) => !elem.closest('header'))
+      .forEach(elem => {
+        if (elem.id) {
+          headingElementsRef.current.set(elem.id, elem as HTMLElement)
+        }
+      })
+
+    // Re-observe elements with IntersectionObserver
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+      Array.from(elements)
+        .filter((elem) => !elem.closest('header'))
+        .forEach(elem => {
+          if (elem.id) observerRef.current?.observe(elem)
+        })
+    }
+
+    return { elements, flatHeadings }
+  }, [])
+
+  useEffect(() => {
+    const { elements, flatHeadings } = scanAndObserveHeadings()
 
     headingElementsRef.current.clear()
     Array.from(elements)
@@ -119,10 +150,45 @@ export function TableOfContents() {
         if (elem.id) observerRef.current?.observe(elem)
       })
 
+    // Set up MutationObserver to detect DOM changes
+    if (mutationObserverRef.current) {
+      mutationObserverRef.current.disconnect()
+    }
+
+    mutationObserverRef.current = new MutationObserver((mutations) => {
+      // Check if any mutations affected headings
+      const hasHeadingChanges = mutations.some(mutation => {
+        if (mutation.type === 'childList') {
+          const hasNewHeadings = Array.from(mutation.addedNodes).some(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const elem = node as HTMLElement
+              return /^H[1-5]$/.test(elem.tagName) || elem.querySelector('h1, h2, h3, h4, h5')
+            }
+            return false
+          })
+          if (hasNewHeadings) return true
+        }
+        return false
+      })
+
+      if (hasHeadingChanges) {
+        scanAndObserveHeadings()
+      }
+    })
+
+    const article = document.querySelector('article')
+    if (article) {
+      mutationObserverRef.current.observe(article, {
+        childList: true,
+        subtree: true
+      })
+    }
+
     return () => {
       observerRef.current?.disconnect()
+      mutationObserverRef.current?.disconnect()
     }
-  }, [])
+  }, [scanAndObserveHeadings])
 
   const scrollToHeading = useCallback((id: string, e: React.MouseEvent) => {
     e.preventDefault()
