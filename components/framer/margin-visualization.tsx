@@ -106,17 +106,17 @@ const MarginVisualization: React.FC<MarginVisualizationProps> = ({
     ];
 
     const hardMargin: DataPoint[] = [
-      // Positive points (dogs) - closer to boundary
-      { x: 2.8, y: 2.6, label: 1 },
+      // Positive points (dogs) - with margin=0.2, must be at x >= 2.7
+      { x: 2.7, y: 2.6, label: 1 },  // At margin boundary (support vector)
       { x: 3.2, y: 2.8, label: 1 },
       { x: 3.0, y: 3.0, label: 1 },
       { x: 3.5, y: 3.2, label: 1 },
       { x: 3.3, y: 2.5, label: 1 },
-      // Negative points (cats) - closer to boundary
+      // Negative points (cats) - with margin=0.2, must be at x <= 2.3
       { x: 2.0, y: 2.2, label: -1 },
-      { x: 2.2, y: 1.8, label: -1 },
+      { x: 2.3, y: 1.8, label: -1 },  // At margin boundary (support vector)
       { x: 1.8, y: 2.0, label: -1 },
-      { x: 2.3, y: 2.4, label: -1 },
+      { x: 1.9, y: 2.4, label: -1 },
       { x: 1.5, y: 1.5, label: -1 },
     ];
 
@@ -142,8 +142,8 @@ const MarginVisualization: React.FC<MarginVisualizationProps> = ({
         A: 1,
         B: 0,
         C: -2.5,
-        margin: 0.3, // Small margin
-        supportVectors: [0, 3] // Indices of closest points
+        margin: 0.2, // Small margin - reduced to match actual support vectors
+        supportVectors: [0, 6] // Indices of points at margin boundaries
       }
     };
   }, []);
