@@ -47,7 +47,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative flex min-h-screen flex-col">
-            <header className="sticky top-0 z-50 w-full border-b border-neutral-200/50 dark:border-neutral-800/30 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+            <header className="sticky top-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-background/70" style={{borderBottom: "1px solid rgba(0, 0, 0, 0.06)"}}>
               <div className="container mx-auto flex h-16 items-center px-4 md:px-6">
                 <div className="mr-4 flex">
                   <Link className="mr-6 flex items-center" href="/">
