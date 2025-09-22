@@ -160,7 +160,6 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
     const mouseY = centerY - (e.clientY - rect.top); // Flip Y axis
 
     setIsDragging(true);
-    setDragStart({ x: mouseX, y: mouseY });
   }, [allowRotation]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<SVGElement>) => {
