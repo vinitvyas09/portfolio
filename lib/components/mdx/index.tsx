@@ -32,6 +32,7 @@ import MultiLayerXOR from "../../../components/framer/multi-layer-xor"
 import MathDetails from "../../../components/framer/math-details"
 import MarginVisualization from "../../../components/framer/margin-visualization"
 import LossComparison from "../../../components/framer/loss-comparison"
+import ConnectionMethodsTable from "./ConnectionMethodsTable"
 
 // Caption component for styled text
 const Caption = ({ children, ...props }: any) => (
@@ -75,6 +76,7 @@ export const mdxComponents = {
   MathDetails,
   MarginVisualization,
   LossComparison,
+  ConnectionMethodsTable,
   h1: (props: any) => <h1 {...props} className="text-4xl font-light tracking-tight mt-12 mb-6" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h2: (props: any) => <h2 {...props} className="text-3xl font-light tracking-tight mt-10 mb-4" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
   h3: (props: any) => <h3 {...props} className="text-2xl font-light tracking-tight mt-8 mb-3" id={props.children?.toString().toLowerCase().replace(/\s+/g, '-')} />,
