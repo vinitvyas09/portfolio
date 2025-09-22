@@ -853,7 +853,12 @@ We're going to track two quantities as the perceptron makes mistakes and updates
 1. **The alignment** between our weights and the perfect weights: `w* · w⁽ᵏ⁾`
 2. **The length** of our weight vector: `||w⁽ᵏ⁾||`
 
-Here's the punchline before we prove it: the alignment grows linearly (like k) but the length only grows like √k. Since alignment is bounded by the product of lengths, something has to give; and that something is that k can't grow forever!
+Here's the punchline before we prove it: the alignment grows linearly (like k) but the length only grows like √k. Now here's the key constraint from linear algebra: the dot product between any two vectors can never exceed the product of their lengths (this is the Cauchy-Schwarz inequality). So we have:
+
+- Left side: alignment growing like k (getting bigger and bigger linearly)
+- Right side: product of lengths growing like √k (getting bigger much more slowly)
+
+But wait! The left side can't be bigger than the right side! That's mathematically impossible. So what gives? The only way to resolve this contradiction is if k stops growing at some point. In other words, the updates must stop, which means convergence!
 
 #### Speed 1: Alignment Grows Linearly
 
