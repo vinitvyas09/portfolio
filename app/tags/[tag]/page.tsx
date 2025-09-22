@@ -36,7 +36,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center animate-slideUp">
           <div className="flex justify-center mb-4">
-            <div className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-foreground/80">
+            <div className="flex items-center gap-2 rounded-full  px-4 py-2 text-foreground/80">
               <Tag className="h-5 w-5" />
               <span className="font-medium">{tag}</span>
             </div>
