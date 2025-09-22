@@ -91,6 +91,19 @@ const MathDetails: React.FC<MathDetailsProps> = ({
           }}
         >
           {title}
+          {!isOpen && (
+            <span style={{
+              fontSize: '14px',
+              fontWeight: '400',
+              color: colors.secondaryText,
+              marginLeft: '0.75rem',
+              opacity: 0.6,
+              fontStyle: 'italic',
+              transition: 'opacity 0.3s ease',
+            }}>
+              · Click to expand
+            </span>
+          )}
         </h2>
       </div>
 
