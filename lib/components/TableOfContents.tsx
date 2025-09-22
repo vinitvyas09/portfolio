@@ -55,18 +55,11 @@ export function TableOfContents() {
     const flatHeadings: FlatHeading[] = Array.from(elements)
       .filter((elem) => !elem.closest('header')) // Exclude headings inside header (like blog title)
       .filter((elem) => {
-        // Exclude headings inside interactive components with animations
-        const hasAnimatedParent = elem.closest('[class*="animate-"]') ||
-                                  elem.closest('.framer-motion') ||
-                                  elem.closest('[data-framer]') ||
-                                  elem.closest('svg')
-        if (hasAnimatedParent) return false
+        // Exclude headings that are inside SVG elements (like chart labels)
+        if (elem.closest('svg')) return false
 
-        // Exclude headings that are inside code blocks or interactive galleries
-        const isInCodeBlock = elem.closest('pre') || elem.closest('code')
-        const isInGallery = elem.closest('[class*="gallery"]') ||
-                            elem.closest('[class*="Gallery"]')
-        if (isInCodeBlock || isInGallery) return false
+        // Exclude headings that are inside code blocks
+        if (elem.closest('pre') || elem.closest('code')) return false
 
         // Include all headings that have an id or can generate one
         return elem.id || elem.textContent?.trim()
