@@ -731,20 +731,15 @@ def perceptron_sgd(data, labels, η=0.01, α=0, epochs=10):
 
 ### 8. Key Insights
 
-1. **Two derivations, one algorithm**:
-   - **Heuristic approach**: The perceptron trick (add misclassified points)
-   - **Optimization approach**: Gradient descent on hinge loss
-   - Setting `η = 1` makes them identical
+1. **The "perceptron trick" isn't just a trick, it's mathematically optimal.** When you add or subtract misclassified points from your weights, you're actually doing gradient descent on the hinge loss function. It's like discovering that your grandmother's recipe for perfect bread is actually based on precise chemical reactions. Setting the learning rate to 1 makes the heuristic and the formal optimization approach completely identical.
 
-2. **The heuristic is optimal**: The perceptron trick corresponds exactly to gradient descent minimizing the hinge loss with unit step size
+2. **Why hinge loss works where 0-1 loss fails is all about gradients.** The 0-1 loss (counting mistakes) creates a cliff: you're either right or wrong with no in-between, so there's no gradient to tell you which way to improve. The hinge loss creates a smooth ramp that gives you continuous feedback about how wrong you are. The worse your mistake, the stronger the gradient pushing you to fix it.
 
-3. **Guaranteed convergence**: For linearly separable data, both approaches provably find a separator
+3. **For linearly separable data, convergence is guaranteed, but there's a catch.** The perceptron will always find a separating line if one exists, which sounds great. But the proof requires that you have a margin γ between classes, and the number of mistakes is bounded by (R/γ)². So if your data points are really close to the boundary (small margin), convergence could take a very long time.
 
-4. **Hyperparameter interpretation**:
-   - Learning rate `η` controls optimization step size
-   - Regularization `α` penalizes weight magnitude
+4. **Learning rate and regularization aren't just knobs to turn, they have specific meanings.** The learning rate η controls how aggressively you update weights when you make a mistake. Too high and you might overshoot the optimal solution; too low and learning crawls. Regularization α directly controls the trade-off between maximizing the margin and correctly classifying points; it's literally asking "how much am I willing to misclassify to get a cleaner boundary?"
 
-5. **Foundation for modern learning**: The framework of loss minimization via gradient descent extends directly to neural networks and deep learning
+5. **This simple algorithm is the foundation of all modern deep learning.** Every neural network, from GPT to computer vision models, uses the same basic principle: define a loss function, compute gradients, update weights. The perceptron taught us this pattern in 1958, and we're still using it today. The main difference is that modern networks stack many layers and use more sophisticated loss functions, but the core learning mechanism remains unchanged.
 
 </MathDetails>
 
@@ -1067,8 +1062,8 @@ Think of it like this: imagine you're walking steadily forward (linear growth) w
 Before diving into the math, let's be crystal clear about our assumptions and notation:
 
 1. **The data is linearly separable**: There exists some hyperplane that perfectly separates the classes
-2. **There's a margin γ > 0**: The margin is the minimum distance from any data point to the separating hyperplane. Think of it as the "safety buffer"—no points are right on the boundary, they're all at least distance γ away. We denote this minimum distance as γ (gamma).
-3. **w\* represents the "perfect" weights**: These are weights that correctly classify everything with at least margin γ—meaning every point is classified correctly AND is at least distance γ from the decision boundary
+2. **There's a margin γ > 0**: The margin is the minimum distance from any data point to the separating hyperplane. Think of it as the "safety buffer" where no points are right on the boundary, they're all at least distance γ away. We denote this minimum distance as γ (gamma).
+3. **w\* represents the "perfect" weights**: These are weights that correctly classify everything with at least margin γ; meaning every point is classified correctly AND is at least distance γ from the decision boundary
 4. **w⁽ᵏ⁾ represents our current weights**: After k mistakes/updates during training
 5. **We start from w⁽⁰⁾ = 0**: Our initial weights are all zeros
 
@@ -1247,7 +1242,7 @@ The bound tells us three crucial things:
 
 The proof never actually constructs the separating hyperplane. We don't know what w\* is, we just know it exists. The proof shows that our random walk through weight space (via mistakes) can't wander forever. It's like proving you'll eventually escape a maze by showing you can't walk in circles more than a certain number of times.
 
-This is a "non-constructive proof"—we prove something must happen without showing exactly how it happens.
+This is a "non-constructive proof", meaning that we prove something must happen without showing exactly how it happens.
 
 </InfoBox>
 
