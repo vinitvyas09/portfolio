@@ -197,7 +197,7 @@ export default function HeadlineCascade({
 
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-xl border border-border bg-card/50 backdrop-blur-sm ${
+      className={`relative w-full overflow-hidden rounded-xl  bg-card/50 backdrop-blur-sm ${
         className ?? ""
       }`}
       style={{ height: cfg.height ?? autoHeight }}
@@ -260,7 +260,7 @@ export default function HeadlineCascade({
                   style={{ zIndex: 100 + (depth - k), width: "100%", maxWidth: 860 }}
                 >
                   <div
-                    className="rounded-xl border border-border bg-card/80 dark:bg-card/60 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 shadow"
+                    className="rounded-xl  bg-card/80 dark:bg-card/60 backdrop-blur-sm px-4 py-3 md:px-5 md:py-4 shadow"
                     style={{
                       boxShadow: shadow,
                       filter: blur ? `blur(${blur.toFixed(2)}px)` : undefined,
@@ -288,7 +288,7 @@ export default function HeadlineCascade({
             })}
           {/* offscreen measurer to estimate card height for overlap math */}
           <div className="absolute -z-50 opacity-0 pointer-events-none left-0 top-0 w-full">
-            <div ref={measureRef} className="rounded-xl border border-border bg-card/80 dark:bg-card/60 px-4 py-3 md:px-5 md:py-4">
+            <div ref={measureRef} className="rounded-xl  bg-card/80 dark:bg-card/60 px-4 py-3 md:px-5 md:py-4">
               <div className="block text-foreground text-[16px] sm:text-[18px] md:text-[20px] font-semibold leading-snug tracking-tight break-words">
                 {base[step]?.title || "Sample"}
               </div>
