@@ -147,7 +147,7 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         {/* Left: XOR Grid */}
         <div style={{ flex: '1 1 280px', maxWidth: '350px', width: '100%' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem', textAlign: 'center' }}>
             XOR Input Space
           </h3>
           <div style={{ width: '100%', maxWidth: '280px', margin: '0 auto' }}>
@@ -237,23 +237,11 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
             <text x="-10" y="5" textAnchor="middle" fontSize="10" fill={colors.textSecondary}>1</text>
           </svg>
           </div>
-
-          <div style={{
-            marginTop: '0.75rem',
-            padding: '0.5rem',
-            background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-            borderRadius: '8px',
-            fontSize: '11px',
-            color: colors.textSecondary,
-            textAlign: 'center'
-          }}>
-            Click any point to see signal flow
-          </div>
         </div>
 
         {/* Right: Neural Network */}
         <div style={{ flex: '1 1 280px', maxWidth: '450px', width: '100%' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: colors.text, marginBottom: '0.75rem', textAlign: 'center' }}>
             2-Layer Neural Network
           </h3>
           <div style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
@@ -399,6 +387,9 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
           }}>
             <div style={{ fontWeight: '600', marginBottom: '0.25rem', color: colors.text, fontSize: '12px' }}>
               How it solves XOR:
+            </div>
+            <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem', fontStyle: 'italic', textAlign: 'center' }}>
+              Click any point to see signal flow
             </div>
             <div style={{ lineHeight: '1.6' }}>
               <div style={{ marginBottom: '0.25rem' }}>• Hidden 1: &quot;at least one input is 1&quot; (OR)</div>
