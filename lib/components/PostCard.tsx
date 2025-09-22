@@ -9,7 +9,7 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   return (
     <article className="group relative flex flex-col space-y-2 animate-slideUp">
-      <div className="overflow-hidden rounded-xl border bg-card p-6 transition-all hover:shadow-sm hover:-translate-y-0.5">
+      <div className="overflow-hidden rounded-xl bg-card p-6 transition-all hover:shadow-sm hover:-translate-y-0.5" style={{border: "1px solid rgba(0, 0, 0, 0.06)"}}>
         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
           <span className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
@@ -23,7 +23,7 @@ export function PostCard({ post }: PostCardProps) {
             <Clock className="h-3 w-3" />
             {post.readingTime}
           </span>
-          <span className={`px-2.5 py-0.5 rounded-full text-[11px] tracking-wide uppercase border border-border text-foreground/70`}>
+          <span className={`px-2.5 py-0.5 rounded-full text-[11px] tracking-wide uppercase text-foreground/70`}>
             {post.level}
           </span>
         </div>
@@ -40,7 +40,7 @@ export function PostCard({ post }: PostCardProps) {
             <Link
               key={tag}
               href={`/tags/${tag}`}
-              className="flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-[12px] text-foreground/70 transition-colors hover:text-foreground"
+              className="flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px] text-foreground/70 transition-colors hover:text-foreground"
             >
               <Tag className="h-3 w-3" />
               {tag}
