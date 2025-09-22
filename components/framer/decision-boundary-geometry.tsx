@@ -149,15 +149,8 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
   }, [angle, isMobile]);
 
   // Mouse handlers for rotation
-  const handleMouseDown = useCallback((e: React.MouseEvent<SVGElement>) => {
+  const handleMouseDown = useCallback(() => {
     if (!allowRotation) return;
-
-    const svg = e.currentTarget;
-    const rect = svg.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const mouseX = e.clientX - rect.left - centerX;
-    const mouseY = centerY - (e.clientY - rect.top); // Flip Y axis
 
     setIsDragging(true);
   }, [allowRotation]);
@@ -182,19 +175,10 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
   }, []);
 
   // Touch handlers for mobile
-  const handleTouchStart = useCallback((e: React.TouchEvent<SVGElement>) => {
+  const handleTouchStart = useCallback(() => {
     if (!allowRotation) return;
 
-    const svg = e.currentTarget;
-    const rect = svg.getBoundingClientRect();
-    const touch = e.touches[0];
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const touchX = touch.clientX - rect.left - centerX;
-    const touchY = centerY - (touch.clientY - rect.top);
-
     setIsDragging(true);
-    setDragStart({ x: touchX, y: touchY });
   }, [allowRotation]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<SVGElement>) => {
