@@ -27,8 +27,8 @@ export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
     // Render as iframe for full notebook
     return (
       <div className="my-12">
-        <div className="rounded-xl overflow-hidden border border-border bg-card">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <div className="rounded-xl overflow-hidden  bg-card">
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <FileCode className="h-5 w-5 text-foreground/80" />
               <span className="font-medium">Jupyter Notebook</span>
@@ -47,7 +47,7 @@ export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
                 href={`https://colab.research.google.com/github/vinitvyas09/portfolio/blob/main/${path}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 px-3 py-1 rounded-md border border-border text-sm hover:bg-muted transition-colors"
+                className="flex items-center gap-1 px-3 py-1 rounded-md  text-sm hover:bg-muted transition-colors"
               >
                 Open in Colab
               </a>
@@ -74,7 +74,7 @@ export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
     // Render selected cells
     return (
       <div className="my-12 space-y-4">
-        <div className="rounded-xl border border-border bg-card p-6">
+        <div className="rounded-xl  bg-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <FileCode className="h-5 w-5 text-foreground/80" />
             <span className="font-medium">
@@ -88,7 +88,7 @@ export function Notebook({ path, selectedCells, height = 600 }: NotebookProps) {
           ) : (
             <div className="space-y-4">
               {/* Rendered cells would go here */}
-              <div className="p-4 bg-card rounded border border-border">
+              <div className="p-4 bg-card rounded ">
                 <pre className="text-sm">
                   <code>{"# Cell output would be rendered here"}</code>
                 </pre>
