@@ -29,7 +29,7 @@ export default function TagsPage() {
                 <Link
                   key={tag}
                   href={`/tags/${tag}`}
-                  className="group flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm animate-slideUp"
+                  className="group flex items-center justify-between rounded-xl  bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm animate-slideUp"
                 >
                   <div className="flex items-center gap-3">
                     <Tag className="h-5 w-5 text-muted-foreground" />
