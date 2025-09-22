@@ -53,35 +53,35 @@ const MathDetails: React.FC<MathDetailsProps> = ({
         marginBottom: '1.5rem',
       }}
     >
-      <h2
-        id={title.toLowerCase().replace(/\s+/g, '-')}
+      <div
         style={{
-          margin: 0,
-          fontSize: '24px',
-          fontWeight: '700',
-          color: colors.text,
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          cursor: 'pointer',
         }}
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <button
-          onClick={() => setIsOpen(!isOpen)}
+        <span style={{
+          fontSize: '16px',
+          transition: 'transform 0.2s ease',
+          transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+          display: 'inline-block',
+          marginTop: '3px'
+        }}>
+          ▶
+        </span>
+        <h2
+          id={title.toLowerCase().replace(/\s+/g, '-')}
           style={{
-            background: 'none',
-            border: 'none',
+            margin: 0,
+            fontSize: '24px',
+            fontWeight: '700',
+            color: colors.text,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            flex: 1,
             padding: '1rem 0',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            fontSize: 'inherit',
-            fontWeight: 'inherit',
-            color: 'inherit',
-            fontFamily: 'inherit',
-            textAlign: 'left',
             transition: 'all 0.2s ease',
-            marginBottom: isOpen ? '1rem' : '0.5rem',
-            marginTop: '0.5rem',
-            width: '100%'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateX(3px)';
@@ -89,22 +89,10 @@ const MathDetails: React.FC<MathDetailsProps> = ({
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateX(0)';
           }}
-          aria-expanded={isOpen}
-          aria-controls="math-details-content"
         >
-          <span style={{
-            fontSize: '16px',
-            transition: 'transform 0.2s ease',
-            transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-            display: 'inline-block'
-          }}>
-            ▶
-          </span>
-          <span>
-            {title}
-          </span>
-        </button>
-      </h2>
+          {title}
+        </h2>
+      </div>
 
       <div
         id="math-details-content"
