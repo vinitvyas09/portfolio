@@ -581,7 +581,31 @@ This clever trick multiplies the true label (+1 or -1) with our prediction score
 
 ### 2. The Perceptron Hinge Loss
 
-The 0-1 loss (counting mistakes) is non-differentiable, so we use a convex surrogate called the **perceptron hinge loss**:
+Ideally, we'd minimize the number of mistakes (0-1 loss): wrong = 1 point, right = 0 points. But there's a problem: this loss function is like a cliff: it suddenly jumps from 0 to 1 at the decision boundary. You can't compute gradients on cliffs (mathematically: it's non-differentiable).
+
+Imagine trying to roll a ball downhill to find the lowest point, but the landscape is made of sudden drops and flat plateaus. The ball would get stuck! We need smooth slopes instead.
+
+<LossComparison
+  config={{
+    showBoth: true,
+    losses: [
+      {
+        name: "0-1 Loss (What We Want)",
+        type: "step",
+        description: "Counts mistakes but has no gradient"
+      },
+      {
+        name: "Hinge Loss (What We Use)",
+        type: "hinge",
+        description: "Smooth approximation we can optimize"
+      }
+    ],
+    showGradientFlow: true,
+    interactive: true
+  }}
+/>
+
+The **perceptron hinge loss** creates a smooth ramp instead of a cliff. When you're wrong, it penalizes you proportionally to how wrong you are (how far on the wrong side of the boundary). This gives us gradients we can follow to improve:
 
 ```
 ℓᵢ(w, b) = max(0, -yᵢ · f(xᵢ)) = max(0, -mᵢ)
@@ -605,7 +629,7 @@ With optional L2 regularization:
 L(w, b) = (1/n) Σᵢ max(0, -yᵢ(w⊤xᵢ + b)) + (α/2)‖w‖²
 ```
 
-The regularization term `(α/2)‖w‖²` penalizes large weights, preventing overfitting. Think of it as preferring simpler solutions—smaller weights mean gentler decision boundaries.
+The regularization term `(α/2)‖w‖²` penalizes large weights, preventing overfitting. Think of it as preferring simpler solutions where smaller weights mean gentler decision boundaries.
 
 ### 3. Computing Subgradients
 
