@@ -121,7 +121,6 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
     showLegend = true,
     interactive = false,
     animateLineDrawing = false,
-    lineAnimationMs = 2000,
     highlightRegions = false,
     regionLabels = ["Team Dog 🐕", "Team Cat 🐈"]
   } = config;
