@@ -296,7 +296,7 @@ const LossComparison: React.FC<LossComparisonProps> = ({ config }) => {
         color: colors.text
       }}>
         <strong style={{ color: colors.accent }}>Key insight:</strong> The hinge loss approximates the 0-1 loss but gives us gradients to work with.
-        When we're wrong (margin {"<"} 0), it tells us not just that we're wrong, but <em>how</em> wrong—and
+        When we&apos;re wrong (margin {"<"} 0), it tells us not just that we&apos;re wrong, but <em>how</em> wrong—and
         therefore which direction to move to improve.
       </div>
     </div>
