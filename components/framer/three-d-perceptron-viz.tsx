@@ -304,7 +304,7 @@ const ThreeDPerceptronViz: React.FC<ThreeDPerceptronVizProps> = ({
 
   return (
     <div className="w-full my-8">
-      <div className="relative bg-background border border-border rounded-lg overflow-hidden">
+      <div className="relative bg-background  rounded-lg overflow-hidden">
         <canvas
           ref={canvasRef}
           className={`w-full ${config.rotatable ? 'cursor-grab active:cursor-grabbing' : ''}`}
