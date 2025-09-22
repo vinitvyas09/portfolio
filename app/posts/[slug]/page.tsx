@@ -81,7 +81,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <Clock className="h-4 w-4" />
                 {post.readingTime}
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[11px] tracking-wide uppercase border border-border text-foreground/70`}>
+              <span className={`px-2.5 py-0.5 rounded-full text-[11px] tracking-wide uppercase  text-foreground/70`}>
                 {post.level}
               </span>
             </div>
@@ -99,7 +99,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 <a
                   key={tag}
                   href={`/tags/${tag}`}
-                  className="flex items-center gap-1 rounded-full border border-border px-3 py-1 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
+                  className="flex items-center gap-1 rounded-full  px-3 py-1 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
                 >
                   <Tag className="h-3 w-3" />
                   {tag}
