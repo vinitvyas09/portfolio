@@ -496,7 +496,7 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
                             
                             {/* Signal animation for active inputs */}
                             {(() => {
-                              const seed = branchIdx * 1000 + pIdx * 100 + sIdx * 10 + animationCycle;
+                              const seed = branchIdx * 1000 + pIdx * 100 + sIdx * 10;
                               const shouldShowSignal = isActive && isAnimating && pseudoRandom(seed) > 0.5;
                               return shouldShowSignal;
                             })() && (
