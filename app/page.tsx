@@ -10,7 +10,7 @@ export default function HomePage() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center animate-slideUp">
           <div className="flex justify-center mb-6">
-            <div className="p-4 rounded-full border border-border">
+            <div className="p-4 rounded-full">
               <IconMark className="h-12 w-12 text-foreground/80" />
             </div>
           </div>
