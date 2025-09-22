@@ -1057,6 +1057,17 @@ Think of it like this: imagine you're walking steadily forward (linear growth) w
 
 <MathDetails title="See the Mathematical Proof (Advanced)">
 
+#### Why We Need a Formal Proof
+
+The perceptron trick we've been using ("if wrong, add or subtract the point") feels almost too simple. It's a heuristic that seems to work, but can we trust it? What if it gets stuck in an infinite loop? What if it only works on toy problems? Without a mathematical proof, we're essentially flying blind, hoping our intuition is correct.
+
+This is where formal mathematics comes in. We need to prove rigorously that:
+- The algorithm will actually terminate (not run forever)
+- It will find a correct solution if one exists
+- We can bound how many steps it will take
+
+The proof below shows that our simple heuristic is not just a lucky guess; it's provably correct under certain conditions. This gives us the confidence to use it in real applications, knowing its theoretical guarantees and limitations.
+
 #### The Setup: What We're Working With
 
 Before diving into the math, let's be crystal clear about our assumptions and notation:
@@ -1225,6 +1236,14 @@ k ≤ R²/γ²
 ```
 
 **The number of mistakes is bounded by R²/γ²!**
+
+#### Back to Simplicity: Why We'll Stick with the Perceptron Trick
+
+Now that we've proven the perceptron converges, you might wonder: should we think about it as optimization with hinge loss and subgradients? The answer is: probably not, at least not for everyday use.
+
+The formal proof gives us confidence that our simple rule works, but in practice, the "perceptron trick" is much easier to understand and implement. You don't need to know about hinge loss, subgradients, or optimization theory. You just need to remember: "if wrong, nudge the weights toward the correct answer." This intuitive understanding is often more valuable than the mathematical machinery.
+
+Going forward in this post, we'll continue using the perceptron trick as our mental model. The math is there when we need the guarantee of convergence, but for building intuition and practical implementation, the simple heuristic wins. Sometimes the best explanations are the simplest ones that still work.
 
 </MathDetails>
 
