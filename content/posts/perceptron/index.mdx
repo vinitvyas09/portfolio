@@ -737,7 +737,7 @@ def perceptron_sgd(data, labels, η=0.01, α=0, epochs=10):
 
 </MathDetails>
 
-### Critical Nuance #1: The Order Matters (A Lot!)
+## Critical Nuance #1: The Order Matters (A Lot!)
 
 The order you show examples to your perceptron can make the difference between learning in seconds or never learning at all.
 
@@ -787,7 +787,7 @@ for epoch in range(num_epochs):
         train_step(data_points[i], labels[i])
 ```
 
-### Critical Nuance #2: How Many Times Should We Loop? (The Epochs Dilemma)
+## Critical Nuance #2: How Many Times Should We Loop? (The Epochs Dilemma)
 
 A hyperparameter is a setting you choose before training starts (as opposed to parameters like weights, which the algorithm learns). The most important one? How many times to loop through your data, called epochs.
 
