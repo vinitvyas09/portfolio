@@ -414,8 +414,6 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
           {/* Test points */}
           {points.map((point, i) => {
             const value = calculateValue(point.x, point.y);
-            const isOnLine = Math.abs(value) < 0.1;
-            const isPositive = value > 0;
 
             // Determine if point is correctly classified
             let isCorrect = false;
@@ -506,8 +504,6 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
       <div className="w-full max-w-[600px] space-y-3">
         {points.map((point, i) => {
           const value = calculateValue(point.x, point.y);
-          const isOnLine = Math.abs(value) < 0.1;
-          const isPositive = value > 0;
 
           // Determine if point is correctly classified
           let isCorrect = false;
