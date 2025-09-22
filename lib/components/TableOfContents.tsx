@@ -234,13 +234,6 @@ export function TableOfContents() {
 
     return (
       <li key={heading.id} className="relative">
-        {/* Tree connector lines */}
-        {depth > 0 && (
-          <>
-            <div className="absolute left-[-11px] top-0 bottom-0 w-[1px] bg-border/30 pointer-events-none" />
-            <div className="absolute left-[-11px] top-3 w-2 h-[1px] bg-border/30 pointer-events-none" />
-          </>
-        )}
         <div className={cn(
           "relative flex items-center group"
         )}>
@@ -294,7 +287,7 @@ export function TableOfContents() {
 
         {hasChildren && isExpanded && (
           <ul className={cn(
-            "relative mt-0",
+            "relative mt-0 list-none",
             depth === 0 ? "ml-3" : "ml-3"
           )}>
             {heading.children!.map((child) => renderHeading(child, depth + 1))}
@@ -309,7 +302,7 @@ export function TableOfContents() {
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
       <div className="relative p-2 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm border border-border/10">
-        <ul className="space-y-0">
+        <ul className="space-y-0 list-none">
           {headings.map(heading => renderHeading(heading))}
         </ul>
       </div>
