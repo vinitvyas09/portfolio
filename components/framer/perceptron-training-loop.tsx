@@ -364,16 +364,16 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
   const yRange = yMax - yMin || 1;
 
   // Scale functions with safety checks
-  const scaleX = (x: number) => {
+  const scaleX = useCallback((x: number) => {
     if (!Number.isFinite(x)) return padding;
     const result = padding + ((x - xMin) / xRange) * innerWidth;
     return Number.isFinite(result) ? result : padding;
-  };
-  const scaleY = (y: number) => {
+  }, [padding, xMin, xRange, innerWidth]);
+  const scaleY = useCallback((y: number) => {
     if (!Number.isFinite(y)) return chartHeight - padding;
     const result = chartHeight - padding - ((y - yMin) / yRange) * innerHeight;
     return Number.isFinite(result) ? result : chartHeight - padding;
-  };
+  }, [chartHeight, padding, yMin, yRange, innerHeight]);
 
   const xTicks = useMemo(() => generateTicks(xMin, xMax, 6), [xMin, xMax]);
   const yTicks = useMemo(() => generateTicks(yMin, yMax, 6), [yMin, yMax]);
@@ -553,7 +553,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
 
     const initialTimeoutId = setTimeout(trainSinglePoint, 500);
     trainingTimeoutsRef.current.push(initialTimeoutId);
-  }, [isTraining, dataPoints, visiblePoints, currentWeights, getLinePoints, getRandomInitialWeights]);
+  }, [isTraining, dataPoints, visiblePoints, currentWeights, getRandomInitialWeights]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Calculate line points for SVG with robust clipping (handles corner cases)
   const getLinePoints = useCallback((lineParams?: { a: number; b: number; c: number }) => {
@@ -659,7 +659,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
       x2: scaleX(xMax),
       y2: scaleY(clampedY2)
     };
-  };
+  }, [trueLine, xMin, xMax, yMin, yMax, scaleX, scaleY]);
 
   // Keep last valid line segment to avoid zero-length/degenerate frames
   const lastLineRef = React.useRef<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
