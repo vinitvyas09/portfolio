@@ -688,13 +688,7 @@ Since `yᵢ² = 1` and `‖xᵢ‖² + 1 > 0`, we have `mᵢ' > mᵢ`. The margi
 
 The optimization perspective reveals how different algorithms relate:
 
-| Method | Loss Function | Key Property |
-|--------|--------------|-------------|
-| **Perceptron** | `max(0, -yf)` | Updates only on mistakes |
-| **SVM** | `max(0, 1-yf)` | Enforces unit margin |
-| **Logistic Regression** | `log(1 + e⁻ʸᶠ)` | Smooth, probabilistic |
-
-Each minimizes a different convex upper bound on the 0-1 loss.
+<ConnectionMethodsTable />
 
 ### 7. The Complete SGD Algorithm
 
