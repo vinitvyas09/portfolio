@@ -379,9 +379,10 @@ const DimensionScalingViz: React.FC<DimensionScalingVizProps> = ({
   const projectionRef = useRef<HTMLCanvasElement>(null);
 
   const currentStage = stageData[activeStageIndex];
-  const currentPair =
+  const currentPair = useMemo(() =>
     currentStage?.pairOptions[0] ??
-    (currentStage ? [0, Math.min(1, currentStage.dims - 1)] : [0, 1]);
+    (currentStage ? [0, Math.min(1, currentStage.dims - 1)] : [0, 1]),
+  [currentStage]);
   const highlightIndex =
     currentStage && currentStage.points.length > 0 ? 0 : -1;
   const example = currentStage?.exampleBreakdown;
