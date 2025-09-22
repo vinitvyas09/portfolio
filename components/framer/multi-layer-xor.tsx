@@ -375,29 +375,31 @@ const MultiLayerXOR: React.FC<MultiLayerXORProps> = ({
           </svg>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Logic explanation */}
-          <div style={{
-            marginTop: '0.5rem',
-            padding: '0.75rem',
-            background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-            borderRadius: '8px',
-            fontSize: '11px',
-            color: colors.textSecondary
-          }}>
-            <div style={{ fontWeight: '600', marginBottom: '0.25rem', color: colors.text, fontSize: '12px' }}>
-              How it solves XOR:
-            </div>
-            <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem', fontStyle: 'italic', textAlign: 'center' }}>
-              Click any point to see signal flow
-            </div>
-            <div style={{ lineHeight: '1.6' }}>
-              <div style={{ marginBottom: '0.25rem' }}>• Hidden 1: &quot;at least one input is 1&quot; (OR)</div>
-              <div style={{ marginBottom: '0.25rem' }}>• Hidden 2: &quot;not both inputs are 1&quot; (NAND)</div>
-              <div style={{ marginBottom: '0.25rem' }}>• Output: both hidden neurons active (AND)</div>
-              <div>• Result: XOR (exactly one input is 1)</div>
-            </div>
-          </div>
+      {/* Logic explanation - centered below both diagrams */}
+      <div style={{
+        marginTop: '1rem',
+        maxWidth: '500px',
+        margin: '1rem auto 0',
+        padding: '0.75rem',
+        background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+        borderRadius: '8px',
+        fontSize: '11px',
+        color: colors.textSecondary
+      }}>
+        <div style={{ fontStyle: 'italic', textAlign: 'center', marginBottom: '0.5rem', fontSize: '12px' }}>
+          Click any point to see signal flow
+        </div>
+        <div style={{ fontWeight: '600', marginBottom: '0.25rem', color: colors.text, fontSize: '12px', textAlign: 'center' }}>
+          How it solves XOR:
+        </div>
+        <div style={{ lineHeight: '1.6' }}>
+          <div style={{ marginBottom: '0.25rem' }}>• Hidden 1: &quot;at least one input is 1&quot; (OR)</div>
+          <div style={{ marginBottom: '0.25rem' }}>• Hidden 2: &quot;not both inputs are 1&quot; (NAND)</div>
+          <div style={{ marginBottom: '0.25rem' }}>• Output: both hidden neurons active (AND)</div>
+          <div>• Result: XOR (exactly one input is 1)</div>
         </div>
       </div>
     </div>
