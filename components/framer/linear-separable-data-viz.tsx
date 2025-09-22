@@ -550,10 +550,10 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
 
     const initialTimeoutId = setTimeout(trainSinglePoint, 500);
     trainingTimeoutsRef.current.push(initialTimeoutId);
-  }, [isTraining, dataPoints, visiblePoints, trueLine, currentWeights, getLinePoints, getRandomInitialWeights]);
+  }, [isTraining, dataPoints, visiblePoints, currentWeights, getLinePoints, getRandomInitialWeights]);
 
   // Calculate line points for SVG with robust clipping (handles corner cases)
-  const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
+  const getLinePoints = useCallback((lineParams?: { a: number; b: number; c: number }) => {
     const line = lineParams || trueLine;
     const { a, b, c } = line;
 
@@ -656,7 +656,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
       x2: scaleX(xMax),
       y2: scaleY(clampedY2)
     };
-  };
+  }, [trueLine, xMin, xMax, yMin, yMax, scaleX, scaleY]);
 
   // Keep last valid line segment to avoid zero-length/degenerate frames
   const lastLineRef = React.useRef<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
