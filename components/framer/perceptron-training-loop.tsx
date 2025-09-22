@@ -553,7 +553,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
 
     const initialTimeoutId = setTimeout(trainSinglePoint, 500);
     trainingTimeoutsRef.current.push(initialTimeoutId);
-  }, [isTraining, dataPoints, visiblePoints, trueLine, currentWeights, getLinePoints, getRandomInitialWeights]);
+  }, [isTraining, dataPoints, visiblePoints, currentWeights, getLinePoints, getRandomInitialWeights]);
 
   // Calculate line points for SVG with robust clipping (handles corner cases)
   const getLinePoints = (lineParams?: { a: number; b: number; c: number }) => {
