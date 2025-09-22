@@ -61,8 +61,13 @@ export function TableOfContents() {
         // Exclude headings that are inside code blocks
         if (elem.closest('pre') || elem.closest('code')) return false
 
-        // Include all headings that have an id or can generate one
-        return elem.id || elem.textContent?.trim()
+        // CRITICAL: Only include headings that have an id attribute
+        // MDX automatically generates ids for markdown headings
+        // Component-generated headings typically don't have ids
+        if (!elem.id) return false
+
+        // Include only if it has an id
+        return true
       })
       .map((elem) => ({
         id: elem.id || elem.textContent?.toLowerCase().replace(/\s+/g, "-") || "",
