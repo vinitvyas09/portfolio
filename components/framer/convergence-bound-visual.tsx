@@ -93,16 +93,29 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
 
     // Find actual convergence point first to determine data generation range
     // Actual convergence follows an exponential decay pattern
+    // BUT must respect theoretical bound - actual CANNOT exceed theoretical
     let convergencePoint = 0;
     const maxDataPoints = 200;
 
     // Find convergence point
+    // Adjust the decay rate to ensure convergence happens before theoretical bound
+    // Use a scaling factor that ensures faster convergence for larger margins
+    const decayRate = margin * 0.5; // Increased from 0.3 to ensure faster convergence
+
     for (let i = 0; i <= maxDataPoints; i++) {
-      const actualError = 100 * Math.exp(-i * margin * 0.3);
+      const actualError = 100 * Math.exp(-i * decayRate);
       if (actualError < 1) {
         convergencePoint = i;
         break;
       }
+    }
+
+    // CRITICAL: Ensure actual convergence never exceeds theoretical bound
+    // The theoretical bound is a mathematical guarantee - violation would be incorrect
+    if (convergencePoint > theoreticalMax) {
+      // Scale down the convergence point to be at most 70% of theoretical bound
+      // This maintains realism while respecting the mathematical guarantee
+      convergencePoint = Math.floor(theoreticalMax * 0.7);
     }
 
     // Determine the x-axis range to show both theoretical bound and convergence clearly
@@ -123,7 +136,8 @@ const ConvergenceBoundVisual: React.FC<ConvergenceBoundVisualProps> = ({
     // Generate actual convergence data up to display range
     const actualData: number[] = [];
     for (let i = 0; i <= displayIterations; i++) {
-      const actualError = 100 * Math.exp(-i * margin * 0.3);
+      // Use the same decay rate as used for finding convergence point
+      const actualError = 100 * Math.exp(-i * decayRate);
       actualData.push(actualError);
     }
 
