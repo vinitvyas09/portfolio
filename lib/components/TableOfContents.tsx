@@ -234,12 +234,15 @@ export function TableOfContents() {
 
     return (
       <li key={heading.id} className="relative">
+        {/* Tree connector lines */}
+        {depth > 0 && (
+          <>
+            <div className="absolute left-[-11px] top-0 bottom-0 w-[1px] bg-border/30 pointer-events-none" />
+            <div className="absolute left-[-11px] top-3 w-2 h-[1px] bg-border/30 pointer-events-none" />
+          </>
+        )}
         <div className={cn(
-          "relative flex items-center group",
-          "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px]",
-          "before:transition-all before:duration-300 before:ease-out",
-          isActive && "before:bg-gradient-to-b before:from-blue-500/70 before:to-blue-500/30 before:shadow-[0_0_8px_rgba(59,130,246,0.5)]",
-          !isActive && "before:bg-transparent"
+          "relative flex items-center group"
         )}>
           {hasChildren && (
             <button
@@ -292,27 +295,9 @@ export function TableOfContents() {
         {hasChildren && isExpanded && (
           <ul className={cn(
             "relative mt-0",
-            depth === 0 ? "ml-1" : "ml-1.5"
+            depth === 0 ? "ml-3" : "ml-3"
           )}>
-            {heading.children!.map((child, index) => {
-              const childElement = renderHeading(child, depth + 1)
-              return (
-                <div key={child.id} className="relative">
-                  {/* Connector line */}
-                  <div className={cn(
-                    "absolute left-[3px] w-[1px] pointer-events-none",
-                    "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
-                    index === 0 ? "top-0" : "-top-0.5",
-                    index === heading.children!.length - 1 ? "h-3" : "h-full"
-                  )} />
-                  {/* Horizontal branch */}
-                  <div className="absolute left-[3px] top-3 w-1.5 h-[1px] bg-border/30 pointer-events-none" />
-                  <div className="pl-2">
-                    {childElement}
-                  </div>
-                </div>
-              )
-            })}
+            {heading.children!.map((child) => renderHeading(child, depth + 1))}
           </ul>
         )}
       </li>
