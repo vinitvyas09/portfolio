@@ -545,7 +545,7 @@ animateImprovement: true
 
 Since `x₁²` and `x₂²` are always positive, the new activation is always at least the old activation plus 1. We've moved in the right direction! We might not classify it correctly yet (if the old activation was -10, adding 1 only gets us to -9), but we're definitely closer.
 
-<MathDetails title="Mathematical Proof (Expand to View)">
+<MathDetails title="Mathematical Proof">
 
 The perceptron trick is intuitive but seems arbitrary. There's a deeper justification through optimization theory. Rather than starting with "add misclassified points," we can derive the algorithm from first principles by:
 
@@ -1049,7 +1049,7 @@ Here's the beautiful idea behind the convergence proof: we're going to set up a 
 
 Think of it like this: imagine you're walking steadily forward (linear growth) while your shadow grows longer as the sun sets (sublinear growth). At some point, you'll outpace your shadow's growth rate. The perceptron convergence proof uses exactly this principle.
 
-<MathDetails title="Mathematical Proof (Expand to View)">
+<MathDetails title="Mathematical Proof>
 
 #### Why We Need a Formal Proof
 
