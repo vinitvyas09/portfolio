@@ -219,6 +219,9 @@ const PerceptronVisualization: React.FC<PerceptronVisualizationProps> = ({
 
   // Start training automatically
   useEffect(() => {
+    // Capture the current timeouts array
+    const currentTimeouts = timeoutsRef.current;
+
     // Random initialization
     setWeights({
       w1: (Math.random() - 0.5) * 2,
@@ -234,8 +237,7 @@ const PerceptronVisualization: React.FC<PerceptronVisualizationProps> = ({
 
     return () => {
       clearTimeout(startTimeout);
-      const timeouts = timeoutsRef.current;
-      timeouts.forEach(clearTimeout);
+      currentTimeouts.forEach(clearTimeout);
       trainingRef.current = false;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
