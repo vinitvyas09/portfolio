@@ -37,9 +37,9 @@ export function Code({
   }
 
   return (
-    <div className="my-8 rounded-xl overflow-hidden bg-card border border-border">
+    <div className="my-8 rounded-xl overflow-hidden bg-card ">
       {title && (
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+        <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
             <Terminal className="h-4 w-4 text-foreground/80" />
             <span className="text-sm font-medium">{title}</span>
@@ -50,7 +50,7 @@ export function Code({
       <div className="relative">
         <button
           onClick={copyToClipboard}
-          className="absolute top-3 right-3 p-2 rounded-md border border-border bg-background hover:bg-muted transition-colors"
+          className="absolute top-3 right-3 p-2 rounded-md  bg-background hover:bg-muted transition-colors"
           aria-label="Copy code"
         >
           {copied ? (
