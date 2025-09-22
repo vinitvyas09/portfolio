@@ -137,7 +137,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
   }, [isDark, mounted]);
 
   // Generate synthetic training and test data
-  const { trainData, testData } = useMemo(() => {
+  const { } = useMemo(() => {
     const generateData = (count: number, noise: number = 0.1) => {
       const points: DataPoint[] = [];
 
@@ -343,7 +343,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
           {/* Training error line */}
           {metrics.length > 1 && (
             <polyline
-              points={metrics.map((m, i) =>
+              points={metrics.map((m) =>
                 `${scaleX(m.epoch, maxEpochs)},${scaleY(m.trainError)}`
               ).join(' ')}
               fill="none"
@@ -356,7 +356,7 @@ const EpochGoldilocksZone: React.FC<EpochGoldilocksZoneProps> = ({
           {/* Test error line */}
           {metrics.length > 1 && (
             <polyline
-              points={metrics.map((m, i) =>
+              points={metrics.map((m) =>
                 `${scaleX(m.epoch, maxEpochs)},${scaleY(m.testError)}`
               ).join(' ')}
               fill="none"
