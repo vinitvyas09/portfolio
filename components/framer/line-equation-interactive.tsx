@@ -147,8 +147,8 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
   // Convert between coordinate systems
   const toSvgX = (x: number) => padding + ((x - xMin) / (xMax - xMin)) * graphWidth;
   const toSvgY = (y: number) => padding + ((yMax - y) / (yMax - yMin)) * graphHeight;
-  const fromSvgX = (svgX: number) => ((svgX - padding) / graphWidth) * (xMax - xMin) + xMin;
-  const fromSvgY = (svgY: number) => yMax - ((svgY - padding) / graphHeight) * (yMax - yMin);
+  const fromSvgX = useCallback((svgX: number) => ((svgX - padding) / graphWidth) * (xMax - xMin) + xMin, [padding, graphWidth, xMax, xMin]);
+  const fromSvgY = useCallback((svgY: number) => yMax - ((svgY - padding) / graphHeight) * (yMax - yMin), [yMax, padding, graphHeight, yMin]);
 
   // Calculate line points
   const linePoints = useMemo(() => {
