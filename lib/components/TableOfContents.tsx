@@ -260,11 +260,11 @@ export function TableOfContents() {
             href={`#${heading.id}`}
             onClick={(e) => scrollToHeading(heading.id, e)}
             className={cn(
-              "toc-item relative flex-1 py-1.5 px-2 -mx-1 rounded-md",
+              "toc-item relative flex-1 py-0.5 px-1.5 -mx-1 rounded-md",
               "leading-snug transition-all duration-200 ease-out",
               "hover:bg-gradient-to-r hover:from-muted/20 hover:to-transparent",
-              !hasChildren && depth === 0 && "ml-5",
-              !hasChildren && depth > 0 && "ml-1",
+              !hasChildren && depth === 0 && "ml-4",
+              !hasChildren && depth > 0 && "ml-0.5",
               heading.level === 1 && "text-[13px] font-semibold tracking-tight",
               heading.level === 2 && "text-[12px] font-medium",
               heading.level === 3 && "text-[11px]",
@@ -291,21 +291,21 @@ export function TableOfContents() {
 
         {hasChildren && isExpanded && (
           <ul className={cn(
-            "relative mt-0.5",
-            depth === 0 ? "ml-3.5" : "ml-4"
+            "relative mt-0",
+            depth === 0 ? "ml-2.5" : "ml-3"
           )}>
             {heading.children!.map((child, index) => (
               <div key={child.id} className="relative">
                 {/* Connector line */}
                 <div className={cn(
-                  "absolute left-[7px] w-[1px]",
+                  "absolute left-[6px] w-[1px]",
                   "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
                   index === 0 ? "top-0" : "-top-0.5",
-                  index === heading.children!.length - 1 ? "h-4" : "h-full"
+                  index === heading.children!.length - 1 ? "h-3" : "h-full"
                 )} />
                 {/* Horizontal branch */}
-                <div className="absolute left-[7px] top-4 w-3 h-[1px] bg-border/30" />
-                <div className="pl-5">
+                <div className="absolute left-[6px] top-3 w-2.5 h-[1px] bg-border/30" />
+                <div className="pl-4">
                   {renderHeading(child, depth + 1)}
                 </div>
               </div>
@@ -320,13 +320,8 @@ export function TableOfContents() {
 
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
-      <div className="relative p-3 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm border border-border/10">
-        {/* Header */}
-        <div className="mb-3 pb-2 border-b border-border/20">
-          <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Contents</h3>
-        </div>
-
-        <ul className="space-y-0.5">
+      <div className="relative p-2 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm border border-border/10">
+        <ul className="space-y-0">
           {headings.map(heading => renderHeading(heading))}
         </ul>
       </div>
