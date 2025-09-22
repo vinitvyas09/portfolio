@@ -140,7 +140,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
     }
 
     // Adjust weight vector length based on viewport
-    const vectorScale = isMobile ? 6 : 10;
+    const vectorScale = isMobile ? 15 : 10;
 
     return {
       weightVector: { x: w1 * vectorScale, y: w2 * vectorScale },
@@ -423,7 +423,7 @@ const DecisionBoundaryGeometry: React.FC<DecisionBoundaryGeometryProps> = ({
               fontSize="12"
               fontWeight="600"
             >
-              w = [{(weightVector.x / (isMobile ? 6 : 10)).toFixed(1)}, {(weightVector.y / (isMobile ? 6 : 10)).toFixed(1)}]
+              w = [{(weightVector.x / (isMobile ? 15 : 10)).toFixed(1)}, {(weightVector.y / (isMobile ? 15 : 10)).toFixed(1)}]
             </text>
           </g>
         )}
