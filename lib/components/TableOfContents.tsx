@@ -302,7 +302,7 @@ export function TableOfContents() {
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
       <div className="relative p-2 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm border border-border/10">
-        <ul className="space-y-0 list-none">
+        <ul className="space-y-0 list-none [&_li]:list-none">
           {headings.map(heading => renderHeading(heading))}
         </ul>
       </div>
@@ -323,6 +323,18 @@ export function TableOfContents() {
 
         nav::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(to bottom, hsl(var(--border) / 0.5), hsl(var(--border) / 0.7));
+        }
+
+        nav ul {
+          list-style: none !important;
+        }
+
+        nav li {
+          list-style: none !important;
+        }
+
+        nav li::before {
+          content: none !important;
         }
 
         @keyframes pulse {
