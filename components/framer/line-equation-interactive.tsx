@@ -214,7 +214,7 @@ const LineEquationInteractive: React.FC<LineEquationInteractiveProps> = ({
     // Trigger animation
     setAnimatingPoint(isDragging);
     setTimeout(() => setAnimatingPoint(null), 300);
-  }, [isDragging]);
+  }, [isDragging, fromSvgX, fromSvgY]);
 
   const handleMouseUp = () => {
     setIsDragging(null);
