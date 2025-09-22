@@ -33,7 +33,7 @@ export function References({ items }: ReferencesProps) {
   }
 
   return (
-    <div className="my-12 rounded-xl p-8 border border-border bg-card">
+    <div className="my-12 rounded-xl p-8  bg-card">
       <div className="flex items-center gap-3 mb-6">
         <BookOpen className="h-6 w-6 text-foreground/80" />
         <h3 className="text-xl font-medium">
