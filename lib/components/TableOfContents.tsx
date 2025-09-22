@@ -94,7 +94,7 @@ export function TableOfContents() {
   }, [])
 
   useEffect(() => {
-    const { elements, flatHeadings } = scanAndObserveHeadings()
+    const { elements } = scanAndObserveHeadings()
 
     headingElementsRef.current.clear()
     Array.from(elements)
