@@ -58,33 +58,31 @@ const MathDetails: React.FC<MathDetailsProps> = ({
         style={{
           background: 'none',
           border: 'none',
-          padding: '0.75rem 0',
+          padding: '1rem 0',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
-          fontSize: '16px',
-          fontWeight: '600',
+          fontSize: '20px',
+          fontWeight: '700',
           color: colors.text,
           fontFamily: 'system-ui, -apple-system, sans-serif',
           textAlign: 'left',
           transition: 'all 0.2s ease',
-          marginBottom: isOpen ? '0.5rem' : '0',
-          opacity: 0.9
+          marginBottom: isOpen ? '1rem' : '0.5rem',
+          marginTop: '0.5rem'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.opacity = '1';
-          e.currentTarget.style.transform = 'translateX(2px)';
+          e.currentTarget.style.transform = 'translateX(3px)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.opacity = '0.9';
           e.currentTarget.style.transform = 'translateX(0)';
         }}
         aria-expanded={isOpen}
         aria-controls="math-details-content"
       >
         <span style={{
-          fontSize: '14px',
+          fontSize: '16px',
           transition: 'transform 0.2s ease',
           transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
           display: 'inline-block'
