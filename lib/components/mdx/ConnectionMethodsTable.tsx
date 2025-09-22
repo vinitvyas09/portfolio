@@ -290,7 +290,7 @@ const ConnectionMethodsTable: React.FC = () => {
           lineHeight: '1.6'
         }}>
           <strong style={{ color: colors.text }}>Note:</strong> Each method minimizes a different convex upper bound on the 0-1 loss.
-          The perceptron's hinge loss creates a margin-based classifier, SVM enforces a fixed margin for better generalization,
+          The perceptron&apos;s hinge loss creates a margin-based classifier, SVM enforces a fixed margin for better generalization,
           and logistic regression provides probabilistic outputs through its smooth loss function.
         </div>
       </div>
