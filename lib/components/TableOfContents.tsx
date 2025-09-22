@@ -55,6 +55,19 @@ export function TableOfContents() {
     const flatHeadings: FlatHeading[] = Array.from(elements)
       .filter((elem) => !elem.closest('header')) // Exclude headings inside header (like blog title)
       .filter((elem) => {
+        // Exclude headings inside interactive components with animations
+        const hasAnimatedParent = elem.closest('[class*="animate-"]') ||
+                                  elem.closest('.framer-motion') ||
+                                  elem.closest('[data-framer]') ||
+                                  elem.closest('svg')
+        if (hasAnimatedParent) return false
+
+        // Exclude headings that are inside code blocks or interactive galleries
+        const isInCodeBlock = elem.closest('pre') || elem.closest('code')
+        const isInGallery = elem.closest('[class*="gallery"]') ||
+                            elem.closest('[class*="Gallery"]')
+        if (isInCodeBlock || isInGallery) return false
+
         // Include all headings that have an id or can generate one
         return elem.id || elem.textContent?.trim()
       })
@@ -261,7 +274,7 @@ export function TableOfContents() {
             onClick={(e) => scrollToHeading(heading.id, e)}
             className={cn(
               "toc-item relative flex-1 py-0.5 px-1.5 -mx-1 rounded-md",
-              "leading-snug transition-all duration-200 ease-out",
+              "leading-snug transition-colors duration-200 ease-out",
               "hover:bg-gradient-to-r hover:from-muted/20 hover:to-transparent",
               !hasChildren && depth === 0 && "ml-4",
               !hasChildren && depth > 0 && "ml-0.5",
@@ -295,20 +308,20 @@ export function TableOfContents() {
             depth === 0 ? "ml-2.5" : "ml-3"
           )}>
             {heading.children!.map((child, index) => (
-              <div key={child.id} className="relative">
+              <li key={child.id} className="relative">
                 {/* Connector line */}
                 <div className={cn(
-                  "absolute left-[6px] w-[1px]",
+                  "absolute left-[6px] w-[1px] pointer-events-none",
                   "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
                   index === 0 ? "top-0" : "-top-0.5",
                   index === heading.children!.length - 1 ? "h-3" : "h-full"
                 )} />
                 {/* Horizontal branch */}
-                <div className="absolute left-[6px] top-3 w-2.5 h-[1px] bg-border/30" />
+                <div className="absolute left-[6px] top-3 w-2.5 h-[1px] bg-border/30 pointer-events-none" />
                 <div className="pl-4">
                   {renderHeading(child, depth + 1)}
                 </div>
-              </div>
+              </li>
             ))}
           </ul>
         )}
