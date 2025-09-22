@@ -14,7 +14,7 @@ export function Math({ children, title, collapsible = false, boxed = false }: Ma
   const [isCollapsed, setIsCollapsed] = useState(collapsible)
 
   const content = (
-    <div className={`${boxed ? 'rounded-xl p-6 border border-border bg-card' : ''} my-8`}>
+    <div className={`${boxed ? 'rounded-xl p-6  bg-card' : ''} my-8`}>
       {title && (
         <div className="flex items-center gap-3 mb-4">
           <Calculator className="h-5 w-5 text-foreground/80" />
