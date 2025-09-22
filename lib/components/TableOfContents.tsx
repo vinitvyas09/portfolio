@@ -306,7 +306,7 @@ export function TableOfContents() {
 
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden">
-      <div className="relative p-2 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm border border-border/10">
+      <div className="relative p-2 rounded-lg bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm">
         <ul className="space-y-0 list-none [&_li]:list-none">
           {headings.map(heading => renderHeading(heading))}
         </ul>
