@@ -96,35 +96,36 @@ const MathDetails: React.FC<MathDetailsProps> = ({
 
       <div
         id="math-details-content"
+        className="math-details-content"
         style={{
           display: isOpen ? 'block' : 'none',
         }}
       >
-        {isOpen && (
-          <>
-            <div style={{
-              fontSize: '13px',
-              color: colors.secondaryText,
-              fontStyle: 'italic',
-              marginBottom: '1.5rem',
-              marginTop: '1rem'
-            }}>
-              Note: You can skip this derivation and jump to the next section below if you prefer the intuition over the mathematics.
-            </div>
-            {children}
-            <div style={{
-              borderTop: `1px solid ${colors.border}`,
-              marginTop: '2rem',
-              paddingTop: '0.5rem',
-              fontSize: '12px',
-              color: colors.secondaryText,
-              fontStyle: 'italic',
-              textAlign: 'center'
-            }}>
-              End of mathematical proof
-            </div>
-          </>
-        )}
+        <div style={{
+          fontSize: '13px',
+          color: colors.secondaryText,
+          fontStyle: 'italic',
+          marginBottom: '1.5rem',
+          marginTop: '1rem',
+          display: isOpen ? 'block' : 'none',
+        }}>
+          Note: You can skip this derivation and jump to the next section below if you prefer the intuition over the mathematics.
+        </div>
+        <div className="math-details-children">
+          {children}
+        </div>
+        <div style={{
+          borderTop: `1px solid ${colors.border}`,
+          marginTop: '2rem',
+          paddingTop: '0.5rem',
+          fontSize: '12px',
+          color: colors.secondaryText,
+          fontStyle: 'italic',
+          textAlign: 'center',
+          display: isOpen ? 'block' : 'none',
+        }}>
+          End of mathematical proof
+        </div>
       </div>
     </div>
   );
