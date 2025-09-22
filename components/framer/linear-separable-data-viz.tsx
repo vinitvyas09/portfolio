@@ -669,7 +669,7 @@ const LinearSeparableDataViz: React.FC<LinearSeparableDataVizProps> = ({
         lastLineRef.current = initialLine;
       }
     }
-  }, [trueLine, dataPoints.length]);
+  }, [trueLine, dataPoints.length, getLinePoints]);
 
   // Initialize or update random weights when data changes
   useEffect(() => {
