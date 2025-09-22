@@ -234,7 +234,8 @@ const PerceptronVisualization: React.FC<PerceptronVisualizationProps> = ({
 
     return () => {
       clearTimeout(startTimeout);
-      timeoutsRef.current.forEach(clearTimeout);
+      const timeouts = timeoutsRef.current;
+      timeouts.forEach(clearTimeout);
       trainingRef.current = false;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
