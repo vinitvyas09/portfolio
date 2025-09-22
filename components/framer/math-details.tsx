@@ -109,7 +109,7 @@ const MathDetails: React.FC<MathDetailsProps> = ({
               marginBottom: '1.5rem',
               marginTop: '1rem'
             }}>
-              Note: You can skip this derivation and jump to "What This Really Means" below if you prefer the intuition over the mathematics.
+              Note: You can skip this derivation and jump to &ldquo;What This Really Means&rdquo; below if you prefer the intuition over the mathematics.
             </div>
             {children}
             <div style={{
