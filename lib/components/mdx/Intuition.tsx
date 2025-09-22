@@ -10,9 +10,9 @@ interface IntuitionProps {
 
 export function Intuition({ children, title = "Intuition" }: IntuitionProps) {
   return (
-    <div className="my-12 rounded-xl p-8 border border-border bg-card">
+    <div className="my-12 rounded-xl p-8  bg-card">
       <div className="flex items-start gap-4">
-        <div className="p-3 rounded-full border border-border">
+        <div className="p-3 rounded-full ">
           <Lightbulb className="h-6 w-6 text-foreground/80" />
         </div>
         <div className="flex-1">
