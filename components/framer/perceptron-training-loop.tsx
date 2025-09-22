@@ -672,7 +672,7 @@ const PerceptronTrainingLoop: React.FC<PerceptronTrainingLoopProps> = ({
         lastLineRef.current = initialLine;
       }
     }
-  }, [trueLine, dataPoints.length]);
+  }, [trueLine, dataPoints.length, getLinePoints]);
 
   // Initialize or update random weights when data changes
   useEffect(() => {
