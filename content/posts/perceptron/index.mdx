@@ -828,67 +828,191 @@ If the data isn't linearly separable, this maximum doesn't exist, and there's no
 
 ### The Proof: Why the Perceptron Must Converge
 
-Here's the main insight: we can prove the perceptron will converge by showing two things grow at different rates.
+Here's the beautiful idea behind the convergence proof: we're going to set up a race between two quantities that grow at different speeds, and show that one can't keep up with the other forever.
 
-The Setup:
-1. Assume the data is linearly separable with margin γ > 0
-2. Let w* be some weights that achieve this margin (they exist by assumption)
-3. Let w⁽ᵏ⁾ be our weights after k updates
+Think of it like this: imagine you're walking steadily forward (linear growth) while your shadow grows longer as the sun sets (sublinear growth). At some point, you'll outpace your shadow's growth rate. The perceptron convergence proof uses exactly this principle.
 
-The Two-Speed Race:
+#### The Setup: What We're Working With
 
-Every time we update (say on example (x,y) that was misclassified):
+Before diving into the math, let's be crystal clear about our assumptions and notation:
 
-**Speed 1: Alignment with w\* grows linearly**
+1. **The data is linearly separable**: There exists some hyperplane that perfectly separates the classes
+2. **There's a margin γ > 0**: Not only are the classes separable, but there's a gap between them
+3. **w\* represents the "perfect" weights**: These are weights that correctly classify everything with margin γ
+4. **w⁽ᵏ⁾ represents our current weights**: After k mistakes/updates during training
+5. **We start from w⁽⁰⁾ = 0**: Our initial weights are all zeros
+
+Now here's the key insight: we'll track how our learned weights w⁽ᵏ⁾ relate to the perfect weights w\*. If they're becoming more aligned over time, we're learning!
+
+#### The Two-Speed Race: Building the Intuition
+
+We're going to track two quantities as the perceptron makes mistakes and updates:
+
+1. **The alignment** between our weights and the perfect weights: `w* · w⁽ᵏ⁾`
+2. **The length** of our weight vector: `||w⁽ᵏ⁾||`
+
+Here's the punchline before we prove it: the alignment grows linearly (like k) but the length only grows like √k. Since alignment is bounded by the product of lengths, something has to give; and that something is that k can't grow forever!
+
+#### Speed 1: Alignment Grows Linearly
+
+Let's say we just made a mistake on example (x, y) where y is the true label (±1). The perceptron update rule says:
+
+```
+w⁽ᵏ⁾ = w⁽ᵏ⁻¹⁾ + yx
+```
+
+Now let's see what happens to the alignment with w\*:
+
 ```
 w* · w⁽ᵏ⁾ = w* · (w⁽ᵏ⁻¹⁾ + yx)
          = w* · w⁽ᵏ⁻¹⁾ + y(w* · x)
-         ≥ w* · w⁽ᵏ⁻¹⁾ + γ||w*||    [because margin ≥ γ]
 ```
 
-After k updates: `w* · w⁽ᵏ⁾ ≥ kγ||w*||`
+This is just the distributive property of dot products. Now comes the key insight. Since w\* correctly classifies x with margin γ, we know:
 
-**Speed 2: Length of w⁽ᵏ⁾ grows slowly (as square root)**
+```
+y(w* · x) / ||w*|| ≥ γ
+```
+
+Why? Because that's literally the definition of margin! The signed distance from x to the hyperplane defined by w\* is at least γ. Rearranging:
+
+```
+y(w* · x) ≥ γ||w*||
+```
+
+So our alignment update becomes:
+
+```
+w* · w⁽ᵏ⁾ = w* · w⁽ᵏ⁻¹⁾ + y(w* · x)
+         ≥ w* · w⁽ᵏ⁻¹⁾ + γ||w*||
+```
+
+After our first mistake: `w* · w⁽¹⁾ ≥ γ||w*||`
+After our second mistake: `w* · w⁽²⁾ ≥ 2γ||w*||`
+After k mistakes: `w* · w⁽ᵏ⁾ ≥ kγ||w*||`
+
+**The alignment grows by at least γ||w\*|| with each mistake!**
+
+#### Speed 2: Length Grows Sublinearly
+
+Now let's track how the length of our weight vector changes. When we update:
+
 ```
 ||w⁽ᵏ⁾||² = ||w⁽ᵏ⁻¹⁾ + yx||²
-          = ||w⁽ᵏ⁻¹⁾||² + 2y(w⁽ᵏ⁻¹⁾ · x) + ||x||²
-          ≤ ||w⁽ᵏ⁻¹⁾||² + ||x||²    [because we misclassified: y(w·x) ≤ 0]
 ```
 
-After k updates: `||w⁽ᵏ⁾||² ≤ k||x||²ₘₐₓ`
+To expand this, remember that for any vectors a and b:
+```
+||a + b||² = ||a||² + 2(a · b) + ||b||²
+```
 
-The Punchline:
+Applying this formula with a = w⁽ᵏ⁻¹⁾ and b = yx:
 
-The dot product w* · w⁽ᵏ⁾ grows linearly with k, but it's bounded by the product of lengths:
+```
+||w⁽ᵏ⁾||² = ||w⁽ᵏ⁻¹⁾||² + 2(w⁽ᵏ⁻¹⁾ · yx) + ||yx||²
+         = ||w⁽ᵏ⁻¹⁾||² + 2y(w⁽ᵏ⁻¹⁾ · x) + y²||x||²
+```
+
+Since y² = 1 (labels are ±1), this simplifies to:
+
+```
+||w⁽ᵏ⁾||² = ||w⁽ᵏ⁻¹⁾||² + 2y(w⁽ᵏ⁻¹⁾ · x) + ||x||²
+```
+
+Now here's the crucial observation: we only update when we make a mistake. What defines a mistake? It's when our prediction has the wrong sign:
+
+- If y = +1 (positive example) and we predict negative: w⁽ᵏ⁻¹⁾ · x < 0
+- If y = -1 (negative example) and we predict positive: w⁽ᵏ⁻¹⁾ · x > 0
+
+In both cases: `y(w⁽ᵏ⁻¹⁾ · x) ≤ 0`
+
+This means the middle term is negative or zero! So:
+
+```
+||w⁽ᵏ⁾||² ≤ ||w⁽ᵏ⁻¹⁾||² + ||x||²
+```
+
+The length squared grows by at most ||x||² per update. If we assume all examples have length at most R (i.e., ||x|| ≤ R for all x), then:
+
+After first mistake: `||w⁽¹⁾||² ≤ R²`
+After second mistake: `||w⁽²⁾||² ≤ 2R²`
+After k mistakes: `||w⁽ᵏ⁾||² ≤ kR²`
+
+Therefore: `||w⁽ᵏ⁾|| ≤ √(kR²) = R√k`
+
+**The length grows like the square root of k!**
+
+#### The Punchline: When Races Collide
+
+Now we use a fundamental inequality from linear algebra. For any two vectors:
+
+```
+a · b ≤ ||a|| × ||b||
+```
+
+This is the Cauchy-Schwarz inequality. Geometrically, the dot product equals ||a|| × ||b|| × cos(θ), and since -1 ≤ cos(θ) ≤ 1, the dot product can't exceed the product of lengths.
+
+Applying this to our vectors:
 
 ```
 w* · w⁽ᵏ⁾ ≤ ||w*|| × ||w⁽ᵏ⁾||
 ```
 
-Combining our bounds:
+Now we substitute what we learned from our two races:
+
+- Left side (alignment): `w* · w⁽ᵏ⁾ ≥ kγ||w*||`
+- Right side (length): `||w⁽ᵏ⁾|| ≤ R√k`
+
+This gives us:
 
 ```
-kγ||w*|| ≤ ||w*|| × √(k||x||²ₘₐₓ)
+kγ||w*|| ≤ ||w*|| × R√k
 ```
 
-Solving for k:
+Dividing both sides by ||w\*|| (which is positive):
+
 ```
-k ≤ ||x||²ₘₐₓ/γ²
+kγ ≤ R√k
 ```
 
-That's it! The number of updates is bounded. After at most `||x||²ₘₐₓ/γ²` updates, the perceptron must have converged.
+Dividing both sides by √k:
 
-The bound tells us three things:
+```
+√k × γ ≤ R
+```
 
-1. **Convergence is guaranteed** (for linearly separable data)
-2. **Larger margins → faster convergence** (γ in the denominator)
-3. **Longer input vectors → slower convergence** (||x||² in the numerator)
+Therefore:
 
-But here's what it doesn't tell us:
+```
+√k ≤ R/γ
+k ≤ R²/γ²
+```
 
-- **Which separator we'll find.** The data might be separable with margin 0.9, but the perceptron might find a boundary with margin 0.00001. It just needs to find some separator.
-- **How to check if data is linearly separable.** If it's not, the perceptron will run forever. There's no general efficient algorithm to check separability beforehand.
-- **The exact number of iterations.** The bound is often pessimistic as real convergence is usually much faster.
+**The number of mistakes is bounded by R²/γ²!**
+
+#### What This Really Means
+
+The bound tells us three crucial things:
+
+1. **Convergence is guaranteed**: The perceptron can make at most R²/γ² mistakes on linearly separable data. After that, it must have found a separating hyperplane.
+
+2. **Larger margins → faster convergence**: If the classes are well-separated (large γ), we learn quickly. If they're barely separable (tiny γ), we might need many updates.
+
+3. **Data scale matters**: If we scale all our data points by 10, R increases by 10, but so does γ. The bound R²/γ² stays the same! This scale-invariance is a beautiful property.
+
+<InfoBox type="insight" title="Why This Proof Is So Elegant">
+
+The proof never actually constructs the separating hyperplane. We don't know what w\* is, we just know it exists. The proof shows that our random walk through weight space (via mistakes) can't wander forever. It's like proving you'll eventually escape a maze by showing you can't walk in circles more than a certain number of times.
+
+This is called a "non-constructive proof" where we prove something must happen without showing exactly how it happens. It's mathematical magic!
+
+</InfoBox>
+
+But here's what the proof doesn't tell us:
+
+- **Which separator we'll find**: The data might be separable with margin 0.9, but the perceptron might find a boundary with margin 0.00001. It just needs to find some separator, not necessarily the best one.
+- **How to check if data is linearly separable**: If it's not, the perceptron will run forever. There's no general efficient algorithm to check separability beforehand, you just have to try and see if it converges.
+- **The exact number of iterations**: The bound R²/γ² is often pessimistic. Real convergence is usually much faster because the bound assumes worst-case behavior at every step.
 
 <ConvergenceBoundVisual
 config={{
@@ -1026,7 +1150,7 @@ showConvergence: true
 
 <Caption>Averaged perceptron: almost as good as voted, almost as cheap as vanilla</Caption>
 
-**The bottom line:** Always use the averaged perceptron. The tiny computational overhead gives you significantly better generalization. With early stopping (halt when validation accuracy plateaus), it's remarkably effective—simple to implement, fast to run, and competitive with fancier algorithms.
+**The bottom line:** Always use the averaged perceptron. The tiny computational overhead gives you significantly better generalization. With early stopping (halt when validation accuracy plateaus), it's remarkably effective: simple to implement, fast to run, and competitive with fancier algorithms.
 
 Think of it this way: vanilla only remembers the last lesson, voted remembers every lesson perfectly (expensive!), and averaged maintains a running wisdom without the storage cost.
 
