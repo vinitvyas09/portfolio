@@ -33,7 +33,6 @@ const InteractivePerceptronPlayground: React.FC<InteractivePerceptronPlaygroundP
   const {
     numInputs = 3,
     threshold = 0,
-    learningRate = 0.1,
     showMath = true,
     activationFunction = 'step'
   } = config;
