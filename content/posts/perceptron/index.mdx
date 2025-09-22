@@ -561,16 +561,23 @@ This derivation takes a fundamentally different approach from the perceptron tri
 
 **Given:** Training data `{(xᵢ, yᵢ)}` where `xᵢ ∈ ℝᵈ` and `yᵢ ∈ {-1, +1}`
 
+Let's decode this notation: `xᵢ` is our i-th data point (like the i-th cat or dog), living in d-dimensional space (`ℝᵈ` just means "d real numbers"). If we're classifying images with 784 pixels, then d = 784 and each xᵢ is a list of 784 pixel values. The label `yᵢ` is simply +1 for one class (dogs) and -1 for the other (cats). We use ±1 instead of 0/1 because the math works out cleaner.
+
 **Goal:** Find weights `w` and bias `b` that minimize prediction errors
 
 **Model:** Linear score function `f(x) = w⊤x + b`
 
+Here, `w⊤x` is the dot product between weights and input (that little ⊤ means "transpose," turning our column vector into a row so the multiplication works). This computes our weighted sum, and `b` is the bias term that shifts our decision boundary.
+
 **Prediction:** `ŷ = sign(f(x))`
 
 The key quantity is the **signed margin**: `mᵢ = yᵢ · f(xᵢ)`
+
+This clever trick multiplies the true label (+1 or -1) with our prediction score. When they have the same sign (both positive or both negative), we get a positive result, which means a correct classification. When they disagree, we get negative, which means it is a mistake.
+
 - If `mᵢ > 0`: Correctly classified
 - If `mᵢ < 0`: Misclassified
-- `|mᵢ|/‖w‖` gives the geometric distance to the decision boundary
+- `|mᵢ|/‖w‖` gives the geometric distance to the decision boundary (‖w‖ is the "length" of the weight vector)
 
 ### 2. The Perceptron Hinge Loss
 
@@ -579,6 +586,8 @@ The 0-1 loss (counting mistakes) is non-differentiable, so we use a convex surro
 ```
 ℓᵢ(w, b) = max(0, -yᵢ · f(xᵢ)) = max(0, -mᵢ)
 ```
+
+The `max` function returns the larger of two values. So this says: "if the margin is negative (we're wrong), the loss equals how wrong we are. If the margin is positive (we're right), the loss is zero."
 
 This loss has an elegant structure:
 - **Correct classification** (`mᵢ ≥ 0`): Loss = 0
@@ -589,10 +598,14 @@ The total objective becomes:
 L(w, b) = (1/n) Σᵢ max(0, -yᵢ(w⊤xᵢ + b))
 ```
 
+This averages the loss over all n training examples. The Σᵢ notation means "sum over all i" (from i=1 to n).
+
 With optional L2 regularization:
 ```
 L(w, b) = (1/n) Σᵢ max(0, -yᵢ(w⊤xᵢ + b)) + (α/2)‖w‖²
 ```
+
+The regularization term `(α/2)‖w‖²` penalizes large weights, preventing overfitting. Think of it as preferring simpler solutions—smaller weights mean gentler decision boundaries.
 
 ### 3. Computing Subgradients
 
@@ -608,6 +621,8 @@ Using the chain rule with `∂f/∂w = xᵢ` and `∂f/∂b = 1`:
 ∂L/∂w = (1/n) Σ{i: mᵢ < 0} (-yᵢxᵢ) + αw
 ∂L/∂b = (1/n) Σ{i: mᵢ < 0} (-yᵢ)
 ```
+
+The notation `Σ{i: mᵢ < 0}` means "sum only over the misclassified examples" (where margin is negative). This is why the perceptron only learns from mistakes!
 
 ### 4. The Gradient Descent Update Rule
 
