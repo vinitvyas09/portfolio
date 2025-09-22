@@ -851,7 +851,7 @@ Now here's the key insight: we'll track how our learned weights w⁽ᵏ⁾ relat
 We're going to track two quantities as the perceptron makes mistakes and updates:
 
 1. **The alignment** between our weights and the perfect weights: `w* · w⁽ᵏ⁾`
-2. **The length** of our weight vector: `||w⁽ᵏ⁾||`
+2. **The length** of our weight vector: `||w⁽ᵏ⁾||` (also called the "norm" or "magnitude", it's the Euclidean distance from the origin, calculated as √(w₁² + w₂² + ... + wₙ²))
 
 Here's the punchline before we prove it: the alignment grows linearly (like k) but the length only grows like √k. Now here's the key constraint from linear algebra: the dot product between any two vectors can never exceed the product of their lengths (this is the Cauchy-Schwarz inequality). So we have:
 
