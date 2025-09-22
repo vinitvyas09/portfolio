@@ -806,25 +806,48 @@ So our first requirement for convergence: the data must be linearly separable. I
 
 ### The Margin: Measuring How "Easy" a Problem Is
 
-Not all linearly separable problems are created equal. Some are easy, the classes are far apart with lots of room for the boundary. Others are hard, the classes nearly touch, and you need to thread the needle perfectly.
+Not all linearly separable problems are created equal. Some are easy, where the classes are far apart with lots of room for the boundary. Others are hard, where the classes nearly touch, and you need to thread the needle perfectly.
 
-We measure this difficulty with the margin (denoted γ, gamma). The margin is the distance from the decision boundary to the closest data point.
+We measure this difficulty with the margin (denoted γ, gamma). The margin is the distance from the decision boundary to the closest data point. Think of it as the "safety buffer" or cushion of empty space around your separating line.
 
-Formally, given weights w and data D:
+<MarginVisualization
+  config={{
+    showMargin: true,
+    showDistances: true,
+    interactive: true,
+    datasets: ["easy_margin", "hard_margin"]
+  }}
+/>
+
+To understand margin mathematically, let's break it down:
+
+**For a single point:** The signed distance from a point (x) with label y to the hyperplane defined by weights w and bias b is:
+
+```
+signed distance = y × (w·x + b) / ||w||
+```
+
+Where:
+- `y` is the true label (+1 or -1)
+- `w·x + b` is the raw activation (positive on one side, negative on the other)
+- `||w||` is the length of the weight vector (for normalization)
+- The multiplication by `y` makes the distance positive when correctly classified, negative when misclassified
+
+**For a dataset:** The margin is the minimum of these distances across all points:
 
 ```
 margin(D, w) = min(all points) [y × (w·x + b) / ||w||]
 ```
 
-This is measuring the signed distance from each point to the boundary, taking the smallest one. If any point is misclassified, the margin is negative (or undefined, depending on your convention).
+This tells us: "What's the closest any point gets to the boundary?" If even one point is misclassified, the margin becomes negative.
 
-The margin of a dataset is the best margin any separator could achieve:
+**The best possible margin:** For a dataset D, we define its margin γ as the best margin any separator could achieve:
 
 ```
-margin(D) = max(all possible w) [margin(D, w)]
+γ = margin(D) = max(all possible w) [margin(D, w)]
 ```
 
-If the data isn't linearly separable, this maximum doesn't exist, and there's no separator at all.
+If the data isn't linearly separable, this maximum doesn't exist (no valid separator), and there's no positive margin.
 
 ### The Proof: Why the Perceptron Must Converge
 
@@ -839,8 +862,8 @@ Think of it like this: imagine you're walking steadily forward (linear growth) w
 Before diving into the math, let's be crystal clear about our assumptions and notation:
 
 1. **The data is linearly separable**: There exists some hyperplane that perfectly separates the classes
-2. **There's a margin γ > 0**: Not only are the classes separable, but there's a gap between them
-3. **w\* represents the "perfect" weights**: These are weights that correctly classify everything with margin γ
+2. **There's a margin γ > 0**: The margin is the minimum distance from any data point to the separating hyperplane. Think of it as the "safety buffer"—no points are right on the boundary, they're all at least distance γ away. We denote this minimum distance as γ (gamma).
+3. **w\* represents the "perfect" weights**: These are weights that correctly classify everything with at least margin γ—meaning every point is classified correctly AND is at least distance γ from the decision boundary
 4. **w⁽ᵏ⁾ represents our current weights**: After k mistakes/updates during training
 5. **We start from w⁽⁰⁾ = 0**: Our initial weights are all zeros
 
@@ -875,13 +898,19 @@ w* · w⁽ᵏ⁾ = w* · (w⁽ᵏ⁻¹⁾ + yx)
          = w* · w⁽ᵏ⁻¹⁾ + y(w* · x)
 ```
 
-This is just the distributive property of dot products. Now comes the key insight. Since w\* correctly classifies x with margin γ, we know:
+This is just the distributive property of dot products. Now comes the key insight. Remember that margin γ means every point is at least distance γ from the decision boundary. For any point x with label y, the signed distance to the hyperplane defined by w\* is:
+
+```
+signed distance = y(w* · x) / ||w*||
+```
+
+Since w\* achieves margin γ (meaning all points are at least γ away from the boundary), we know:
 
 ```
 y(w* · x) / ||w*|| ≥ γ
 ```
 
-Why? Because that's literally the definition of margin! The signed distance from x to the hyperplane defined by w\* is at least γ. Rearranging:
+This is saying "the signed distance from any point to our perfect hyperplane is at least γ." Rearranging by multiplying both sides by ||w\*||:
 
 ```
 y(w* · x) ≥ γ||w*||
