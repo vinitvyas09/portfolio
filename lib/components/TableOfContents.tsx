@@ -285,12 +285,6 @@ export function TableOfContents() {
           >
             <span className="relative z-10 block">
               {heading.text}
-              {isActive && (
-                <>
-                  <span className="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
-                  <span className="absolute -left-[18px] top-1/2 -translate-y-1/2 w-1 h-1 bg-blue-500/50 rounded-full animate-ping" />
-                </>
-              )}
             </span>
           </a>
         </div>
@@ -300,22 +294,25 @@ export function TableOfContents() {
             "relative mt-0",
             depth === 0 ? "ml-1" : "ml-1.5"
           )}>
-            {heading.children!.map((child, index) => (
-              <li key={child.id} className="relative">
-                {/* Connector line */}
-                <div className={cn(
-                  "absolute left-[3px] w-[1px] pointer-events-none",
-                  "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
-                  index === 0 ? "top-0" : "-top-0.5",
-                  index === heading.children!.length - 1 ? "h-3" : "h-full"
-                )} />
-                {/* Horizontal branch */}
-                <div className="absolute left-[3px] top-3 w-1.5 h-[1px] bg-border/30 pointer-events-none" />
-                <div className="pl-2">
-                  {renderHeading(child, depth + 1)}
+            {heading.children!.map((child, index) => {
+              const childElement = renderHeading(child, depth + 1)
+              return (
+                <div key={child.id} className="relative">
+                  {/* Connector line */}
+                  <div className={cn(
+                    "absolute left-[3px] w-[1px] pointer-events-none",
+                    "bg-gradient-to-b from-border/40 via-border/20 to-transparent",
+                    index === 0 ? "top-0" : "-top-0.5",
+                    index === heading.children!.length - 1 ? "h-3" : "h-full"
+                  )} />
+                  {/* Horizontal branch */}
+                  <div className="absolute left-[3px] top-3 w-1.5 h-[1px] bg-border/30 pointer-events-none" />
+                  <div className="pl-2">
+                    {childElement}
+                  </div>
                 </div>
-              </li>
-            ))}
+              )
+            })}
           </ul>
         )}
       </li>
