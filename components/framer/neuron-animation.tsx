@@ -43,7 +43,6 @@ const NeuronAnimation: React.FC<NeuronAnimationProps> = ({
   const [currentSum, setCurrentSum] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [terminalLit, setTerminalLit] = useState(false);
-  const [animationCycle, setAnimationCycle] = useState(0);
 
   const { inputs = 5, fireThreshold = 0.4, animationMs = 3000, description } = config;
   
