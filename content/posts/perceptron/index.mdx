@@ -735,6 +735,14 @@ def perceptron_sgd(data, labels, η=0.01, α=0, epochs=10):
 
 5. **This simple algorithm is the foundation of all modern deep learning.** Every neural network, from GPT to computer vision models, uses the same basic principle: define a loss function, compute gradients, update weights. The perceptron taught us this pattern in 1958, and we're still using it today. The main difference is that modern networks stack many layers and use more sophisticated loss functions, but the core learning mechanism remains unchanged.
 
+#### Back to Simplicity: Why We'll Stick with the Perceptron Trick
+
+Now that we've proven the perceptron converges, you might wonder: should we think about it as optimization with hinge loss and subgradients? The answer is: probably not, at least not for everyday use.
+
+The formal proof gives us confidence that our simple rule works, but in practice, the "perceptron trick" is much easier to understand and implement. You don't need to know about hinge loss, subgradients, or optimization theory. You just need to remember: "if wrong, nudge the weights toward the correct answer." This intuitive understanding is often more valuable than the mathematical machinery.
+
+Going forward in this post, we'll continue using the perceptron trick as our mental model. The math is there when we need the guarantee of convergence, but for building intuition and practical implementation, the simple heuristic wins. Sometimes the best explanations are the simplest ones that still work.
+
 </MathDetails>
 
 ## Critical Nuance #1: The Order Matters (A Lot!)
@@ -1230,14 +1238,6 @@ k ≤ R²/γ²
 ```
 
 **The number of mistakes is bounded by R²/γ²!**
-
-#### Back to Simplicity: Why We'll Stick with the Perceptron Trick
-
-Now that we've proven the perceptron converges, you might wonder: should we think about it as optimization with hinge loss and subgradients? The answer is: probably not, at least not for everyday use.
-
-The formal proof gives us confidence that our simple rule works, but in practice, the "perceptron trick" is much easier to understand and implement. You don't need to know about hinge loss, subgradients, or optimization theory. You just need to remember: "if wrong, nudge the weights toward the correct answer." This intuitive understanding is often more valuable than the mathematical machinery.
-
-Going forward in this post, we'll continue using the perceptron trick as our mental model. The math is there when we need the guarantee of convergence, but for building intuition and practical implementation, the simple heuristic wins. Sometimes the best explanations are the simplest ones that still work.
 
 </MathDetails>
 
