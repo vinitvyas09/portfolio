@@ -547,13 +547,23 @@ Since `x₁²` and `x₂²` are always positive, the new activation is always at
 
 <MathDetails title="Mathematical Proof">
 
-The perceptron trick is intuitive but seems arbitrary. There's a deeper justification through optimization theory. Rather than starting with "add misclassified points," we can derive the algorithm from first principles by:
+### The Perceptron Trick and Its Limitations
 
-1. Defining a loss function to minimize
-2. Computing gradients
-3. Applying gradient descent
+So far, we've been using the "perceptron trick", when we misclassify a point, we simply add or subtract it from our weights. It's simple: if we predicted "dog" but it was actually a "cat", we nudge the weights away from that mistake. This heuristic has served us well and actually works remarkably effectively.
 
-This derivation reveals why the perceptron trick works and connects it to modern machine learning.
+But the perceptron trick has some theoretical weaknesses that should bother us:
+
+1. **Multiple solutions with no way to choose:** The perceptron can find any line that separates the data, but which one? If your data has a wide margin, there could be infinitely many perfect separators. The perceptron trick just gives you whichever one it stumbles upon first, depending entirely on the order of examples and initial weights. There's no principled way to pick the "best" separator.
+
+2. **No notion of confidence or margin:** The perceptron trick doesn't care if a point is barely on the correct side or far away from the boundary. It treats a point that's 0.0001 units from the boundary the same as one that's 100 units away - both are "correct" so no update happens. But intuitively, we'd prefer a separator with a wide safety margin.
+
+3. **No theoretical framework for extensions:** Want to add regularization to prevent overfitting? Want to optimize for maximum margin? Want to handle non-separable data gracefully? The perceptron trick doesn't give us a framework for these extensions. It's a clever heuristic, but not a principled optimization approach.
+
+4. **Hard to analyze theoretically:** While we can prove the perceptron trick converges (as we'll see later), it's harder to analyze properties like generalization bounds or connect it to statistical learning theory. Modern machine learning is built on optimization foundations that the perceptron trick doesn't naturally fit into.
+
+This motivates a different perspective: what if we could derive the perceptron algorithm from first principles using formal optimization? What if the perceptron trick is actually the solution to a well-defined optimization problem?
+
+Spoiler: it is! Let's derive the perceptron algorithm properly through the lens of loss minimization and gradient descent. This will reveal that our simple trick is actually mathematically optimal and connect it to the foundations of modern deep learning.
 
 ### 1. Setup: The Optimization Perspective
 
