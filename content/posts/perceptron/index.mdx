@@ -739,11 +739,13 @@ def perceptron_sgd(data, labels, η=0.01, α=0, epochs=10):
 
 ### Back to Simplicity: Why We'll Stick with the Perceptron Trick
 
-Now that we've proven the perceptron converges, you might wonder: should we think about it as optimization with hinge loss and subgradients? The answer is: probably not, at least not for everyday use.
+We just proved that the perceptron trick (add or subtract misclassified points) is mathematically equivalent to gradient descent on the hinge loss. So should we think about perceptrons in terms of optimization, loss functions, and subgradients from now on?
 
-The formal proof gives us confidence that our simple rule works, but in practice, the "perceptron trick" is much easier to understand and implement. You don't need to know about hinge loss, subgradients, or optimization theory. You just need to remember: "if wrong, nudge the weights toward the correct answer." This intuitive understanding is often more valuable than the mathematical machinery.
+The answer is: probably not, at least not for everyday use.
 
-Going forward in this post, we'll continue using the perceptron trick as our mental model. The math is there when we need the guarantee of convergence, but for building intuition and practical implementation, the simple heuristic wins. Sometimes the best explanations are the simplest ones that still work.
+Yes, the formal derivation shows our simple heuristic is mathematically rigorous, it's not just a lucky guess, it's actually optimal gradient descent. But in practice, the "perceptron trick" mental model is much easier to understand and implement. You don't need to know about hinge loss, subgradients, or optimization theory. You just need to remember: "if wrong, nudge the weights toward the correct answer."
+
+Going forward in this post, we'll continue using the perceptron trick as our mental model. The mathematical derivation gives us confidence that this simple rule is theoretically sound, but for building intuition and practical implementation, the simple heuristic wins. Sometimes the best explanations are the simplest ones that still work.
 
 ## Critical Nuance #1: The Order Matters (A Lot!)
 
